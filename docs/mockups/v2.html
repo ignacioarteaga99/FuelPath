@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FuelPath mockups v2</title>
+<link rel="stylesheet" href="mockups.css">
+<style>
+  /* KPIs con rango */
+  .kpi { background: var(--gris); border-radius: 16px; padding: 14px; margin: 12px 0 10px; }
+  .kpi .fila-k { display: flex; align-items: baseline; gap: 8px; }
+  .kpi .estado { margin-left: auto; font-size: 12px; font-weight: 800; padding: 3px 8px; border-radius: 8px; }
+  .estado.bajo { background: #fff1d6; color: #9a6200; }
+  .estado.ok { background: var(--ok-claro); color: #136b3a; }
+  .estado.sobre { background: #fde3e3; color: #b42323; }
+  .rango { position: relative; height: 12px; border-radius: 6px; background: var(--linea); margin: 14px 0 6px; }
+  .rango .banda { position: absolute; top: 0; bottom: 0; background: #cfeedd; border-radius: 0; }
+  .rango .hecho { position: absolute; left: 0; top: 0; bottom: 0; background: var(--acento); border-radius: 6px 0 0 6px; }
+  .rango .proy { position: absolute; top: 0; bottom: 0; background: repeating-linear-gradient(45deg, #f7b79b 0 4px, #fbd3c1 4px 8px); }
+  .rango .marca { position: absolute; top: -5px; width: 3px; height: 22px; background: var(--tinta); border-radius: 2px; }
+  .rango .marca.alt { background: var(--ok); }
+  .escala { display: flex; justify-content: space-between; font-size: 11px; color: var(--suave); font-family: "PP Mono"; }
+  .ley { display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; color: var(--suave); margin-top: 6px; }
+  .ley i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 4px; vertical-align: -1px; }
+  .kpi .mini { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; margin-top: 10px; }
+  .kpi .mini > div { background: var(--panel); border-radius: 12px; padding: 8px 10px; }
+  .kpi .mini small { display: block; font-size: 11px; font-weight: 700; color: var(--suave); text-transform: uppercase; }
+  .kpi .mini b { font-family: "PP Display"; font-size: 18px; }
+  .kpi .mini span { font-size: 12px; color: var(--suave); }
+  .kpi .mini .sal small { color: #6b3fc4; }
+  .boton.chico { padding: 10px 12px; font-size: 15px; }
+
+  /* Paso a paso (− / +) */
+  .paso { display: inline-flex; align-items: center; border: 1px solid var(--linea); border-radius: 10px; background: var(--panel); overflow: hidden; }
+  .paso span { width: 34px; height: 32px; display: grid; place-items: center; font-size: 18px; font-weight: 700; color: var(--acento); }
+  .paso b { min-width: 74px; text-align: center; font-size: 14px; border-left: 1px solid var(--linea); border-right: 1px solid var(--linea); line-height: 32px; }
+  .item.editando { background: var(--acento-claro); margin: 0 -14px; padding: 10px 14px; border-bottom: 0; }
+  .item.editando .txt small.cambio { color: var(--acento); font-weight: 700; }
+  .item .col { flex: 1; min-width: 0; display: grid; gap: 6px; justify-items: start; }
+  .sim .it .paso, .item .col .paso { flex: none; }
+
+  /* Agua */
+  .agua { background: var(--azul-claro); border-radius: 16px; padding: 12px 14px; margin: 10px 0; }
+  .agua .cab-a { display: flex; align-items: baseline; gap: 8px; }
+  .agua .cab-a b { font-size: 16px; }
+  .agua .cab-a .der { margin-left: auto; font-family: "PP Mono"; font-size: 14px; color: var(--azul); }
+  .vasos { display: flex; gap: 6px; margin: 10px 0 8px; }
+  .vasos svg { width: 26px; height: 30px; flex: none; }
+  .agua .pista { margin: 0; font-size: 13px; color: #3a5a8c; }
+  .agua .boton { background: var(--azul); }
+
+  /* Hoja de recálculo */
+  .comparar { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 8px; margin: 10px 0; }
+  .comparar > div { border: 1.5px solid var(--linea); border-radius: 14px; padding: 10px; }
+  .comparar > div.on { border-color: var(--ok); background: var(--ok-claro); }
+  .comparar small { display: block; font-size: 11px; font-weight: 700; color: var(--suave); text-transform: uppercase; }
+  .comparar b { font-family: "PP Display"; font-size: 28px; letter-spacing: -.6px; display: block; line-height: 1.1; margin: 2px 0 4px; }
+  .cambios { background: var(--gris); border-radius: 14px; padding: 2px 12px; }
+
+  /* Cómo quedaría */
+  .sim { background: var(--gris); border-radius: 16px; padding: 4px 14px 8px; margin: 10px 0; }
+  .sim .cab-s { display: flex; align-items: baseline; gap: 8px; padding: 10px 0 4px; }
+  .sim .cab-s b { font-size: 16px; }
+  .sim .cab-s .der { margin-left: auto; font-family: "PP Mono"; font-size: 14px; }
+  .sim .cab-s .der .mas { color: var(--ok); }
+  .sim .it { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--linea); font-size: 14px; }
+  .sim .it .txt { flex: 1; min-width: 0; }
+  .sim .it .g { font-family: "PP Mono"; font-size: 13px; min-width: 44px; text-align: right; }
+  .sim.pasada { opacity: .55; padding-bottom: 10px; }
+  .candado { font-size: 12px; color: var(--suave); font-weight: 600; }
+  .suma { position: sticky; bottom: 0; background: var(--panel); border-top: 1px solid var(--linea); padding: 12px 16px 30px; margin: 0 -16px; box-shadow: 0 -6px 16px rgba(0,0,0,.06); }
+  .suma .linea-s { display: flex; align-items: baseline; gap: 6px; font-size: 14px; color: var(--suave); }
+  .suma .linea-s b { font-family: "PP Display"; font-size: 26px; color: var(--tinta); letter-spacing: -.5px; }
+  .suma .linea-s .estado { margin-left: auto; }
+
+  /* PC */
+  .pc { display: grid; grid-template-columns: 220px minmax(0,1fr) 360px; min-height: 860px; }
+  .pc aside.menu { border-right: 1px solid var(--linea); padding: 22px 14px; }
+  .pc aside.menu .marca { margin-bottom: 26px; padding: 0 8px; }
+  .pc aside.menu a { display: flex; align-items: center; gap: 10px; padding: 10px 10px; border-radius: 10px; font-weight: 600; color: var(--suave); margin-bottom: 2px; }
+  .pc aside.menu a svg { width: 22px; height: 22px; }
+  .pc aside.menu a.on { background: var(--acento-claro); color: var(--acento); }
+  .pc aside.menu .pie { position: absolute; bottom: 22px; display: flex; gap: 6px; }
+  .pc aside.menu .pie span { padding: 6px 10px; font-size: 13px; font-weight: 700; border-radius: 12px; background: var(--gris); border: 1px solid var(--linea); }
+  .pc .centro { padding: 26px 32px; }
+  .pc .lado { border-left: 1px solid var(--linea); padding: 26px 22px; background: #fbfbfc; }
+  .pc .comidas { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 0 14px; }
+  .pc .comidas .comida.abierta { grid-column: 1 / -1; }
+  .pc .lado .kpi .grande { font-size: 36px; }
+  .pc .lado .kpi .grande small { font-size: 15px; }
+  .pc .lado .agua .cab-a { flex-wrap: wrap; }
+  .pc .lado .agua .cab-a .der { margin-left: auto; }
+</style>
+</head>
+<body>
+<template id="cab">
+  <header><div class="marca">
+    <svg viewBox="0 0 26 26"><rect width="26" height="26" rx="7" fill="#f2541b"/><path d="M13 5.5c3 3.6 5 6.4 5 9a5 5 0 0 1-10 0c0-2.6 2-5.4 5-9z" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/><path d="M11 15.5a2.2 2.2 0 0 0 2 2" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>
+    FuelPath<span class="der"><span>EN</span><span>☾</span></span></div></header>
+</template>
+<template id="nav">
+  <nav>
+    <a data-v="hoy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>Hoy</a>
+    <a data-v="pauta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 9h6M9 13h6M9 17h3"/></svg>Pauta</a>
+    <a data-v="carrera"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg>Carrera</a>
+    <a data-v="perfil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>Perfil</a>
+  </nav>
+</template>
+<template id="vaso-lleno"><svg viewBox="0 0 26 30"><path d="M4 3h18l-2.5 24h-13z" fill="#2a6fdb" stroke="#2a6fdb" stroke-width="2" stroke-linejoin="round"/></svg></template>
+<template id="vaso-vacio"><svg viewBox="0 0 26 30"><path d="M4 3h18l-2.5 24h-13z" fill="none" stroke="#9db8e6" stroke-width="2" stroke-linejoin="round"/></svg></template>
+
+<!-- Bloques reutilizados por móvil y PC -->
+<template id="kpi">
+  <div class="kpi">
+    <div class="fila-k"><span class="tipo" style="color:var(--suave)">Carga del día</span><span class="estado bajo">Bajo el rango</span></div>
+    <div class="grande" style="margin-top:6px">308 <small>hecho · va a quedar en 635 g</small></div>
+    <div class="rango">
+      <div class="banda" style="left:76.5%;width:11.8%"></div>
+      <div class="proy" style="left:36.2%;width:38.5%"></div>
+      <div class="hecho" style="width:36.2%"></div>
+      <div class="marca" style="left:80%"></div>
+    </div>
+    <div class="escala"><span>0</span><span>rango 650–750 · objetivo 680</span><span>850</span></div>
+    <div class="ley"><span><i style="background:var(--acento)"></i>Hecho</span><span><i style="background:#f7b79b"></i>Lo que queda</span><span><i style="background:#cfeedd"></i>Rango</span><span><i style="background:var(--tinta);width:3px"></i>Objetivo</span></div>
+    <div class="mini">
+      <div class="sal"><small>Sodio</small><b>1,6</b> <span>de 3,5 g</span><div class="barra fina" style="background:#e3d7fb"><i style="width:46%;background:#6b3fc4"></i></div></div>
+      <div><small>Por hora</small><b>9,9</b> <span>g/kg proyectado</span></div>
+    </div>
+    <div class="botones"><div class="boton chico">Ajustar lo que queda</div></div>
+  </div>
+</template>
+<template id="agua">
+  <div class="agua">
+    <div class="cab-a"><b>Agua</b><span class="pista">aparte de jugos e isotónica</span><span class="der">1,5 de 2,5 L</span></div>
+    <div class="vasos" data-llenos="6" data-total="10"></div>
+    <div class="botones" style="margin-top:4px;align-items:center"><span class="pista" style="flex:1">1 vaso = 250 ml. Orina clara: vas bien.</span><div class="boton chico" style="flex:none">+ 1 vaso</div></div>
+  </div>
+</template>
+<template id="almuerzo">
+  <div class="comida abierta">
+    <div class="fila-cab"><svg class="anillo" viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" fill="none" stroke="#e6e6ea" stroke-width="5"/><circle cx="22" cy="22" r="18" fill="none" stroke="#f2541b" stroke-width="5" stroke-dasharray="73 113" transform="rotate(-90 22 22)" stroke-linecap="round"/></svg>
+      <div class="txt" style="flex:1"><b style="font-size:17px">Almuerzo</b><small style="color:var(--acento);font-weight:700">AHORA · 13:30</small></div><div class="der"><b>111 g</b>de 172</div></div>
+    <div class="item editando"><span class="ck si">✓</span><div class="col"><div class="txt"><b>Fideos</b> con salsa de tomate<small class="cambio">Plan: 3 tazas · comiste 1 menos (−43 g)</small></div><div class="paso"><span>−</span><b>2 tazas</b><span>+</span></div></div><span class="g">85 g</span></div>
+    <div class="item"><span class="ck si">✓</span><div class="txt"><b>1 vaso</b> de jugo de naranja</div><span class="g">26 g</span></div>
+    <div class="item"><span class="ck"></span><div class="col"><div class="txt"><b>Jalea</b> de postre</div><div class="paso"><span>−</span><b>1 pote</b><span>+</span></div></div><span class="g">18 g</span><span class="mas">⋯</span></div>
+    <div class="botones" style="margin-top:8px"><div class="boton sec" style="padding:10px">✓ Todo</div><div class="boton sec" style="padding:10px">A medias</div><div class="boton sec" style="padding:10px">✕ No</div></div>
+  </div>
+</template>
+<template id="comidas-hechas">
+  <div class="comida"><svg class="anillo" viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" fill="none" stroke="#1f9d55" stroke-width="5"/><path d="M15 22l5 5 9-10" fill="none" stroke="#1f9d55" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div class="txt"><b>Desayuno</b><small>07:30 · pan de molde, plátano, jugo</small></div><div class="der"><b>129 g</b>de 130</div></div>
+  <div class="comida"><svg class="anillo" viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" fill="none" stroke="#1f9d55" stroke-width="5"/><path d="M15 22l5 5 9-10" fill="none" stroke="#1f9d55" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div class="txt"><b>Colación</b><small>10:30 · isotónica, galletas, barra</small></div><div class="der"><b>68 g</b>de 70</div></div>
+</template>
+<template id="comidas-futuras">
+  <div class="comida"><svg class="anillo" viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" fill="none" stroke="#e6e6ea" stroke-width="5"/></svg>
+    <div class="txt"><b>Once</b><small>17:00 · pan de molde con miel, leche cho…</small></div><div class="der"><b>128 g</b>3 ítems</div></div>
+  <div class="comida"><svg class="anillo" viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" fill="none" stroke="#e6e6ea" stroke-width="5"/></svg>
+    <div class="txt"><b>Cena</b><small>19:30 · arroz con pollo, papa, jalea</small></div><div class="der"><b>134 g</b>3 ítems</div></div>
+  <div class="comida"><svg class="anillo" viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" fill="none" stroke="#e6e6ea" stroke-width="5"/></svg>
+    <div class="txt"><b>Antes de dormir</b><small>21:30 · galletas de agua, jugo</small></div><div class="der"><b>47 g</b>2 ítems</div></div>
+</template>
+
+<!-- 1. Agenda con KPIs, ajuste de gramos y agua -->
+<div class="pantalla" id="v1" data-nav="hoy">
+  <main>
+    <span class="tipo">Maratón de Santiago · faltan 17 h</span>
+    <h2>Sábado: día de carga 2 de 2</h2>
+    <div class="dias"><div class="dia listo">Vie<b>23</b></div><div class="dia on">Sáb<b>24</b></div><div class="dia">Dom<b>25</b></div></div>
+    <div data-t="kpi"></div>
+    <div data-t="agua"></div>
+    <h4>Comidas</h4>
+    <div data-t="comidas-hechas"></div>
+    <div data-t="almuerzo"></div>
+    <div data-t="comidas-futuras"></div>
+  </main>
+</div>
+
+<!-- 2. ¿Recalcular? -->
+<div class="pantalla" id="v2" data-nav="hoy">
+  <main>
+    <span class="tipo">Maratón de Santiago · faltan 17 h</span>
+    <h2>Sábado: día de carga 2 de 2</h2>
+    <div data-t="almuerzo"></div>
+  </main>
+  <div class="velo"></div>
+  <div class="hoja">
+    <div class="asa"></div>
+    <span class="tipo">Almuerzo · fideos</span>
+    <h2 style="font-size:20px">Comiste 43 g menos de lo planeado</h2>
+    <p class="pista" style="margin:0">¿Lo repartimos en las comidas que vienen? Lo que ya comiste no cambia.</p>
+    <div class="comparar">
+      <div><small>Dejar así</small><b>635 g</b><span class="estado bajo">15 g bajo el rango</span></div>
+      <div class="on"><small>Recalcular</small><b>683 g</b><span class="estado ok">En el rango</span></div>
+    </div>
+    <div class="rango" style="margin-top:6px">
+      <div class="banda" style="left:76.5%;width:11.8%"></div>
+      <div class="hecho" style="width:36.2%"></div>
+      <div class="proy" style="left:36.2%;width:44.2%"></div>
+      <div class="marca" style="left:74.7%;background:#9a6200"></div>
+      <div class="marca alt" style="left:80.4%"></div>
+    </div>
+    <div class="escala"><span>hecho 308</span><span>rango 650–750 · objetivo 680</span></div>
+    <h4 style="margin-top:14px">Así quedaría</h4>
+    <div class="cambios">
+      <div class="reparto"><div class="txt">Once · 17:00<small>+1 rebanada de pan de molde</small></div><span class="mono">+13 g</span></div>
+      <div class="reparto"><div class="txt">Cena · 19:30<small>+½ taza de arroz</small></div><span class="mono">+22 g</span><span class="tope">tope</span></div>
+      <div class="reparto"><div class="txt">Antes de dormir · 21:30<small>+½ vaso de jugo</small></div><span class="mono">+13 g</span></div>
+    </div>
+    <div class="botones"><div class="boton sec">Dejar así</div><div class="boton sec">Ajustar a mano</div><div class="boton">Recalcular</div></div>
+  </div>
+</div>
+
+<!-- 3. Cómo quedaría -->
+<div class="pantalla" id="v3" data-nav="hoy">
+  <main style="padding-bottom:0">
+    <span class="tipo">Ajustar lo que queda · sábado</span>
+    <h2>Cómo quedaría tu día</h2>
+    <p class="pista">Mueve los gramos de las comidas que vienen. Las que ya pasaron no cambian.</p>
+
+    <div class="sim pasada"><div class="cab-s"><b>Desayuno y colación</b><span class="candado">ya hechas</span><span class="der">197 g</span></div></div>
+    <div class="sim pasada"><div class="cab-s"><b>Almuerzo</b><span class="candado">hecho</span><span class="der">111 g</span></div></div>
+
+    <div class="sim">
+      <div class="cab-s"><b>Once</b><span class="pista" style="margin:0">17:00</span><span class="der">141 g <span class="mas">+13</span></span></div>
+      <div class="it"><div class="txt">Pan de molde con miel</div><div class="paso"><span>−</span><b>4 rebanadas</b><span>+</span></div><span class="g">68 g</span></div>
+      <div class="it"><div class="txt">Leche chocolatada + plátano</div><div class="paso"><span>−</span><b>1 + 1</b><span>+</span></div><span class="g">49 g</span></div>
+      <div class="it"><div class="txt">Gomitas</div><div class="paso"><span>−</span><b>1 bolsita</b><span>+</span></div><span class="g">24 g</span></div>
+    </div>
+    <div class="sim">
+      <div class="cab-s"><b>Cena</b><span class="pista" style="margin:0">19:30 · tope 160 g</span><span class="der">156 g <span class="mas">+22</span></span></div>
+      <div class="it"><div class="txt">Arroz con pollo</div><div class="paso"><span>−</span><b>2 ½ tazas</b><span>+</span></div><span class="g">112 g</span></div>
+      <div class="it"><div class="txt">Papa cocida</div><div class="paso"><span>−</span><b>1</b><span>+</span></div><span class="g">26 g</span></div>
+      <div class="it"><div class="txt">Jalea</div><div class="paso"><span>−</span><b>1 pote</b><span>+</span></div><span class="g">18 g</span></div>
+    </div>
+    <div class="sim">
+      <div class="cab-s"><b>Antes de dormir</b><span class="pista" style="margin:0">21:30</span><span class="der">60 g <span class="mas">+13</span></span></div>
+      <div class="it"><div class="txt">Galletas de agua</div><div class="paso"><span>−</span><b>6</b><span>+</span></div><span class="g">21 g</span></div>
+      <div class="it"><div class="txt">Jugo</div><div class="paso"><span>−</span><b>1 ½ vaso</b><span>+</span></div><span class="g">39 g</span></div>
+    </div>
+    <div class="suma">
+      <div class="linea-s"><b>683</b> de 680 g<span class="estado ok">En el rango</span></div>
+      <div class="rango" style="margin:10px 0 4px">
+        <div class="banda" style="left:76.5%;width:11.8%"></div>
+        <div class="hecho" style="width:36.2%"></div>
+        <div class="proy" style="left:36.2%;width:44.2%"></div>
+        <div class="marca" style="left:80%"></div>
+      </div>
+      <div class="escala"><span>hecho 308 + por venir 375</span><span>650–750</span></div>
+      <div class="botones"><div class="boton sec">Cancelar</div><div class="boton">Aplicar</div></div>
+    </div>
+  </main>
+</div>
+
+<!-- 4. PC -->
+<div class="pantalla" id="v4">
+  <div class="pc">
+    <aside class="menu" style="position:relative">
+      <div class="marca"><svg viewBox="0 0 26 26"><rect width="26" height="26" rx="7" fill="#f2541b"/><path d="M13 5.5c3 3.6 5 6.4 5 9a5 5 0 0 1-10 0c0-2.6 2-5.4 5-9z" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/><path d="M11 15.5a2.2 2.2 0 0 0 2 2" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>FuelPath</div>
+      <a class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>Hoy</a>
+      <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 9h6M9 13h6M9 17h3"/></svg>Pauta</a>
+      <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg>Carrera</a>
+      <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>Perfil</a>
+      <div class="pie"><span>EN</span><span>☾</span></div>
+    </aside>
+    <div class="centro">
+      <span class="tipo">Maratón de Santiago · faltan 17 h</span>
+      <h2 style="font-size:26px">Sábado: día de carga 2 de 2</h2>
+      <div class="dias" style="max-width:420px"><div class="dia listo">Vie<b>23</b></div><div class="dia on">Sáb<b>24</b></div><div class="dia">Dom<b>25</b></div></div>
+      <div class="comidas" style="margin-top:8px">
+        <div data-t="comidas-hechas" style="display:contents"></div>
+        <div data-t="almuerzo" style="display:contents"></div>
+        <div data-t="comidas-futuras" style="display:contents"></div>
+      </div>
+    </div>
+    <div class="lado">
+      <div data-t="kpi"></div>
+      <div data-t="agua"></div>
+      <div class="aviso">Es normal subir 1–2 kg con la carga: el glucógeno se guarda con agua. No es grasa.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const q = new URLSearchParams(location.search);
+  const p = q.get("p") || "v1";
+  const el = document.getElementById(p);
+  el.classList.add("on");
+  for (const h of el.querySelectorAll("[data-t]")) h.replaceWith(...[...document.getElementById(h.dataset.t).content.cloneNode(true).childNodes].map(n => { if (h.style.display === "contents" && n.nodeType === 1) {} return n; }));
+  for (const v of el.querySelectorAll(".vasos")) for (let i = 0; i < +v.dataset.total; i++)
+    v.append(document.getElementById(i < +v.dataset.llenos ? "vaso-lleno" : "vaso-vacio").content.cloneNode(true));
+  if (p !== "v4") {
+    el.prepend(document.getElementById("cab").content.cloneNode(true));
+    if (p === "v1") { const nav = document.getElementById("nav").content.cloneNode(true); nav.querySelector('[data-v="hoy"]').classList.add("on"); el.append(nav); }
+  }
+</script>
+</body>
+</html>

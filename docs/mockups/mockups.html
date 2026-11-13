@@ -4,164 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>FuelPath mockups</title>
-<style>
-  :root {
-    --acento: #f2541b; --acento-osc: #c9410f; --tinta: #1d1d21; --suave: #6b6b75;
-    --linea: #e6e6ea; --fondo: #ffffff; --gris: #f5f5f7; --ok: #1f9d55; --panel: #ffffff;
-    --acento-claro: #fdeae2; --ok-claro: #e3f4ea; --azul: #2a6fdb; --azul-claro: #e6effc;
-  }
-  @font-face { font-family: "PP Display"; src: url("../../web/vendor/fuentes/InterDisplay-SemiBold.woff2"); font-weight: 600; }
-  @font-face { font-family: "PP Display"; src: url("../../web/vendor/fuentes/InterDisplay-Bold.woff2"); font-weight: 700; }
-  @font-face { font-family: "PP Mono"; src: url("../../web/vendor/fuentes/JetBrainsMono-Bold.woff2"); font-weight: 700; }
-  * { box-sizing: border-box; }
-  html, body { margin: 0; background: var(--fondo); color: var(--tinta);
-    font: 15px/1.4 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif; }
-  .pantalla { display: none; min-height: 844px; position: relative; }
-  .pantalla.on { display: block; }
-  header { position: sticky; top: 0; z-index: 5; background: var(--panel); padding: 54px 16px 10px; border-bottom: 1px solid var(--linea); }
-  .marca { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 19px; letter-spacing: -.3px; }
-  .marca svg { width: 26px; height: 26px; }
-  .marca .der { margin-left: auto; display: flex; gap: 6px; }
-  .marca .der span { padding: 6px 10px; font-size: 13px; font-weight: 700; border-radius: 12px; background: var(--gris); border: 1px solid var(--linea); }
-  main { padding: 14px 16px 110px; }
-  .tipo { color: var(--acento); font-weight: 800; font-size: 12px; letter-spacing: .6px; text-transform: uppercase; }
-  h2 { margin: 2px 0 6px; font-size: 22px; letter-spacing: -.3px; }
-  h4 { margin: 18px 0 8px; font-size: 13px; color: var(--suave); text-transform: uppercase; letter-spacing: .5px; }
-  .pista { color: var(--suave); margin: 4px 0 12px; font-size: 14px; }
-  .aviso { background: #fff6e5; border-radius: 10px; padding: 9px 11px; color: #8a5a00; font-size: 13px; margin: 12px 0; }
-  .aviso-ok { background: var(--ok-claro); border-radius: 10px; padding: 9px 11px; color: #136b3a; font-size: 13px; margin: 12px 0; }
-  .tarjeta { background: var(--gris); border-radius: 16px; padding: 14px; margin: 10px 0; }
-  .grande { font-family: "PP Display", sans-serif; font-weight: 700; font-size: 44px; letter-spacing: -1.5px; line-height: 1; }
-  .grande small { font-size: 18px; letter-spacing: 0; color: var(--suave); font-weight: 600; }
-  .mono { font-family: "PP Mono", ui-monospace, monospace; font-weight: 700; }
-  .barra { height: 10px; border-radius: 5px; background: var(--linea); overflow: hidden; margin: 10px 0 4px; }
-  .barra i { display: block; height: 100%; background: var(--acento); border-radius: 5px; }
-  .barra.fina { height: 6px; margin: 6px 0 2px; }
-  .barra.azul i { background: var(--azul); }
-  .barra.verde i { background: var(--ok); }
-  form { display: grid; gap: 10px; }
-  .fila { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 10px; }
-  label { display: grid; gap: 4px; font-size: 12px; font-weight: 700; color: var(--suave); }
-  .input { font-size: 16px; padding: 11px 12px; border-radius: 12px; border: 1px solid var(--linea); background: var(--gris);
-    color: var(--tinta); font-weight: 400; display: flex; justify-content: space-between; align-items: center; min-height: 46px; }
-  .input .flecha { color: var(--suave); font-size: 12px; }
-  .seg { display: flex; background: var(--gris); border: 1px solid var(--linea); border-radius: 12px; padding: 3px; gap: 3px; }
-  .seg span { flex: 1; text-align: center; padding: 8px 4px; border-radius: 9px; font-size: 15px; font-weight: 600; color: var(--suave); }
-  .seg span.on { background: var(--panel); color: var(--tinta); box-shadow: 0 1px 3px rgba(0,0,0,.12); }
-  .opciones { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; }
-  .op { border: 1.5px solid var(--linea); border-radius: 14px; padding: 10px 8px; text-align: center; background: var(--panel); }
-  .op b { display: block; font-family: "PP Display"; font-size: 24px; letter-spacing: -.5px; color: var(--tinta); }
-  .op small { display: block; font-size: 11px; color: var(--suave); font-weight: 600; }
-  .op .g { font-size: 13px; color: var(--tinta); font-weight: 700; margin-top: 4px; }
-  .op.on { border-color: var(--acento); background: var(--acento-claro); }
-  .op.on small.et { color: var(--acento); }
-  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
-  .chip { padding: 8px 12px; border-radius: 20px; background: var(--gris); border: 1px solid var(--linea); font-size: 14px; font-weight: 600; }
-  .chip.on { background: var(--tinta); color: #fff; border-color: var(--tinta); }
-  .interruptor { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 15px; font-weight: 600;
-    color: var(--tinta); padding: 10px 0; border-bottom: 1px solid var(--linea); }
-  .interruptor small { display: block; font-weight: 400; color: var(--suave); font-size: 13px; }
-  .sw { width: 46px; height: 28px; border-radius: 14px; background: var(--linea); position: relative; flex: none; }
-  .sw::after { content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.2); }
-  .sw.on { background: var(--ok); } .sw.on::after { left: 21px; }
-  .boton { display: block; text-align: center; font-size: 16px; border-radius: 12px; padding: 13px 16px; font-weight: 700; background: var(--acento); color: #fff; }
-  .boton.sec { background: var(--gris); color: var(--tinta); border: 1px solid var(--linea); }
-  .botones { display: flex; gap: 8px; margin-top: 12px; } .botones .boton { flex: 1; }
-  nav { position: absolute; left: 0; right: 0; bottom: 0; background: var(--panel); border-top: 1px solid var(--linea); display: flex; padding: 6px 0 28px; }
-  nav a { flex: 1; text-align: center; color: var(--suave); font-size: 11px; font-weight: 600; }
-  nav a svg { width: 24px; height: 24px; display: block; margin: 0 auto 2px; }
-  nav a.on { color: var(--acento); }
-  .fijo nav { position: fixed; }
-
-  /* Alimentos */
-  .alim { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--linea); }
-  .alim:last-child { border-bottom: 0; }
-  .alim .txt { flex: 1; min-width: 0; }
-  .alim .txt b { display: block; font-size: 15px; }
-  .alim .txt small { color: var(--suave); font-size: 13px; }
-  .alim .g { font-family: "PP Mono"; font-size: 14px; color: var(--tinta); }
-  .tick { width: 26px; height: 26px; border-radius: 8px; border: 2px solid var(--linea); flex: none; display: grid; place-items: center; font-size: 15px; font-weight: 800; color: #fff; background: var(--panel); }
-  .tick.on { background: var(--acento); border-color: var(--acento); }
-  .tick.off { background: var(--gris); }
-  .icn { width: 34px; height: 34px; border-radius: 10px; background: var(--panel); border: 1px solid var(--linea); display: grid; place-items: center; color: var(--suave); font-size: 15px; flex: none; }
-  .etq { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 6px; background: var(--azul-claro); color: var(--azul); margin-left: 4px; vertical-align: 1px; }
-  .etq.gris { background: var(--linea); color: var(--suave); }
-  .etq.sal { background: #f1e9ff; color: #6b3fc4; }
-  .tachado b { text-decoration: line-through; color: var(--suave); }
-
-  /* Agenda A: línea de tiempo */
-  .dias { display: flex; gap: 8px; margin: 10px 0 4px; }
-  .dia { flex: 1; text-align: center; border-radius: 12px; padding: 7px 4px; background: var(--gris); font-size: 12px; font-weight: 700; color: var(--suave); }
-  .dia b { display: block; font-size: 15px; color: var(--tinta); }
-  .dia.on { background: var(--tinta); color: #c9c9d0; } .dia.on b { color: #fff; }
-  .dia.listo b::after { content: " ✓"; color: var(--ok); }
-  .resumen { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; margin-top: 10px; }
-  .resumen div { background: var(--panel); border-radius: 12px; padding: 8px 10px; }
-  .resumen small { display: block; font-size: 11px; font-weight: 700; color: var(--suave); text-transform: uppercase; letter-spacing: .4px; }
-  .resumen b { font-family: "PP Display"; font-size: 18px; letter-spacing: -.3px; }
-  .resumen span { font-size: 12px; color: var(--suave); }
-  .linea { position: relative; padding-left: 58px; }
-  .linea::before { content: ""; position: absolute; left: 22px; top: 8px; bottom: 8px; width: 2px; background: var(--linea); }
-  .hito { position: relative; margin-bottom: 14px; }
-  .hito .hora { position: absolute; left: -58px; top: 0; width: 46px; text-align: center; font-family: "PP Mono"; font-size: 12px; color: var(--suave); background: var(--fondo); padding: 2px 0; }
-  .hito.hecho .hora { color: var(--ok); }
-  .hito.ahora .hora { color: #fff; background: var(--acento); border-radius: 6px; }
-  .hito .cab { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; }
-  .hito .cab b { font-size: 16px; }
-  .hito .cab .meta { margin-left: auto; font-family: "PP Mono"; font-size: 13px; color: var(--suave); }
-  .hito .caja { background: var(--gris); border-radius: 14px; padding: 2px 12px; }
-  .hito.ahora .caja { background: var(--panel); border: 1.5px solid var(--acento); }
-  .hito.hecho .caja { opacity: .65; }
-  .item { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--linea); }
-  .item:last-child { border-bottom: 0; }
-  .ck { width: 24px; height: 24px; border-radius: 50%; border: 2px solid #c8c8d0; flex: none; display: grid; place-items: center; font-size: 13px; font-weight: 800; color: #fff; }
-  .ck.si { background: var(--ok); border-color: var(--ok); }
-  .ck.medio { border-color: var(--ok); background: linear-gradient(90deg, var(--ok) 50%, transparent 50%); }
-  .ck.no { background: var(--linea); border-color: var(--linea); color: var(--suave); }
-  .item .txt { flex: 1; min-width: 0; font-size: 14px; }
-  .item .txt b { font-size: 15px; }
-  .item .txt small { display: block; color: var(--suave); font-size: 12px; }
-  .item .g { font-family: "PP Mono"; font-size: 13px; }
-  .item .mas { color: var(--suave); font-size: 18px; padding-left: 2px; letter-spacing: -1px; }
-
-  /* Agenda B: tarjetas */
-  .comida { background: var(--gris); border-radius: 16px; padding: 12px 14px; margin: 10px 0; display: flex; align-items: center; gap: 12px; }
-  .comida .anillo { width: 44px; height: 44px; flex: none; }
-  .comida .txt { flex: 1; min-width: 0; }
-  .comida .txt b { font-size: 16px; }
-  .comida .txt small { display: block; color: var(--suave); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .comida .der { text-align: right; font-family: "PP Mono"; font-size: 13px; color: var(--suave); }
-  .comida .der b { display: block; color: var(--tinta); font-size: 15px; }
-  .comida.abierta { display: block; background: var(--panel); border: 1.5px solid var(--acento); }
-  .comida.abierta .fila-cab { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
-
-  /* Hoja de recálculo */
-  .velo { position: absolute; inset: 0; background: rgba(20,20,24,.45); z-index: 20; }
-  .hoja { position: absolute; left: 0; right: 0; bottom: 0; z-index: 21; background: var(--panel); border-radius: 22px 22px 0 0; padding: 10px 16px 34px; }
-  .asa { width: 40px; height: 5px; border-radius: 3px; background: var(--linea); margin: 0 auto 12px; }
-  .reparto { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--linea); font-size: 14px; }
-  .reparto:last-child { border-bottom: 0; }
-  .reparto .txt { flex: 1; } .reparto .txt small { display: block; color: var(--suave); font-size: 12px; }
-  .reparto .mono { color: var(--ok); }
-  .reparto .tope { font-size: 11px; font-weight: 700; color: var(--suave); background: var(--linea); border-radius: 6px; padding: 2px 6px; }
-  .reemp { display: flex; gap: 8px; overflow: hidden; margin: 6px 0; }
-  .reemp div { flex: none; width: 128px; background: var(--gris); border-radius: 14px; padding: 10px; font-size: 13px; }
-  .reemp div b { display: block; font-size: 14px; }
-  .reemp div .mono { color: var(--acento); font-size: 13px; }
-  .reemp div.on { border: 1.5px solid var(--acento); background: var(--acento-claro); }
-
-  /* Carrera */
-  .gel { display: flex; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--linea); font-size: 14px; }
-  .gel:last-child { border-bottom: 0; }
-  .gel .mono { min-width: 58px; color: var(--acento); }
-  .gel .km { margin-left: auto; font-family: "PP Mono"; color: var(--suave); font-size: 13px; }
-  .trio { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; }
-  .trio > div { background: var(--gris); border-radius: 14px; padding: 10px; }
-  .trio small { display: block; font-size: 11px; font-weight: 700; color: var(--suave); text-transform: uppercase; }
-  .trio b { font-family: "PP Display"; font-size: 22px; letter-spacing: -.5px; }
-  .trio span { font-size: 12px; color: var(--suave); }
-  .trio > div.sal { background: #f4eefe; } .trio > div.sal small { color: #6b3fc4; }
-</style>
+<link rel="stylesheet" href="mockups.css">
 </head>
 <body>
 
@@ -241,6 +84,7 @@
 
     <h4>Pan, arroz y pastas</h4>
     <div class="tarjeta" style="padding:2px 14px">
+      <div class="alim"><div class="tick on">✓</div><div class="txt"><b>Pan de molde blanco</b><small>2 rebanadas · 50 g</small></div><span class="g">25 g</span><div class="icn">⇄</div></div>
       <div class="alim"><div class="tick on">✓</div><div class="txt"><b>Marraqueta</b><small>1 unidad · 100 g</small></div><span class="g">58 g</span><div class="icn">⇄</div></div>
       <div class="alim"><div class="tick on">✓</div><div class="txt"><b>Fideos cocidos</b><small>1 taza · 140 g</small></div><span class="g">43 g</span><div class="icn">⇄</div></div>
       <div class="alim"><div class="tick on">✓</div><div class="txt"><b>Arroz blanco cocido</b><small>1 taza · 160 g</small></div><span class="g">45 g</span><div class="icn">⇄</div></div>
@@ -403,9 +247,9 @@
 
     <div class="linea" style="margin-top:12px">
       <div class="hito ahora"><span class="hora">04:00</span>
-        <div class="cab"><b>Desayuno</b><span class="meta">3 h antes · 175 g</span></div>
+        <div class="cab"><b>Desayuno</b><span class="meta">3 h antes · 167 g</span></div>
         <div class="caja">
-          <div class="item"><span class="ck"></span><div class="txt"><b>1 marraqueta</b> con 2 cdas de miel</div><span class="g">92 g</span></div>
+          <div class="item"><span class="ck"></span><div class="txt"><b>4 rebanadas</b> de pan de molde con 2 cdas de miel</div><span class="g">84 g</span></div>
           <div class="item"><span class="ck"></span><div class="txt"><b>1 plátano</b> · <b>1 vaso</b> de jugo</div><span class="g">53 g</span></div>
           <div class="item"><span class="ck"></span><div class="txt"><b>1 isotónica</b> 500 ml, a sorbos hasta las 06:00<small>Líquido y sodio para partir hidratado</small></div><span class="g">30 g</span></div>
         </div></div>
