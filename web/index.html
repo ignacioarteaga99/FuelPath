@@ -526,6 +526,10 @@ const EN = {
   "Desmarcar": "Untick",
   "Guardar": "Save",
   "La diferencia es chica: no hace falta mover nada.": "The difference is small: nothing needs to move.",
+  // Cantidad a mano
+  "O escríbela": "Or type it",
+  "ej.: 1/2, 1 1/4, 0,3": "e.g. 1/2, 1 1/4, 0.3",
+  "Listo": "Done",
 };
 const PT = {
   "Hoy": "Hoje", "Pauta": "Plano", "Carrera": "Prova", "Perfil": "Perfil", "Tus datos": "Seus dados",
@@ -687,6 +691,10 @@ const PT = {
   "Desmarcar": "Desmarcar",
   "Guardar": "Salvar",
   "La diferencia es chica: no hace falta mover nada.": "A diferença é pequena: não precisa mover nada.",
+  // Cantidad a mano
+  "O escríbela": "Ou digite",
+  "ej.: 1/2, 1 1/4, 0,3": "ex.: 1/2, 1 1/4, 0,3",
+  "Listo": "Pronto",
 };
 function t(es, vars) {
   let s = idioma === "en" ? (EN[es] ?? es) : idioma === "pt" ? (PT[es] ?? EN[es] ?? es) : es;
@@ -744,10 +752,31 @@ async function cargarCatalogo(restr = [], sensible = false) {
 // ── Cuentas de la agenda ───────────────────────────────────────────────────
 // El número como se dice en la cocina: ¼, ½, ¾ y enteros (igual que alimentos.casero en el servidor).
 function casero(n) {
-  let e = Math.trunc(n), r = Math.round((n - e) * 4) / 4;
-  if (r >= 1) { e += 1; r = 0; }
-  const f = { 0.25: "¼", 0.5: "½", 0.75: "¾" }[r] || "";
-  return e && f ? `${e} ${f}` : f || String(e);
+  let e = Math.trunc(n + 1e-9), r = n - e;
+  const fr = [[0, ""], [0.25, "¼"], [1 / 3, "⅓"], [0.5, "½"], [2 / 3, "⅔"], [0.75, "¾"], [1, ""]].find(([v]) => Math.abs(r - v) < 0.02);
+  if (!fr) return fmt(n, 2).replace(/0$/, "");                       // 0,4 · 1,15: tal cual lo escribió
+  if (fr[0] === 1) e += 1;
+  return e && fr[1] ? `${e} ${fr[1]}` : fr[1] || String(e);
+}
+// «1/2», «1 1/2», «1½», «½», «0,5», «2» → número (o null si no se entiende).
+function leerCantidad(txt) {
+  const x = String(txt || "").trim().replace(/,/g, ".").replace(/¼/g, " 1/4").replace(/½/g, " 1/2").replace(/¾/g, " 3/4")
+    .replace(/⅓/g, " 1/3").replace(/⅔/g, " 2/3").trim();
+  if (!x) return null;
+  let total = 0;
+  for (const parte of x.split(/\s+/)) {
+    const m = parte.match(/^(\d+(?:\.\d+)?)(?:\/(\d+(?:\.\d+)?))?$/);
+    if (!m) return null;
+    total += m[2] ? Number(m[1]) / Number(m[2]) : Number(m[1]);
+  }
+  return isFinite(total) && total >= 0 && total <= 50 ? Math.round(total * 1000) / 1000 : null;
+}
+// Botones rápidos y campo para escribir la cantidad a mano (en «Agregar», «Cuánto comiste» y la agenda).
+function bloqueCantidad(a, n) {
+  const rapidas = a.paso < 1 ? [0.25, 0.5, 0.75, 1, 1.5, 2] : [1, 2, 3, 4, 5, 6].map((x) => x * a.paso);
+  return `<div class="chips" style="margin:2px 0 10px">${rapidas.map((x) =>
+      `<button type="button" class="chip${Math.abs(x - n) < 0.001 ? " on" : ""}" data-acc="cant" data-n="${x}">${casero(x)}</button>`).join("")}</div>
+    <label>${t("O escríbela")}<input data-cant="1" placeholder="${t("ej.: 1/2, 1 1/4, 0,3")}" inputmode="text" autocomplete="off"></label>`;
 }
 function cantidad(a, n) {
   const u = n <= 1 ? a.unidad[0] : a.unidad[1];
@@ -942,7 +971,7 @@ function itemHtml(di, ci, ii, it, d) {
     <button type="button" class="ck ${ck}" data-acc="marcar" data-d="${di}" data-c="${ci}" data-i="${ii}" aria-label="${t("Marcar")}">${ck === "no" ? "✕" : "✓"}</button>
     <div class="col"><div class="txt">${editable ? `<b>${esc(a.nombre)}</b>` : `<b>${cantidad(a, n)}</b> · ${esc(a.nombre)}`}${nota}</div>
       ${editable ? `<div class="paso"><button type="button" data-acc="menos" data-d="${di}" data-c="${ci}" data-i="${ii}" aria-label="${t("Menos")}" ${n <= 0 ? "disabled" : ""}>−</button>
-        <b>${cantidad(a, n)}</b><button type="button" data-acc="mas" data-d="${di}" data-c="${ci}" data-i="${ii}" aria-label="${t("Más")}" ${n + a.paso > maximo(a, d.escala, it) + 1e-6 ? "disabled" : ""}>+</button></div>` : ""}</div>
+        <b data-acc="cant-item" data-d="${di}" data-c="${ci}" data-i="${ii}" role="button" tabindex="0" style="cursor:pointer">${cantidad(a, n)}</b><button type="button" data-acc="mas" data-d="${di}" data-c="${ci}" data-i="${ii}" aria-label="${t("Más")}" ${n + a.paso > maximo(a, d.escala, it) + 1e-6 ? "disabled" : ""}>+</button></div>` : ""}</div>
     <span class="g">${gTexto(it, n)}</span>
     <button type="button" class="mas" data-acc="opciones" data-d="${di}" data-c="${ci}" data-i="${ii}" aria-label="${t("Más opciones")}">⋯</button></div>`;
 }
@@ -1093,12 +1122,38 @@ function pintarOpcionesMarcado() {
   abrirHoja(`<span class="tipo">${nombreComida(cm)} · ${cm.hora}</span><h2 style="font-size:20px">${esc(a.nombre)}</h2>
     <h4 style="margin-top:8px">${t("Cuánto comiste")}</h4>
     <div class="agr-sel"><div class="paso"><button type="button" data-acc="opc-paso" data-s="-1" aria-label="${t("Menos")}" ${n <= 0 ? "disabled" : ""}>−</button>
-      <b>${cantidad(a, n)}</b><button type="button" data-acc="opc-paso" data-s="1" aria-label="${t("Más")}">+</button></div>
-      <div class="grande">${gTexto(it, n) || "0 g"}</div></div>
+      <b id="cant-q">${cantidad(a, n)}</b><button type="button" data-acc="opc-paso" data-s="1" aria-label="${t("Más")}">+</button></div>
+      <div class="grande" id="cant-g">${gTexto(it, n) || "0 g"}</div></div>
+    ${bloqueCantidad(a, n)}
     ${editarPropio(a)}
     <div class="botones fijos"><button type="button" class="sec" data-acc="opc-sacar">✕ ${t("Sacar")}</button>
       <button type="button" class="sec" data-acc="opc-desmarcar">${t("Desmarcar")}</button>
       <button type="button" data-acc="opc-guardar">${t("Guardar")}</button></div>`);
+}
+
+// Cantidad escrita a mano: vale para «Agregar», «Cuánto comiste» y la cantidad de un ítem de la agenda.
+let cantItem = null;
+function cantContexto() {
+  if (agr) { const a = agr.sel ? A(agr.sel) : { cho: Number(String(agr.cho).replace(",", ".")) || 0, paso: 1, unidad: [agr.porcion || t("porción"), agr.porcion || t("porciones")] };
+    return { a, n: agr.n, poner: (n) => { agr.n = n; }, g: (n) => `${fmt(n * a.cho)} <small>g</small>`, repintar: pintarAgregar }; }
+  const ctx = cantItem || opciones;
+  if (!ctx) return null;
+  const it = plan.dias[ctx.di].comidas[ctx.ci].items[ctx.ii], a = A(it.a);
+  return { a, n: ctx.n, poner: (n) => { ctx.n = n; }, g: (n) => gTexto(it, n) || "0 g", repintar: cantItem ? pintarCantItem : pintarOpcionesMarcado };
+}
+function abrirCantItem(di, ci, ii) {
+  const it = plan.dias[di].comidas[ci].items[ii];
+  cantItem = { di, ci, ii, n: it.v ?? it.p };
+  pintarCantItem();
+}
+function pintarCantItem() {
+  const { di, ci, ii, n } = cantItem, cm = plan.dias[di].comidas[ci], it = cm.items[ii], a = A(it.a);
+  abrirHoja(`<span class="tipo">${nombreComida(cm)} · ${cm.hora}</span><h2 style="font-size:20px">${esc(a.nombre)}</h2>
+    <div class="agr-sel"><b id="cant-q" style="font-size:18px">${cantidad(a, n)}</b><div class="grande" id="cant-g">${gTexto(it, n) || "0 g"}</div></div>
+    ${bloqueCantidad(a, n)}
+    <div class="botones fijos"><button type="button" class="sec" data-acc="cerrar">${t("Cancelar")}</button>
+      <button type="button" data-acc="cant-ok">${t("Listo")}</button></div>`);
+  cantItem = { di, ci, ii, n };                       // abrirHoja→cerrarHoja no lo borra: se repone
 }
 
 // Agregar algo que no venía en la pauta (palta en el pan) o un alimento propio con sus gramos.
@@ -1135,8 +1190,9 @@ function pintarAgregar() {
         <p class="pista" style="margin:0">${t("Mira la etiqueta: carbohidratos por porción.")}</p></div>`
         : `<h3 style="margin:10px 0 0">${esc(a.nombre)}</h3>`}
       <div class="agr-sel"><div class="paso"><button type="button" data-acc="agr-paso" data-s="-1" aria-label="${t("Menos")}" ${agr.n <= a.paso ? "disabled" : ""}>−</button>
-        <b>${cantidad(a, agr.n)}</b><button type="button" data-acc="agr-paso" data-s="1" aria-label="${t("Más")}">+</button></div>
-        <div class="grande" id="agr-g">${fmt(agr.n * a.cho)} <small>g</small></div></div>
+        <b id="cant-q">${cantidad(a, agr.n)}</b><button type="button" data-acc="agr-paso" data-s="1" aria-label="${t("Más")}">+</button></div>
+        <div class="grande" id="cant-g">${fmt(agr.n * a.cho)} <small>g</small></div></div>
+      ${bloqueCantidad(a, agr.n)}
       ${a.tags?.includes("grasa_alta") ? `<p class="aviso" style="margin-top:0">${t("Aporta grasa: en la carga, mejor poco y no cerca de dormir.")}</p>` : ""}
       ${comido}
       <div class="botones fijos"><button type="button" class="sec" data-acc="agr-volver">← ${t("Volver")}</button>
@@ -1201,7 +1257,7 @@ function cerrarAjuste() { sim = null; $("ajuste").hidden = true; $("ajuste").inn
 
 // ── Hoja, avisos ───────────────────────────────────────────────────────────
 function abrirHoja(html) { $("hoja").innerHTML = `<div class="asa"></div>${html}`; $("capa").hidden = false; document.body.classList.add("bloq"); }
-function cerrarHoja() { $("capa").hidden = true; propuesta = opciones = agr = null; if ($("ajuste").hidden) document.body.classList.remove("bloq"); }
+function cerrarHoja() { $("capa").hidden = true; propuesta = opciones = agr = cantItem = null; if ($("ajuste").hidden) document.body.classList.remove("bloq"); }
 let _toast;
 function aviso(txt) { $("toast").textContent = txt; $("toast").hidden = false; clearTimeout(_toast); _toast = setTimeout(() => $("toast").hidden = true, 4000); }
 
@@ -1509,6 +1565,10 @@ const ACC = {
   "agr-paso": (b) => { const a = agr.sel ? A(agr.sel) : { paso: 1, max: 99 };
     agr.n = Math.max(a.paso, Math.min(a.max * 2, +(agr.n + Number(b.dataset.s) * a.paso).toFixed(2))); pintarAgregar(); },
   "agr-ok": () => agregarOk(),
+  cant: (b) => { const c = cantContexto(); if (!c) return; c.poner(Number(b.dataset.n)); c.repintar(); },
+  "cant-item": (b) => abrirCantItem(+b.dataset.d, +b.dataset.c, +b.dataset.i),
+  "cant-ok": () => { const { di, ci, ii, n } = cantItem, it = plan.dias[di].comidas[ci].items[ii];
+    if (Math.abs(n - it.p) < 1e-6) delete it.v; else it.v = n; cerrarHoja(); refrescar(); },
   entrar: () => { location.href = "/entrar"; },
   salir: async () => { await subirCuenta(); await fetch("/api/auth/salir", { method: "POST" }).catch(() => {}); location.replace("/"); },
   exportar: () => { location.href = "/api/cuenta/exportar"; },
@@ -1543,10 +1603,20 @@ document.addEventListener("keydown", (e) => {
 // Campos del formulario: se guardan en `form` al escribir; los que cambian la pantalla la repintan.
 // Campos de «Agregar»: la búsqueda repinta sólo la lista (para no perder el foco).
 $("hoja").addEventListener("input", (e) => {
+  if (e.target.dataset?.cant) {
+    const c = cantContexto(), n = leerCantidad(e.target.value);
+    e.target.style.outlineColor = n == null && e.target.value.trim() ? "var(--rojo)" : "";
+    if (!c || n == null) return;
+    c.poner(n);
+    if ($("cant-q")) $("cant-q").textContent = cantidad(c.a, n);
+    if ($("cant-g")) $("cant-g").innerHTML = c.g(n);
+    document.querySelectorAll("#hoja [data-acc=cant]").forEach((x) => x.classList.toggle("on", Math.abs(Number(x.dataset.n) - n) < 0.001));
+    return;
+  }
   const k = e.target.dataset?.agr; if (!k || !agr) return;
   agr[k] = e.target.type === "checkbox" ? e.target.checked : e.target.value;
   if (k === "q") $("agr-lista").innerHTML = listaAgregar();
-  if (k === "cho" && $("agr-g")) $("agr-g").innerHTML = `${fmt(agr.n * (Number(String(agr.cho).replace(",", ".")) || 0))} <small>g</small>`;
+  if (k === "cho" && $("cant-g")) $("cant-g").innerHTML = `${fmt(agr.n * (Number(String(agr.cho).replace(",", ".")) || 0))} <small>g</small>`;
 });
 $("pauta").addEventListener("input", (e) => {
   const k = e.target.dataset?.f; if (!k) return;
