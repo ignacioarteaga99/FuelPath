@@ -47,7 +47,7 @@ lo decidido; leerlo al empezar).
 
 ## Salud y nutrición
 - La pauta es **una guía general basada en consensos** (ACSM 2016, COI 2018).
-  Las referencias están en `fuelpath/pauta.py`.
+  Las referencias están en `fuelpath/carga.py` y `docs/NUTRICION.md`.
 - No promete resultados ni reemplaza a un nutricionista.
 - Si el usuario carga la pauta de su nutricionista, **esa manda** (Fase 2).
 - No dar consejos para condiciones médicas (diabetes, trastornos alimentarios,

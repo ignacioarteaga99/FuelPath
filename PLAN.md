@@ -8,7 +8,7 @@ que el plan de carrera esté probado antes.
 
 ```
 iPhone (web móvil, instalable)  ──►  API FuelPath (FastAPI)
-                                       ├─ pauta.py: carga, comida previa, plan en carrera
+                                       ├─ carga.py, reparto.py, alimentos.py: la pauta comida a comida
                                        ├─ cuentas + sesión (de PacePath)
                                        ├─ correo (Resend/SMTP, de PacePath)
                                        └─ Postgres (Neon): cuentas, datos sincronizados, registro
@@ -18,7 +18,7 @@ Detalle y qué archivos traer de PacePath: `docs/ARQUITECTURA.md`.
 
 ## Fase 0 — Esqueleto
 - [x] Repo, FastAPI, pytest, Dockerfile, Blueprint de Render y CI con tests.
-- [x] `pauta.py` con los rangos de los consensos y sus tests.
+- [x] La lógica de la pauta con los rangos de los consensos y sus tests (hoy en `carga.py`).
 - [x] App móvil con 4 pestañas (Hoy, Pauta, Carrera, Perfil), ES/EN/PT, modo
       noche, instalable (manifest + service worker), mismos tokens que PacePath.
 - [ ] Dominio propio (¿fuelpathapp.com o subdominio de PacePath?). Mientras, la URL de Render.

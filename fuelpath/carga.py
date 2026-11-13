@@ -4,7 +4,15 @@ Con el evento, el peso, el régimen elegido (g/kg/día), los horarios y los
 alimentos del corredor, arma una agenda con cada comida, su hora y sus
 alimentos en medidas caseras. La agenda es la que se va marcando en la app.
 
-Criterios (ver también `pauta.py` y docs/NUTRICION.md):
+Referencias (detalle en docs/NUTRICION.md):
+  · Thomas, Erdman y Burke. Nutrition and Athletic Performance. Posición conjunta
+    ACSM / Academy of Nutrition and Dietetics / Dietitians of Canada, 2016.
+  · Consenso del COI sobre nutrición deportiva (Maughan et al., 2018).
+  · Burke et al., 2011; Bussau et al., 2002; Jeukendrup, 2014.
+Es una guía general: si el corredor tiene la pauta de su nutricionista, esa manda
+(Fase 2 del PLAN). Ningún texto promete resultados ni reemplaza a un profesional.
+
+Criterios:
   · Carga larga (42K, 70.3, Ironman, gran fondo; o más de 2,5 h): 36–48 h
     previas, 8–12 g/kg/día (recomendado 10). Son los dos días antes de la carrera.
   · Carga corta (21K; o entre 75 min y 2,5 h): 24 h previas, 7–10 g/kg

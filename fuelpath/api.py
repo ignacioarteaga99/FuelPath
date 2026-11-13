@@ -5,7 +5,6 @@
     GET  /api/alimentos          base de alimentos (con las restricciones: permitidos y marcados de partida)
     POST /api/carga              plan de carga: agenda de comidas de los días previos y del día de carrera
     POST /api/reparto            propuesta para recalcular lo que queda del día
-    POST /api/pauta              pauta resumida (rangos por día; versión anterior, sin agenda)
 
     Cuentas (de PacePath: cuentas.py, oauth.py, acceso.py, correo.py)
     POST /api/auth/registro · /api/auth/entrar · /api/auth/salir   cuenta con correo
@@ -39,7 +38,7 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, Redirect
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from . import acceso, alimentos, carga, correo, cuentas, idioma, oauth, pauta, registro, reparto, uso
+from . import acceso, alimentos, carga, correo, cuentas, idioma, oauth, registro, reparto, uso
 from .idioma import tr
 
 WEB = Path(__file__).resolve().parent.parent / "web"
@@ -250,28 +249,6 @@ def _poner_cookie(resp: Response, request: Request, nombre: str, valor: str, max
 @app.get("/api/salud")
 def salud():
     return {"ok": True}
-
-
-class PedidoPauta(BaseModel):
-    peso_kg: float = Field(ge=pauta.PESO_MIN, le=pauta.PESO_MAX)
-    distancia_km: float = Field(gt=0, le=250)
-    tiempo_min: float | None = Field(default=None, gt=0, le=48 * 60)
-    ritmo_s_km: float | None = Field(default=None, ge=120, le=1200)
-    fecha: date
-    hora: time = time(8, 0)
-    gel_g: float = Field(default=25, ge=5, le=100)
-    intestino_entrenado: bool = False
-
-
-@app.post("/api/pauta")
-def api_pauta(p: PedidoPauta):
-    minutos = p.tiempo_min or (pauta.ritmo_a_tiempo(p.distancia_km, p.ritmo_s_km) if p.ritmo_s_km else None)
-    if not minutos:
-        raise HTTPException(422, idioma.tr("Falta el tiempo estimado o el ritmo.",
-                                           "Missing the estimated time or pace.",
-                                           "Falta o tempo estimado ou o ritmo."))
-    c = pauta.Carrera(p.peso_kg, p.distancia_km, minutos, p.fecha, p.hora, p.gel_g, p.intestino_entrenado)
-    return pauta.pauta(c)
 
 
 @app.get("/api/alimentos")

@@ -14,7 +14,8 @@ web/manifest.webmanifest, web/icons/   ícono y nombre al instalar
 web/vendor/         librerías y fuentes servidas por la app (nada de CDNs)
 fuelpath/api.py     FastAPI: middlewares, endpoints, archivos fijos
 fuelpath/idioma.py  idioma por petición (ContextVar) y tr(es, en, pt)
-fuelpath/pauta.py   la lógica del producto, pura y con tests
+fuelpath/carga.py   la lógica del producto (agenda de carga), pura y con tests
+fuelpath/reparto.py recalcular el día con topes · fuelpath/alimentos.py la base de alimentos
 tests/              pytest + TestClient
 render.yaml         Blueprint de Render · Dockerfile · .github/workflows/tests.yml
 ```
@@ -24,7 +25,7 @@ render.yaml         Blueprint de Render · Dockerfile · .github/workflows/tests
 1. **La lógica va en módulos puros y testeados.** `api.py` sólo valida con
    pydantic y llama.
    - Ejemplos en PacePath: `coach.py`, `bitacora.py`.
-   - Aquí: `pauta.py`.
+   - Aquí: `carga.py`, `reparto.py` y `alimentos.py`.
 2. **Los textos del servidor también se traducen.**
    - El servidor usa `tr("es", "en", "pt")`.
    - La app manda la cabecera `X-Idioma`, que el middleware `_idioma` lee.
