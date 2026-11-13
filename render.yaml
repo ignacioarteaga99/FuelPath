@@ -4,36 +4,51 @@
 #   · 512 MB de RAM y el disco se borra al dormir (15 min sin uso): nada
 #     persistente en disco; cuentas, datos y registro en Postgres (Neon).
 #   · Los secretos se pegan en Render («sync: false»), nunca en el repositorio.
+#   · FUELPATH_ACCESO_LIBRE es sólo para tests y desarrollo local: NUNCA aquí.
+#
+# Ramas como en PacePath: Render despliega «produccion» (autoDeploy); el
+# trabajo va en «main» y pasa a producción por fast-forward cuando pytest pasa.
 services:
   - type: web
     name: fuelpath
     runtime: docker
     plan: free
+    branch: produccion
     dockerfilePath: ./Dockerfile
     healthCheckPath: /api/salud
     autoDeploy: true
     envVars:
-      # URL pública (dominio propio); con ella se arman los enlaces de los correos.
+      # URL pública. Mientras no haya dominio propio, déjala vacía (se usa la de
+      # Render). Con dominio: https://… y quien entre por *.onrender.com se redirige.
       - key: FUELPATH_URL
         sync: false
-      # Panel /admin (Fase 0): clave larga inventada, pegada en Render.
+      # Clave del panel /admin: invéntala larga y pégala en Render.
       - key: FUELPATH_ADMIN
         sync: false
       # Postgres (Neon gratis): cuentas, sesiones, datos sincronizados, registro.
+      # Sin ella todo vive en /tmp y se borra cada vez que Render duerme.
       - key: DATABASE_URL
         sync: false
-      # Correos (Resend o SMTP, como PacePath). «1» sólo cuando estén las cuatro.
+      # Correos (Resend, como PacePath). «1» sólo cuando estén las otras cuatro;
+      # si falta alguna, el panel /admin dice cuál.
       - key: FUELPATH_CORREO_ACTIVO
         value: "0"
       - key: FUELPATH_CORREO_SMTP
-        sync: false
+        value: smtp.resend.com:465
       - key: FUELPATH_CORREO_USUARIO
-        sync: false
+        value: resend
       - key: FUELPATH_CORREO_CLAVE
         sync: false
       - key: FUELPATH_CORREO_DE
         sync: false
-      # Entrar con Google o Microsoft. Sin ellas, sólo correo y clave.
+      # (Opcional) a quién avisar de cada cuenta nueva, y el correo de soporte
+      # que muestran los correos y las páginas legales (si no, el remitente).
+      - key: FUELPATH_CORREO_AVISOS
+        sync: false
+      - key: FUELPATH_SOPORTE
+        sync: false
+      # Entrar con Google o Microsoft (apps OAuth nuevas, con la URL de FuelPath).
+      # Sin ellas, sólo correo y clave.
       - key: GOOGLE_CLIENT_ID
         sync: false
       - key: GOOGLE_CLIENT_SECRET

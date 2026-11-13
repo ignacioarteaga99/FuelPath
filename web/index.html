@@ -264,6 +264,7 @@
   .dato { display: flex; justify-content: space-between; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--linea); font-size: 14px; }
   .dato:last-child { border-bottom: 0; } .dato span:first-child { color: var(--suave); }
   .dato span:last-child { text-align: right; font-weight: 600; }
+  #v-perfil a { color: var(--suave); }
   nav { position: fixed; z-index: 10; left: 0; right: 0; bottom: 0; background: var(--panel);
     border-top: 1px solid var(--linea); display: flex; padding: 6px 0 calc(env(safe-area-inset-bottom) + 6px); }
   nav a { flex: 1; text-align: center; color: var(--suave); font-size: 11px; font-weight: 600; text-decoration: none; }
@@ -312,10 +313,12 @@
   <section id="v-perfil" hidden>
     <span class="tipo" data-i18n>Perfil</span>
     <h2 data-i18n>Tus datos</h2>
-    <p class="pista" data-i18n>Por ahora todo se guarda en este teléfono. Con cuenta (pronto) se sincroniza entre tus aparatos.</p>
+    <div id="cuenta"></div>
     <div class="botones"><button class="sec" id="borrar" type="button" data-i18n>Borrar mi pauta</button></div>
     <div id="historial"></div>
     <p class="pista" id="fuente"></p>
+    <p class="pista"><a href="/privacidad" target="_blank" rel="noopener" data-i18n>Privacidad</a> ·
+      <a href="/terminos" target="_blank" rel="noopener" data-i18n>Términos</a></p>
   </section>
 </main>
 
@@ -479,6 +482,17 @@ const EN = {
   "Si te sentiste pesado, prueba el régimen conservador o más líquidos con carbohidratos.": "If you felt heavy, try the conservative regime or more carb drinks.",
   "Si te quedaste con hambre y lo toleraste bien, puedes probar un régimen más alto.": "If you were still hungry and tolerated it well, you can try a higher regime.",
   "Te funcionó: repite este plan en tu próxima carrera.": "It worked: repeat this plan at your next race.",
+  // Cuenta
+  "Entra con tu cuenta.": "Sign in with your account.",
+  "Tus datos se guardan en tu cuenta y viajan a tus otros aparatos.": "Your data is saved to your account and travels to your other devices.",
+  "Descargar mis datos": "Download my data",
+  "Cerrar sesión": "Sign out",
+  "Borrar mi cuenta": "Delete my account",
+  "Sin cuenta: tus datos viven sólo en este aparato.": "No account: your data lives only on this device.",
+  "Entrar": "Sign in",
+  "¿Borrar tu cuenta y todos tus datos? No se puede deshacer.": "Delete your account and all your data? This can't be undone.",
+  "Privacidad": "Privacy",
+  "Términos": "Terms",
 };
 const PT = {
   "Hoy": "Hoje", "Pauta": "Plano", "Carrera": "Prova", "Perfil": "Perfil", "Tus datos": "Seus dados",
@@ -603,6 +617,17 @@ const PT = {
   "Si te sentiste pesado, prueba el régimen conservador o más líquidos con carbohidratos.": "Se você se sentiu pesado, experimente o regime conservador ou mais líquidos com carboidratos.",
   "Si te quedaste con hambre y lo toleraste bien, puedes probar un régimen más alto.": "Se ficou com fome e tolerou bem, pode testar um regime mais alto.",
   "Te funcionó: repite este plan en tu próxima carrera.": "Funcionou: repita este plano na sua próxima prova.",
+  // Cuenta
+  "Entra con tu cuenta.": "Entre com sua conta.",
+  "Tus datos se guardan en tu cuenta y viajan a tus otros aparatos.": "Seus dados ficam salvos na sua conta e vão para seus outros aparelhos.",
+  "Descargar mis datos": "Baixar meus dados",
+  "Cerrar sesión": "Sair",
+  "Borrar mi cuenta": "Apagar minha conta",
+  "Sin cuenta: tus datos viven sólo en este aparato.": "Sem conta: seus dados ficam só neste aparelho.",
+  "Entrar": "Entrar",
+  "¿Borrar tu cuenta y todos tus datos? No se puede deshacer.": "Apagar sua conta e todos os seus dados? Não dá para desfazer.",
+  "Privacidad": "Privacidade",
+  "Términos": "Termos",
 };
 function t(es, vars) {
   let s = idioma === "en" ? (EN[es] ?? es) : idioma === "pt" ? (PT[es] ?? EN[es] ?? es) : es;
@@ -615,6 +640,7 @@ window.fetch = (u, o = {}) => _fetch(u, { ...o, headers: { ...(o.headers || {}),
 async function api(url, cuerpo) {
   const r = await fetch(url, cuerpo === undefined ? {} : { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(cuerpo) });
   const j = await r.json().catch(() => ({}));
+  if (r.status === 401) { location.replace("/"); throw new Error(t("Entra con tu cuenta.")); }
   if (!r.ok) throw new Error(typeof j.detail === "string" ? j.detail : t("No pude armar la pauta. Revisa tu conexión."));
   return j;
 }
@@ -1211,6 +1237,55 @@ function cambiarVista(v) {
 function pintarPerfil() {
   $("fuente").textContent = plan?.fuente || cat?.fuente || "";
   $("historial").innerHTML = historialHtml();
+  $("cuenta").innerHTML = miCuenta
+    ? `<div class="tarjeta"><h3>${esc(miCuenta.nombre || miCuenta.correo)}</h3><p class="pista" style="margin:0 0 4px">${esc(miCuenta.correo)}</p>
+        <p class="pista" style="margin:0">${t("Tus datos se guardan en tu cuenta y viajan a tus otros aparatos.")}</p>
+        <div class="botones"><button type="button" class="sec chico" data-acc="exportar">⤓ ${t("Descargar mis datos")}</button>
+          <button type="button" class="sec chico" data-acc="salir">${t("Cerrar sesión")}</button></div>
+        <div class="botones"><button type="button" class="sec chico" data-acc="borrar-cuenta">✕ ${t("Borrar mi cuenta")}</button></div></div>`
+    : `<p class="pista">${t("Sin cuenta: tus datos viven sólo en este aparato.")}</p>
+       <div class="botones"><button type="button" class="sec" data-acc="entrar">${t("Entrar")}</button></div>`;
+}
+
+// ── Lo que viaja con la cuenta (como DATOS_CUENTA de PacePath) ──────────────
+// Perfil, agenda con lo marcado, agua, planes anteriores, idioma y modo noche se
+// suben a la cuenta y bajan en cualquier aparato donde entres.
+const DATOS_CUENTA = ["fp_perfil", "fp_plan", "fp_agua", "fp_historial", "fp_idioma", "fp_noche"];
+let miCuenta = null;
+const hashTexto = (x) => { let h = 5381; for (let i = 0; i < x.length; i++) h = ((h * 33) ^ x.charCodeAt(i)) >>> 0; return h.toString(36); };
+const instantanea = () => { const o = {}; try { for (const k of DATOS_CUENTA) { const v = localStorage.getItem(k); if (v !== null) o[k] = v; } } catch {} return o; };
+let subiendo = false;
+async function subirCuenta() {
+  if (!miCuenta || subiendo) return;
+  const datos = instantanea(), h = hashTexto(JSON.stringify(datos));
+  if (h === pref("fp_cuenta_hash", null)) return;            // nada cambió desde la última vez
+  subiendo = true;
+  try {
+    const r = await fetch("/api/cuenta/datos", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ datos }) });
+    if (r.ok) { guardar("fp_cuenta_hash", h); guardar("fp_cuenta_ts", (await r.json()).actualizado); }
+  } catch {} finally { subiendo = false; }
+}
+async function alEntrarCuenta() {
+  const de = pref("fp_cuenta_de", null);
+  if (de && de !== miCuenta.id) {                              // el aparato era de otra cuenta: no se mezcla
+    for (const k of [...DATOS_CUENTA, "fp_cuenta_hash", "fp_cuenta_ts", "fp_alimentos"]) borrarClave(k);
+    plan = perfil = null; agua = {}; historial = [];
+  }
+  const j = await fetch("/api/cuenta/datos").then((r) => r.ok ? r.json() : null).catch(() => null);
+  if (j && j.actualizado && (de !== miCuenta.id || j.actualizado > (pref("fp_cuenta_ts", "") || ""))) {
+    // Lo de la cuenta es más nuevo (o es la primera vez aquí): manda.
+    const antes = JSON.stringify(instantanea());
+    for (const [k, v] of Object.entries(j.datos)) try { localStorage.setItem(k, v); } catch {}
+    guardar("fp_cuenta_ts", j.actualizado); guardar("fp_cuenta_hash", hashTexto(JSON.stringify(j.datos)));
+    guardar("fp_cuenta_de", miCuenta.id);
+    if (JSON.stringify(instantanea()) !== antes && !sessionStorage.getItem("fp_recargada")) {
+      sessionStorage.setItem("fp_recargada", "1"); location.reload(); return;
+    }
+  }
+  guardar("fp_cuenta_de", miCuenta.id);
+  subirCuenta();
+  setInterval(subirCuenta, 20_000);
+  document.addEventListener("visibilitychange", () => { if (document.hidden) subirCuenta(); });
 }
 for (const a of document.querySelectorAll("nav a")) a.onclick = (e) => { e.preventDefault(); cambiarVista(a.dataset.vista); };
 
@@ -1258,6 +1333,16 @@ const ACC = {
   elegir: (b) => { const s = new Set(form.elegidos); s.has(b.dataset.a) ? s.delete(b.dataset.a) : s.add(b.dataset.a); form.elegidos = [...s]; pintarAlimentos(); },
   volver: () => { paso = 1; pintarForm(); },
   armar: () => armar(),
+  entrar: () => { location.href = "/entrar"; },
+  salir: async () => { await subirCuenta(); await fetch("/api/auth/salir", { method: "POST" }).catch(() => {}); location.replace("/"); },
+  exportar: () => { location.href = "/api/cuenta/exportar"; },
+  "borrar-cuenta": async () => {
+    if (!confirm(t("¿Borrar tu cuenta y todos tus datos? No se puede deshacer."))) return;
+    const r = await fetch("/api/cuenta/borrar", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ confirmo: true }) }).catch(() => null);
+    if (!r?.ok) return aviso(t("Sin conexión: quedó marcado. Puedes ajustar lo que queda más tarde."));
+    for (const k of [...DATOS_CUENTA, "fp_cuenta_hash", "fp_cuenta_ts", "fp_cuenta_de", "fp_alimentos"]) borrarClave(k);
+    location.replace("/");
+  },
   // cierre e historial
   fb: (b) => { fb[b.dataset.k] = fb[b.dataset.k] === b.dataset.v ? undefined : b.dataset.v; pintarHoy(); },
   archivar: () => archivar(),
@@ -1350,6 +1435,12 @@ $("botonNoche").onclick = () => { noche = !noche; guardar("fp_noche", noche); ap
 if (pref("fp_pauta", null) && !plan) for (const k of ["fp_carrera", "fp_pauta", "fp_comido"]) borrarClave(k);
 if (plan && !Array.isArray(plan.dias?.[0]?.comidas)) { plan = null; borrarClave("fp_plan"); }
 aplicarNoche(); aplicarIdioma(); cambiarVista("hoy");
+fetch("/api/cuenta").then((r) => r.json()).then((c) => {
+  miCuenta = c.usuario;
+  if (vista === "perfil") pintarPerfil();
+  if (miCuenta) alEntrarCuenta().catch(() => {});
+}).catch(() => {});
+window.addEventListener("load", () => sessionStorage.removeItem("fp_recargada"));
 fetch("/api/salud").catch(() => {});            // despierta el servidor (Render gratis duerme a los 15 min)
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").catch(() => {});
 </script>

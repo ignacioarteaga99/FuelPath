@@ -1,19 +1,16 @@
 # FuelPath
 
-**Tu pauta nutricional para llegar con todo a la carrera.**
+**Tu carga de carbohidratos antes de la carrera, comida a comida.**
 
-FuelPath arma y sigue la pauta de los días previos a una carrera. Pones tu
-peso, la carrera, la hora de salida y tu tiempo estimado, y te dice:
+Con tu carrera, tu peso, tus horarios y los alimentos que te gustan, FuelPath arma
+la agenda de las 36–48 h previas (o 24 h en un 21K) en medidas caseras. Ahí vas
+marcando lo que comes y, si comes más o menos, la app reparte la diferencia en lo
+que queda del día, sin pasar el tope de ninguna comida. También arma el desayuno
+del día, las sales y el plan en carrera (geles, líquido y sodio por hora), y al
+terminar guarda tu feedback para la próxima.
 
-| Momento | Qué te dice |
-|---|---|
-| Días antes | Cuántos gramos de carbohidratos comer cada día (carga de 10–12 g/kg las 36–48 h previas en carreras de más de 90 min) y qué evitar |
-| Comida previa | A qué hora y cuántos gramos (1–4 g/kg, 1 a 4 h antes) |
-| En carrera | Gramos por hora, líquido y sodio, y en qué minuto y kilómetro va cada gel |
-| Hoy | Lo que te toca hoy y cuánto llevas, sumando con un toque |
-
-Es una guía general basada en consensos de nutrición deportiva. Si tienes la
-pauta de tu nutricionista, FuelPath te ayuda a seguir esa (Fase 2 del plan).
+Es una guía general basada en consensos de nutrición deportiva (ver
+[`docs/NUTRICION.md`](docs/NUTRICION.md)). No reemplaza a tu nutricionista.
 
 App hermana de [PacePath](https://github.com/ignacioarteaga99/PacePath): misma
 arquitectura (FastAPI + web móvil instalable, Render + Neon) y mismo estilo.
@@ -24,19 +21,30 @@ arquitectura (FastAPI + web móvil instalable, Render + Neon) y mismo estilo.
 python3 -m venv .venv && . .venv/bin/activate
 pip install -e ".[dev]"
 pytest
-uvicorn fuelpath.api:app --reload   # http://localhost:8000
+# Sin cuenta obligatoria (SÓLO en local):
+FUELPATH_ACCESO_LIBRE=1 uvicorn fuelpath.api:app --reload   # http://localhost:8000
+# Con cuentas y panel /admin, con una SQLite local:
+FUELPATH_ADMIN=una-clave DATABASE_URL=/tmp/fuelpath.sqlite uvicorn fuelpath.api:app --reload
 ```
 
-```bash
-curl -X POST localhost:8000/api/pauta -H 'Content-Type: application/json' \
-     -d '{"peso_kg": 70, "distancia_km": 42.2, "tiempo_min": 210, "fecha": "2027-04-11", "hora": "07:30"}'
-```
+## Puesta en marcha (Render + Neon)
 
-## Despliegue en Render (gratis)
+1. **Neon** (neon.tech, gratis): crea el proyecto «fuelpath» y copia la *connection string* (`postgresql://…`).
+   Las tablas `fp_…` se crean solas al primer uso.
+2. **Render** → New → **Blueprint** → este repo. Usa `render.yaml`, que despliega la rama `produccion`. Pega en
+   Render (nunca en el repo):
+   - `DATABASE_URL`: la de Neon.
+   - `FUELPATH_ADMIN`: una clave larga inventada para el panel `/admin`.
+   - `FUELPATH_URL`: vacía hasta tener dominio propio.
+3. Entra a la app, **crea tu cuenta** y en `/admin` márcate con **beta**. La beta parte cerrada: sólo entran
+   las cuentas marcadas.
+4. Correos (cuando haya dominio): verifica el dominio en **Resend**. En Render pega `FUELPATH_CORREO_CLAVE`
+   (la API key) y `FUELPATH_CORREO_DE` (`FuelPath <hola@tu-dominio>`), y cambia `FUELPATH_CORREO_ACTIVO` a `1`.
+   El panel dice si falta algo y manda un correo de prueba.
+5. Google y Microsoft (opcional): crea las apps OAuth con la vuelta `{URL}/api/auth/google/vuelta` y
+   `{URL}/api/auth/microsoft/vuelta`, y pega `GOOGLE_CLIENT_ID/SECRET` y `MICROSOFT_CLIENT_ID/SECRET`.
 
-`render.yaml` es un Blueprint: en render.com → **New → Blueprint** → este repo.
-Imagen Docker, salud en `/api/salud`. Los secretos se pegan en Render, nunca
-en el repositorio.
+`FUELPATH_ACCESO_LIBRE` es sólo para tests y desarrollo local: **nunca** en Render.
 
 Plan de trabajo: [`PLAN.md`](PLAN.md) · Arquitectura y qué se trae de PacePath:
 [`docs/ARQUITECTURA.md`](docs/ARQUITECTURA.md) · Estilo: [`docs/ESTILO.md`](docs/ESTILO.md).

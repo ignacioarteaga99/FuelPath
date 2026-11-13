@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Privacidad · FuelPath</title>
+<link rel="icon" type="image/svg+xml" href="/icons/icono.svg">
+<!-- Formato de PacePath (web/privacidad.html); contenido reescrito para FuelPath: aquí hay datos de salud. -->
+<style>
+  :root { --acento: #f2541b; --tinta: #1d1d21; --suave: #5d5d68; --linea: #e6e6ea; --fondo: #fff; }
+  @media (prefers-color-scheme: dark) { :root { --tinta: #f4f4f6; --suave: #a8a8b3; --linea: #2c2c33; --fondo: #141418; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--fondo); color: var(--tinta); font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif; }
+  main { max-width: 720px; margin: 0 auto; padding: calc(env(safe-area-inset-top) + 28px) 18px calc(env(safe-area-inset-bottom) + 60px); }
+  header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .marca { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 20px; color: var(--tinta); text-decoration: none; }
+  .marca img { width: 34px; height: 34px; border-radius: 9px; }
+  .idiomas a { color: var(--suave); font-weight: 700; text-decoration: none; margin-left: 10px; }
+  .idiomas a[aria-current] { color: var(--acento); }
+  h1 { font-size: 30px; line-height: 1.15; letter-spacing: -.6px; margin: 28px 0 6px; }
+  .fecha { color: var(--suave); font-size: 14px; margin: 0 0 22px; }
+  h2 { font-size: 18px; margin: 28px 0 6px; }
+  ul { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .nota { border: 1px solid var(--linea); border-radius: 12px; padding: 12px 14px; color: var(--suave); font-size: 14.5px; }
+  a { color: var(--acento); }
+  main [lang="en"], main [lang="pt"] { display: none; }
+  body.en main [lang="es"], body.pt main [lang="es"] { display: none; }
+  body.en main [lang="en"], body.pt main [lang="pt"] { display: block; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <a class="marca" href="/"><img src="/icons/icono-192.png" alt="">FuelPath</a>
+    <nav class="idiomas"><a href="?lang=es" id="es">ES</a><a href="?lang=en" id="en">EN</a><a href="?lang=pt" id="pt">PT</a></nav>
+  </header>
+
+  <section lang="es">
+    <h1>Privacidad</h1>
+    <p class="fecha">Actualizada el 13 de noviembre de 2026</p>
+    <p class="nota">En corto: FuelPath guarda tu peso, tu carrera y lo que marcas que comiste para armar tu pauta, sólo
+      con tu consentimiento. No vendemos ni compartimos tus datos, no hay publicidad, y puedes descargarlos o borrarlos
+      cuando quieras desde la app (Perfil).</p>
+
+    <h2>Qué datos guardamos</h2>
+    <ul>
+      <li><b>Tu cuenta:</b> correo, nombre (si lo das), cómo entras (clave, Google o Microsoft) y cuándo diste tu
+        consentimiento. La clave se guarda cifrada con scrypt: nadie puede leerla.</li>
+      <li><b>Datos de salud y de tu pauta:</b> peso, carrera (fecha, distancia, tiempo esperado), horarios,
+        restricciones y alergias que marques, si tienes el estómago sensible o sudas con sal, la agenda de comidas,
+        lo que marcas como comido, el agua, y tus planes anteriores con tu feedback.</li>
+      <li><b>Uso de la app:</b> cuándo se usa cada función (por ejemplo «armar pauta» y la distancia), si salió bien,
+        cuánto tardó, el idioma y el tipo de aparato. Va ligado a tu cuenta y a un identificador al azar del teléfono.
+        <b>No</b> guarda tu peso, tus comidas ni tu IP.</li>
+    </ul>
+
+    <h2>Por qué los usamos</h2>
+    <ul>
+      <li>Para armar y seguir tu pauta y para que esté igual en todos tus aparatos.</li>
+      <li>Para que puedas entrar a tu cuenta y recuperar tu clave.</li>
+      <li>Para ver qué falla y mejorar la app (con el registro de uso, sin datos de salud).</li>
+    </ul>
+    <p>Los datos de salud son <b>datos sensibles</b> (Ley 19.628 y Ley 21.719 de Chile; RGPD en Europa). Por eso los
+      tratamos sólo con tu <b>consentimiento explícito</b>, que das al crear tu cuenta y puedes retirar borrándola.</p>
+
+    <h2>Quién más los ve</h2>
+    <p>Nadie, salvo los servicios que hacen funcionar FuelPath y que sólo los guardan o transportan por nosotros:</p>
+    <ul>
+      <li><b>Render</b> (servidor) y <b>Neon</b> (base de datos Postgres), en Estados Unidos.</li>
+      <li><b>Resend</b>, para mandarte los correos de la cuenta (confirmar, recuperar la clave).</li>
+      <li><b>Google</b> o <b>Microsoft</b>, sólo si eliges entrar con ellos: nos dan tu correo y tu nombre.</li>
+    </ul>
+    <p>No vendemos datos, no hay publicidad ni rastreadores de terceros.</p>
+
+    <h2>Tu teléfono</h2>
+    <p>La app guarda tu pauta en el teléfono (almacenamiento local del navegador) para funcionar aunque el servidor
+      tarde en responder, y la sincroniza con tu cuenta. Usamos cookies sólo para la sesión y el identificador al azar.</p>
+
+    <h2>Cuánto tiempo</h2>
+    <ul>
+      <li>Tu cuenta y tus datos, hasta que la borres.</li>
+      <li>El registro de uso, 365 días; al borrar la cuenta deja de estar ligado a ti.</li>
+    </ul>
+
+    <h2>Tus derechos</h2>
+    <p>Puedes acceder a tus datos, corregirlos, borrarlos y oponerte a su tratamiento:</p>
+    <ul>
+      <li><b>Descargar todo</b> (JSON) en Perfil → «Descargar mis datos».</li>
+      <li><b>Borrar tu cuenta y todo lo tuyo</b> en Perfil → «Borrar mi cuenta». Es inmediato.</li>
+      <li>Corregir: edita tu carrera y tu peso en la pestaña Pauta.</li>
+    </ul>
+    <p>Para cualquier otra cosa, escríbenos a <a href="mailto:{{SOPORTE}}">{{SOPORTE}}</a>.</p>
+
+    <h2>Salud</h2>
+    <p>FuelPath es una guía general basada en consensos de nutrición deportiva. No es un servicio médico ni reemplaza
+      a tu nutricionista. Con diabetes, un trastorno alimentario o un embarazo, la app no arma pauta.</p>
+
+    <h2>Cambios</h2>
+    <p>Si cambiamos esta política te lo diremos en la app antes de que rija.</p>
+  </section>
+
+  <section lang="en">
+    <h1>Privacy</h1>
+    <p class="fecha">Updated November 13, 2026</p>
+    <p class="nota">In short: FuelPath stores your weight, your race and what you mark as eaten to build your plan,
+      only with your consent. We don't sell or share your data, there are no ads, and you can download or delete it
+      whenever you want from the app (Profile).</p>
+    <h2>What we store</h2>
+    <ul>
+      <li><b>Your account:</b> email, name (if you give it), how you sign in (password, Google or Microsoft) and when you
+        gave your consent. Passwords are hashed with scrypt: nobody can read them.</li>
+      <li><b>Health and plan data:</b> weight, race (date, distance, expected time), schedule, restrictions and allergies
+        you tick, whether you have a sensitive stomach or sweat salty, the meal schedule, what you mark as eaten, water,
+        and your past plans with your feedback.</li>
+      <li><b>App usage:</b> when each feature is used (e.g. «build plan» and the distance), whether it worked, how long it
+        took, language and device type. It's linked to your account and a random phone identifier. It does <b>not</b>
+        store your weight, your meals or your IP.</li>
+    </ul>
+    <h2>Why we use it</h2>
+    <ul>
+      <li>To build and track your plan and keep it the same on all your devices.</li>
+      <li>So you can sign in and recover your password.</li>
+      <li>To see what breaks and improve the app (usage log, no health data).</li>
+    </ul>
+    <p>Health data is <b>sensitive data</b> (Chilean Laws 19.628 and 21.719; GDPR in Europe). We process it only with
+      your <b>explicit consent</b>, given when you create your account, which you can withdraw by deleting it.</p>
+    <h2>Who else sees it</h2>
+    <p>Nobody, except the services that run FuelPath and only store or carry it for us: <b>Render</b> (server) and
+      <b>Neon</b> (Postgres database) in the United States; <b>Resend</b> for account emails; <b>Google</b> or
+      <b>Microsoft</b> only if you sign in with them. No data sales, no ads, no third-party trackers.</p>
+    <h2>Your phone</h2>
+    <p>The app keeps your plan on your phone (browser local storage) so it works even if the server is slow, and syncs
+      it with your account. Cookies are used only for the session and the random identifier.</p>
+    <h2>How long</h2>
+    <ul><li>Your account and data, until you delete it.</li>
+      <li>The usage log, 365 days; once you delete your account it's no longer linked to you.</li></ul>
+    <h2>Your rights</h2>
+    <ul><li><b>Download everything</b> (JSON) in Profile → «Download my data».</li>
+      <li><b>Delete your account and everything in it</b> in Profile → «Delete my account». It's immediate.</li>
+      <li>Correct: edit your race and weight in the Plan tab.</li></ul>
+    <p>For anything else, write to <a href="mailto:{{SOPORTE}}">{{SOPORTE}}</a>.</p>
+    <h2>Health</h2>
+    <p>FuelPath is general guidance based on sports nutrition consensus. It isn't a medical service and doesn't replace
+      your dietitian. With diabetes, an eating disorder or a pregnancy, the app doesn't build a plan.</p>
+    <h2>Changes</h2>
+    <p>If we change this policy we'll tell you in the app before it applies.</p>
+  </section>
+
+  <section lang="pt">
+    <h1>Privacidade</h1>
+    <p class="fecha">Atualizada em 13 de novembro de 2026</p>
+    <p class="nota">Resumindo: o FuelPath guarda seu peso, sua prova e o que você marca como comido para montar seu
+      plano, só com o seu consentimento. Não vendemos nem compartilhamos seus dados, não há anúncios, e você pode
+      baixá-los ou apagá-los quando quiser no app (Perfil).</p>
+    <h2>Que dados guardamos</h2>
+    <ul>
+      <li><b>Sua conta:</b> e-mail, nome (se você informar), como entra (senha, Google ou Microsoft) e quando deu seu
+        consentimento. A senha é guardada criptografada com scrypt: ninguém consegue lê-la.</li>
+      <li><b>Dados de saúde e do plano:</b> peso, prova (data, distância, tempo esperado), horários, restrições e
+        alergias que marcar, se tem estômago sensível ou sua salgado, a agenda de refeições, o que marca como comido,
+        a água e seus planos anteriores com seu feedback.</li>
+      <li><b>Uso do app:</b> quando cada função é usada (ex.: «montar plano» e a distância), se deu certo, quanto
+        demorou, idioma e tipo de aparelho. Fica ligado à sua conta e a um identificador aleatório do celular.
+        <b>Não</b> guarda seu peso, suas refeições nem seu IP.</li>
+    </ul>
+    <h2>Para que usamos</h2>
+    <ul><li>Para montar e acompanhar seu plano e mantê-lo igual em todos os seus aparelhos.</li>
+      <li>Para você entrar na conta e recuperar a senha.</li>
+      <li>Para ver o que falha e melhorar o app (registro de uso, sem dados de saúde).</li></ul>
+    <p>Dados de saúde são <b>dados sensíveis</b> (Leis 19.628 e 21.719 do Chile; LGPD no Brasil; RGPD na Europa).
+      Só os tratamos com seu <b>consentimento explícito</b>, dado ao criar a conta, que você pode retirar apagando-a.</p>
+    <h2>Quem mais vê</h2>
+    <p>Ninguém, exceto os serviços que fazem o FuelPath funcionar e só guardam ou transportam os dados para nós:
+      <b>Render</b> (servidor) e <b>Neon</b> (banco Postgres) nos Estados Unidos; <b>Resend</b> para os e-mails da conta;
+      <b>Google</b> ou <b>Microsoft</b> só se você entrar com eles. Sem venda de dados, sem anúncios, sem rastreadores.</p>
+    <h2>Seu celular</h2>
+    <p>O app guarda seu plano no celular (armazenamento local do navegador) para funcionar mesmo se o servidor demorar,
+      e o sincroniza com sua conta. Cookies só para a sessão e o identificador aleatório.</p>
+    <h2>Por quanto tempo</h2>
+    <ul><li>Sua conta e seus dados, até você apagá-la.</li>
+      <li>O registro de uso, 365 dias; ao apagar a conta, deixa de estar ligado a você.</li></ul>
+    <h2>Seus direitos</h2>
+    <ul><li><b>Baixar tudo</b> (JSON) em Perfil → «Baixar meus dados».</li>
+      <li><b>Apagar sua conta e tudo nela</b> em Perfil → «Apagar minha conta». É imediato.</li>
+      <li>Corrigir: edite sua prova e seu peso na aba Plano.</li></ul>
+    <p>Para qualquer outra coisa, escreva para <a href="mailto:{{SOPORTE}}">{{SOPORTE}}</a>.</p>
+    <h2>Saúde</h2>
+    <p>O FuelPath é um guia geral baseado em consensos de nutrição esportiva. Não é um serviço médico e não substitui
+      seu nutricionista. Com diabetes, transtorno alimentar ou gravidez, o app não monta plano.</p>
+    <h2>Mudanças</h2>
+    <p>Se mudarmos esta política, avisaremos no app antes de entrar em vigor.</p>
+  </section>
+</main>
+<script>
+  const q = new URLSearchParams(location.search).get("lang");
+  let app = null; try { app = JSON.parse(localStorage.getItem("fp_idioma")); } catch {}
+  let lang = (q || app || navigator.language || "es").toLowerCase().slice(0, 2);
+  if (!["es", "en", "pt"].includes(lang)) lang = "es";
+  document.body.classList.add(lang);
+  document.documentElement.lang = lang === "pt" ? "pt-BR" : lang;
+  document.title = { es: "Privacidad", en: "Privacy", pt: "Privacidade" }[lang] + " · FuelPath";
+  document.getElementById(lang).setAttribute("aria-current", "true");
+</script>
+</body>
+</html>

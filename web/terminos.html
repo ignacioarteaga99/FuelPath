@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Términos · FuelPath</title>
+<link rel="icon" type="image/svg+xml" href="/icons/icono.svg">
+<!-- Formato de PacePath (web/privacidad.html); contenido reescrito para FuelPath: aquí hay datos de salud. -->
+<style>
+  :root { --acento: #f2541b; --tinta: #1d1d21; --suave: #5d5d68; --linea: #e6e6ea; --fondo: #fff; }
+  @media (prefers-color-scheme: dark) { :root { --tinta: #f4f4f6; --suave: #a8a8b3; --linea: #2c2c33; --fondo: #141418; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--fondo); color: var(--tinta); font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif; }
+  main { max-width: 720px; margin: 0 auto; padding: calc(env(safe-area-inset-top) + 28px) 18px calc(env(safe-area-inset-bottom) + 60px); }
+  header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .marca { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 20px; color: var(--tinta); text-decoration: none; }
+  .marca img { width: 34px; height: 34px; border-radius: 9px; }
+  .idiomas a { color: var(--suave); font-weight: 700; text-decoration: none; margin-left: 10px; }
+  .idiomas a[aria-current] { color: var(--acento); }
+  h1 { font-size: 30px; line-height: 1.15; letter-spacing: -.6px; margin: 28px 0 6px; }
+  .fecha { color: var(--suave); font-size: 14px; margin: 0 0 22px; }
+  h2 { font-size: 18px; margin: 28px 0 6px; }
+  ul { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .nota { border: 1px solid var(--linea); border-radius: 12px; padding: 12px 14px; color: var(--suave); font-size: 14.5px; }
+  a { color: var(--acento); }
+  main [lang="en"], main [lang="pt"] { display: none; }
+  body.en main [lang="es"], body.pt main [lang="es"] { display: none; }
+  body.en main [lang="en"], body.pt main [lang="pt"] { display: block; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <a class="marca" href="/"><img src="/icons/icono-192.png" alt="">FuelPath</a>
+    <nav class="idiomas"><a href="?lang=es" id="es">ES</a><a href="?lang=en" id="en">EN</a><a href="?lang=pt" id="pt">PT</a></nav>
+  </header>
+
+  <section lang="es">
+    <h1>Términos de uso</h1>
+    <p class="fecha">Actualizados el 13 de noviembre de 2026</p>
+    <p class="nota">FuelPath te ayuda a seguir una carga de carbohidratos antes de una carrera. Es una guía general,
+      no un consejo médico: si tienes la pauta de tu nutricionista, sigue esa.</p>
+    <h2>Qué es FuelPath</h2>
+    <p>Una app que, con tu carrera, tu peso y tus horarios, arma una agenda de comidas basada en consensos de
+      nutrición deportiva (ACSM 2016, COI 2018) y te deja marcar lo que comes. Está en beta: puede tener errores.</p>
+    <h2>Tu salud</h2>
+    <ul>
+      <li>FuelPath no es un servicio médico ni de nutrición clínica, y no reemplaza a un profesional.</li>
+      <li>No la uses si tienes diabetes, un trastorno alimentario, estás embarazada u otra condición médica que
+        afecte tu alimentación: en esos casos consulta a un profesional.</li>
+      <li>Los valores de los alimentos son aproximados: lo que manda es la etiqueta de tu producto.</li>
+      <li>Prueba la pauta y los geles en tus entrenamientos antes de usarlos en una carrera.</li>
+    </ul>
+    <h2>Tu cuenta</h2>
+    <p>Eres responsable de tu clave y de lo que hagas con tu cuenta. Puedes borrarla cuando quieras desde Perfil.
+      Podemos desactivar cuentas que abusen del servicio.</p>
+    <h2>Tus datos</h2>
+    <p>Los tratamos como dice la <a href="/privacidad">política de privacidad</a>, con tu consentimiento.</p>
+    <h2>Responsabilidad</h2>
+    <p>FuelPath se entrega «tal cual», sin garantías de resultados deportivos ni de salud. En lo que permita la ley, no
+      respondemos por daños derivados de seguir la pauta sin supervisión profesional.</p>
+    <h2>Propiedad</h2>
+    <p>El código, el diseño y los textos de FuelPath tienen todos los derechos reservados.</p>
+    <h2>Ley aplicable</h2>
+    <p>Estos términos se rigen por las leyes de Chile. Dudas: <a href="mailto:{{SOPORTE}}">{{SOPORTE}}</a>.</p>
+  </section>
+
+  <section lang="en">
+    <h1>Terms of use</h1>
+    <p class="fecha">Updated November 13, 2026</p>
+    <p class="nota">FuelPath helps you follow a carb load before a race. It's general guidance, not medical advice:
+      if you have a plan from your dietitian, follow that one.</p>
+    <h2>What FuelPath is</h2>
+    <p>An app that, from your race, weight and schedule, builds a meal schedule based on sports nutrition consensus
+      (ACSM 2016, IOC 2018) and lets you tick what you eat. It's in beta: it may have bugs.</p>
+    <h2>Your health</h2>
+    <ul>
+      <li>FuelPath isn't a medical or clinical nutrition service and doesn't replace a professional.</li>
+      <li>Don't use it if you have diabetes, an eating disorder, are pregnant or have another medical condition that
+        affects your diet: see a professional instead.</li>
+      <li>Food values are approximate: your product's label is what counts.</li>
+      <li>Try the plan and the gels in training before using them in a race.</li>
+    </ul>
+    <h2>Your account</h2>
+    <p>You're responsible for your password and for what you do with your account. You can delete it any time from
+      Profile. We may disable accounts that abuse the service.</p>
+    <h2>Your data</h2>
+    <p>We handle it as described in the <a href="/privacidad?lang=en">privacy policy</a>, with your consent.</p>
+    <h2>Liability</h2>
+    <p>FuelPath is provided «as is», with no guarantee of athletic or health results. To the extent the law allows,
+      we're not liable for harm from following the plan without professional supervision.</p>
+    <h2>Ownership</h2>
+    <p>FuelPath's code, design and text are all rights reserved.</p>
+    <h2>Governing law</h2>
+    <p>These terms are governed by the laws of Chile. Questions: <a href="mailto:{{SOPORTE}}">{{SOPORTE}}</a>.</p>
+  </section>
+
+  <section lang="pt">
+    <h1>Termos de uso</h1>
+    <p class="fecha">Atualizados em 13 de novembro de 2026</p>
+    <p class="nota">O FuelPath ajuda você a seguir uma carga de carboidratos antes de uma prova. É um guia geral, não
+      um conselho médico: se você tem o plano do seu nutricionista, siga esse.</p>
+    <h2>O que é o FuelPath</h2>
+    <p>Um app que, com sua prova, seu peso e seus horários, monta uma agenda de refeições baseada em consensos de
+      nutrição esportiva (ACSM 2016, COI 2018) e deixa você marcar o que come. Está em beta: pode ter erros.</p>
+    <h2>Sua saúde</h2>
+    <ul>
+      <li>O FuelPath não é um serviço médico nem de nutrição clínica e não substitui um profissional.</li>
+      <li>Não use se tiver diabetes, transtorno alimentar, estiver grávida ou tiver outra condição médica que afete
+        sua alimentação: procure um profissional.</li>
+      <li>Os valores dos alimentos são aproximados: o que vale é o rótulo do seu produto.</li>
+      <li>Teste o plano e os géis nos treinos antes de usá-los numa prova.</li>
+    </ul>
+    <h2>Sua conta</h2>
+    <p>Você é responsável pela sua senha e pelo que faz com sua conta. Pode apagá-la quando quiser em Perfil. Podemos
+      desativar contas que abusem do serviço.</p>
+    <h2>Seus dados</h2>
+    <p>Tratamos como diz a <a href="/privacidad?lang=pt">política de privacidade</a>, com seu consentimento.</p>
+    <h2>Responsabilidade</h2>
+    <p>O FuelPath é oferecido «como está», sem garantia de resultados esportivos ou de saúde. Na medida permitida pela
+      lei, não respondemos por danos de seguir o plano sem supervisão profissional.</p>
+    <h2>Propriedade</h2>
+    <p>O código, o design e os textos do FuelPath têm todos os direitos reservados.</p>
+    <h2>Lei aplicável</h2>
+    <p>Estes termos são regidos pelas leis do Chile. Dúvidas: <a href="mailto:{{SOPORTE}}">{{SOPORTE}}</a>.</p>
+  </section>
+</main>
+<script>
+  const q = new URLSearchParams(location.search).get("lang");
+  let app = null; try { app = JSON.parse(localStorage.getItem("fp_idioma")); } catch {}
+  let lang = (q || app || navigator.language || "es").toLowerCase().slice(0, 2);
+  if (!["es", "en", "pt"].includes(lang)) lang = "es";
+  document.body.classList.add(lang);
+  document.documentElement.lang = lang === "pt" ? "pt-BR" : lang;
+  document.title = { es: "Términos", en: "Terms", pt: "Termos" }[lang] + " · FuelPath";
+  document.getElementById(lang).setAttribute("aria-current", "true");
+</script>
+</body>
+</html>

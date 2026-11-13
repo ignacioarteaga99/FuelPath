@@ -61,6 +61,9 @@ Complementa `CLAUDE.md`.
   - En PC: menú a la izquierda y panel a la derecha.
   - Al terminar la carrera: feedback y plan guardado como plan anterior.
   - Mockups en `docs/mockups/`.
+- **Fase 0 (nov 2026):** cuentas, panel, registro, correo y páginas legales traídos de PacePath.
+  - Consentimiento explícito para datos de salud (casilla al crear la cuenta).
+  - Render despliega la rama `produccion`; se trabaja en `main` y se pasa por fast-forward.
 - **Pendiente de decidir:** dominio propio (¿fuelpathapp.com?) o subdominio de
   pacepathapp.com.
 - **Próximo paso sugerido:**

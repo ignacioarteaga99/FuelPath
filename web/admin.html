@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Panel · FuelPath</title>
+<link rel="icon" type="image/svg+xml" href="/icons/icono.svg">
+<!-- Copiado de PacePath (web/admin.html, commit 58ecb41) y adaptado: sin motor, mapa ni Strava.
+     Quedan acceso beta, correo, usuarios, base de datos y el registro de consultas. -->
+<style>  :root {
+    --acento: #f2541b; --tinta: #1d1d21; --suave: #5d5d68; --tenue: #8a8a94; --linea: #e6e6ea;
+    --fondo: #f6f6f8; --tarjeta: #fff; --campo: #fff; --grilla: #ececf0;
+    --ok: #2a78d6; --error: #d03b3b; --ok-suave: #e8f1fc; --error-suave: #fbeaea; --verde: #0b8a0b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --tinta: #f4f4f6; --suave: #b0b0ba; --tenue: #85858f; --linea: #2c2c33; --fondo: #111114;
+      --tarjeta: #1a1a1e; --campo: #222227; --grilla: #26262c; --ok: #4f93e6; --error: #e5605f;
+      --ok-suave: #1b2a3d; --error-suave: #3a1e1f; --verde: #3cc13c; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--fondo); color: var(--tinta);
+    font: 14px/1.45 -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif; }
+  main { max-width: 1240px; margin: 0 auto; padding: 18px 16px 60px; }
+  header { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .marca { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 19px; }
+  .marca img { width: 32px; height: 32px; border-radius: 9px; }
+  .marca span { color: var(--suave); font-weight: 600; }
+  .almacen { font-size: 12.5px; padding: 4px 10px; border-radius: 999px; background: var(--tarjeta); border: 1px solid var(--linea); color: var(--suave); }
+  .almacen.mal { color: var(--error); border-color: var(--error); }
+  .acciones { margin-left: auto; display: flex; gap: 8px; }
+  button, select, input { font: inherit; color: inherit; }
+  button { cursor: pointer; border: 1px solid var(--linea); background: var(--tarjeta); border-radius: 10px; padding: 7px 12px; font-weight: 600; }
+  button:hover { border-color: var(--tenue); }
+  button.prim { background: var(--acento); border-color: var(--acento); color: #fff; }
+  select, input { background: var(--campo); border: 1px solid var(--linea); border-radius: 10px; padding: 7px 10px; font-size: 16px; min-width: 0; }
+  @media (min-width: 700px) { select, input { font-size: 14px; } }
+
+  .filtros { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 16px 0 6px; }
+  .chips { display: flex; gap: 4px; background: var(--tarjeta); border: 1px solid var(--linea); border-radius: 12px; padding: 3px; }
+  .chips button { border: 0; padding: 5px 10px; border-radius: 9px; background: none; color: var(--suave); }
+  .chips button.on { background: var(--tinta); color: var(--fondo); }
+  .rango { display: flex; gap: 6px; align-items: center; color: var(--suave); }
+  .rango input { width: 140px; }
+  .mas-filtros { display: contents; }
+  .filtros input[type=search] { flex: 1 1 180px; }
+  #verFiltros { display: none; }
+  @media (max-width: 700px) {
+    header .almacen { order: 3; flex-basis: 100%; text-align: center; }
+    .acciones button { padding: 6px 10px; }
+    #verFiltros { display: block; }
+    .mas-filtros { display: none; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; }
+    .mas-filtros.abierto { display: grid; }
+    .mas-filtros select { width: 100%; }
+    .mas-filtros .rango, .mas-filtros input[type=search] { grid-column: 1 / -1; }
+    .rango input { flex: 1; width: auto; }
+    .chips { flex: 1 1 100%; justify-content: space-between; }
+    .chips button { padding: 6px 4px; flex: 1; white-space: nowrap; }
+    #verFiltros { flex: 1 1 100%; }
+    .kpi { padding: 10px 12px; }
+    .kpi b { font-size: 22px; }
+  }
+  .resumen-filtro { color: var(--suave); font-size: 12.5px; margin: 0 0 14px; min-height: 18px; }
+  .resumen-filtro button { padding: 1px 8px; font-size: 12px; margin-left: 6px; }
+
+  .kpis { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-bottom: 14px; }
+  @media (max-width: 900px) { .kpis { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 480px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
+  .kpi { background: var(--tarjeta); border: 1px solid var(--linea); border-radius: 14px; padding: 12px 14px; }
+  .kpi span { display: block; font-size: 12px; color: var(--suave); }
+  .kpi b { display: block; font-size: 26px; letter-spacing: -.5px; margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .kpi small { color: var(--tenue); font-size: 12px; }
+
+  .grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 14px; margin-bottom: 14px; }
+  @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+  .tarjeta { background: var(--tarjeta); border: 1px solid var(--linea); border-radius: 14px; padding: 14px 16px; min-width: 0; margin-bottom: 14px; }
+  .grid .tarjeta { margin-bottom: 0; }
+  .tarjeta h2 { font-size: 15px; margin: 0 0 2px; }
+  .tarjeta .sub { color: var(--suave); font-size: 12.5px; margin: 0 0 10px; }
+  .leyenda { display: flex; gap: 14px; font-size: 12.5px; color: var(--suave); margin-bottom: 6px; }
+  .leyenda i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
+  svg { display: block; width: 100%; overflow: visible; }
+  svg text { fill: var(--tenue); font-size: 11px; }
+  .barra-h { display: grid; grid-template-columns: minmax(0, 170px) 1fr auto; gap: 8px; align-items: center; padding: 4px 6px; border-radius: 8px; cursor: pointer; }
+  .barra-h:hover, .barra-h.on { background: var(--fondo); }
+  .barra-h span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 13px; }
+  .barra-h .pista { height: 10px; display: flex; gap: 2px; }
+  .barra-h .pista i { display: block; height: 100%; border-radius: 0 4px 4px 0; }
+  .barra-h .pista i.e { border-radius: 0 4px 4px 0; }
+  .barra-h .pista i.o:not(:last-child) { border-radius: 0; }
+  .barra-h b { font-size: 12.5px; font-variant-numeric: tabular-nums; color: var(--suave); font-weight: 600; }
+
+  .tabla { overflow-x: auto; margin: 0 -16px; padding: 0 16px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th { text-align: left; color: var(--suave); font-weight: 600; font-size: 12px; padding: 6px 8px; border-bottom: 1px solid var(--linea); white-space: nowrap; position: sticky; top: 0; background: var(--tarjeta); }
+  td { padding: 6px 8px; border-bottom: 1px solid var(--grilla); vertical-align: top; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tr.clic { cursor: pointer; }
+  tr.clic:hover td { background: var(--fondo); }
+  .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+  .nowrap { white-space: nowrap; }
+  .err { color: var(--error); max-width: 420px; }
+  .det { max-width: 280px; color: var(--suave); }
+  .res { display: inline-flex; align-items: center; gap: 4px; font-weight: 700; font-size: 12px; padding: 1px 8px; border-radius: 999px; white-space: nowrap; }
+  .res.ok { color: var(--verde); background: color-mix(in srgb, var(--verde) 12%, transparent); }
+  .res.mal { color: var(--error); background: var(--error-suave); }
+  .tag { font-size: 11px; color: var(--suave); border: 1px solid var(--linea); border-radius: 999px; padding: 0 6px; white-space: nowrap; }
+  .mas { margin-top: 10px; }
+  a { color: var(--ok); }
+  td.err { min-width: 220px; }
+  td.det { min-width: 140px; }
+  .fichas { display: none; }
+  .ficha { padding: 10px 0; border-bottom: 1px solid var(--grilla); display: grid; gap: 3px; }
+  .ficha .l1 { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .ficha .l1 b { font-size: 13.5px; }
+  .ficha .l1 .res { margin-left: auto; }
+  .ficha small { color: var(--suave); font-size: 12.5px; }
+  .ficha .err { font-size: 12.5px; }
+  @media (max-width: 700px) {
+    #tRegistro .tabla { display: none; }
+    #tRegistro .fichas { display: block; max-height: 75vh; overflow: auto; }
+  }
+  .vacio { color: var(--suave); padding: 18px 0; text-align: center; }
+  .scroll { max-height: 420px; overflow: auto; }
+  .tabla.alta { max-height: 70vh; overflow: auto; }
+
+  #tip { position: fixed; pointer-events: none; z-index: 10; background: var(--tinta); color: var(--fondo); padding: 7px 10px; border-radius: 9px; font-size: 12.5px; line-height: 1.4; display: none; white-space: nowrap; }
+  #login { max-width: 380px; margin: 12vh auto; background: var(--tarjeta); border: 1px solid var(--linea); border-radius: 16px; padding: 22px; }
+  #login h1 { font-size: 20px; margin: 0 0 6px; }
+  #login p { color: var(--suave); margin: 0 0 14px; }
+  #login form { display: flex; gap: 8px; }
+  #login input { flex: 1; }
+  #login .mal { color: var(--error); margin-top: 10px; min-height: 1em; }
+  .cargando { color: var(--suave); padding: 30px 0; text-align: center; }
+  .limite { height: 6px; border-radius: 3px; background: var(--grilla); margin-top: 8px; overflow: hidden; }
+  .limite i { display: block; height: 100%; border-radius: 3px; }
+  .acc-prueba { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .acc-prueba input { flex: 1; min-width: 180px; }
+  .acceso { margin: 14px 0 0; }
+  .acc-cab { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .acc-cab .sub { margin: 0; }
+  .acc-cab .sub b.on { color: var(--verde); }
+  .acc-form { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .acc-form label { display: grid; gap: 3px; font-size: 12px; color: var(--suave); flex: 1 1 180px; }
+  .acc-form button { align-self: end; }
+  .acc-aviso { font-size: 12.5px; color: var(--suave); margin: 8px 0 0; min-height: 1em; }
+  .acc-aviso.mal { color: var(--error); }
+  .interruptor { position: relative; display: inline-block; vertical-align: middle; flex: none; width: 50px; height: 30px; }
+  .interruptor input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+  .interruptor span { position: absolute; inset: 0; border-radius: 999px; background: var(--linea); transition: background .2s; pointer-events: none; }
+  .interruptor span:after { content: ""; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,.3); transition: transform .2s; }
+  .interruptor input:checked + span { background: var(--acento); }
+  .interruptor input:checked + span:after { transform: translateX(20px); }
+  .interruptor input:focus-visible + span { outline: 2px solid var(--ok); outline-offset: 2px; }
+  .interruptor.chico { width: 40px; height: 24px; }
+  .interruptor.chico span:after { width: 18px; height: 18px; }
+  .interruptor.chico input:checked + span:after { transform: translateX(16px); }
+  .usr-cab { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .usr-filtros { display: flex; gap: 8px; margin: 12px 0 8px; flex-wrap: wrap; }
+  .usr-filtros input { flex: 1 1 220px; }
+  .usr td { vertical-align: middle; }
+  .usr .metodos .tag { margin-right: 4px; }
+  .usr .acc button { padding: 4px 8px; font-size: 12.5px; margin-left: 4px; }
+  .usr .apagado td { opacity: .55; }
+  dialog { border: 1px solid var(--linea); border-radius: 16px; padding: 20px; background: var(--tarjeta); color: var(--tinta); width: min(420px, 92vw); }
+  dialog::backdrop { background: rgba(0,0,0,.35); }
+  dialog form { display: grid; gap: 10px; }
+  dialog h2 { font-size: 17px; margin: 0 0 4px; }
+  dialog label { display: grid; gap: 4px; font-size: 12.5px; color: var(--suave); }
+  dialog .fila-chk { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--tinta); }
+  .dlg-acciones { display: flex; justify-content: flex-end; gap: 8px; margin-top: 4px; }
+  @media (max-width: 700px) {
+    .usr .creado, .usr .metodos { display: none; }
+  }
+
+  .faltan { color: var(--error); }
+  .config { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px; margin-top: 10px; }
+  .config div { border: 1px solid var(--linea); border-radius: 10px; padding: 8px 10px; font-size: 13px; }
+  .config b { display: block; font-size: 12px; color: var(--suave); font-weight: 600; }
+  .config .on { color: var(--verde); font-weight: 700; } .config .off { color: var(--error); font-weight: 700; }
+</style>
+</head>
+<body>
+<div id="login" hidden>
+  <h1>Panel de FuelPath</h1>
+  <p>Escribe la clave de administración (la variable <code>FUELPATH_ADMIN</code> de Render).</p>
+  <form id="formLogin"><input id="clave" type="password" autocomplete="current-password" placeholder="Clave" required>
+    <button class="prim" type="submit">Entrar</button></form>
+  <div class="mal" id="loginError"></div>
+</div>
+
+<main id="panel" hidden>
+  <header>
+    <div class="marca"><img src="/icons/icono-192.png" alt="">FuelPath <span>· Panel</span></div>
+    <span class="almacen" id="almacen"></span>
+    <div class="acciones">
+      <button id="actualizar" type="button">Actualizar</button>
+      <button id="csv" type="button">CSV</button>
+      <button id="salir" type="button">Salir</button>
+    </div>
+  </header>
+
+  <section class="tarjeta acceso" id="acceso">
+    <div class="acc-cab">
+      <div><h2>Acceso beta</h2><p class="sub" id="accEstado">Cargando…</p></div>
+      <label class="interruptor" title="Activar o desactivar"><input type="checkbox" id="accActivo" role="switch" aria-label="Beta cerrada"><span></span></label>
+    </div>
+    <div class="config" id="accConfig"></div>
+    <p class="acc-aviso" id="accCorreo"></p>
+    <form class="acc-prueba" id="accPrueba" hidden><input type="email" id="pruebaPara" required placeholder="tu@correo.cl" aria-label="Correo para la prueba">
+      <button type="submit">Mandar correo de prueba</button></form>
+    <p class="acc-aviso" id="accAviso"></p>
+  </section>
+
+  <section class="tarjeta" id="usuarios">
+    <div class="usr-cab">
+      <div><h2>Usuarios</h2><p class="sub" id="usrResumen">Cargando…</p></div>
+      <button class="prim" type="button" id="usrNuevo">+ Nuevo usuario</button>
+    </div>
+    <div class="usr-filtros">
+      <input type="search" id="usrBuscar" placeholder="Buscar por correo o nombre…" aria-label="Buscar usuarios">
+      <select id="usrFiltro" aria-label="Filtrar usuarios">
+        <option value="">Todos</option><option value="beta">Con beta</option><option value="sinbeta">Sin beta</option>
+        <option value="sinconsentimiento">Sin consentimiento</option><option value="bloqueados">Desactivados</option>
+      </select>
+    </div>
+    <div id="usrLista"></div>
+  </section>
+
+  <dialog id="usrDialogo">
+    <form method="dialog" id="usrForm">
+      <h2 id="usrTitulo">Nuevo usuario</h2>
+      <label>Correo<input id="uCorreo" type="email" required maxlength="200" autocomplete="off"></label>
+      <label>Nombre<input id="uNombre" maxlength="80" autocomplete="off"></label>
+      <label><span id="uClaveEt">Clave (opcional)</span><input id="uClave" type="password" minlength="8" maxlength="200" autocomplete="new-password" placeholder="Vacía = entra con Google o Microsoft"></label>
+      <label class="fila-chk"><input type="checkbox" id="uBeta"> Habilitado para la beta</label>
+      <label class="fila-chk" id="uAvisarFila"><input type="checkbox" id="uAvisar" checked> Avisarle por correo al habilitarlo</label>
+      <p class="acc-aviso mal" id="uError"></p>
+      <div class="dlg-acciones"><button type="button" id="uCancelar">Cancelar</button><button class="prim" type="submit">Guardar</button></div>
+    </form>
+  </dialog>
+
+  <section class="tarjeta" id="base"><h2>Base de datos</h2><p class="sub" id="baseResumen">Cargando…</p><div id="baseTablas"></div></section>
+
+  <div class="filtros">
+    <div class="chips" id="periodos" role="group" aria-label="Periodo">
+      <button type="button" data-d="1">Hoy</button><button type="button" data-d="7">7 días</button>
+      <button type="button" data-d="30">30 días</button><button type="button" data-d="90">90 días</button>
+      <button type="button" data-d="365">1 año</button>
+    </div>
+    <button type="button" id="verFiltros" aria-expanded="false">Filtros</button>
+    <div class="mas-filtros" id="masFiltros">
+    <div class="rango"><input type="date" id="desde" aria-label="Desde"> – <input type="date" id="hasta" aria-label="Hasta"></div>
+    <select id="fConsulta" aria-label="Tipo de consulta"></select>
+    <select id="fResultado" aria-label="Resultado">
+      <option value="">Todos los resultados</option><option value="1">Exitosas</option><option value="0">Con error</option></select>
+    <select id="fCuenta" aria-label="Cuenta"></select>
+    <select id="fDisp" aria-label="Dispositivo"></select>
+    <input type="search" id="fTexto" placeholder="Buscar en detalle o error…" aria-label="Buscar">
+    </div>
+  </div>
+  <p class="resumen-filtro" id="resumenFiltro"></p>
+  <div id="contenido"><div class="cargando">Cargando…</div></div>
+</main>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const num = (n) => Number(n).toLocaleString("es-CL");
+const ZONA = "America/Santiago";
+const NOMBRES = {
+  visita: "Visita", privacidad: "Privacidad", terminos: "Términos", carga: "Armar pauta", reparto: "Recalcular",
+  alimentos: "Lista de alimentos", cuenta_registro: "Cuenta · registro", cuenta_entrar: "Cuenta · entrar", cuenta_salir: "Cuenta · salir",
+  cuenta_google: "Cuenta · vuelta de Google", cuenta_microsoft: "Cuenta · vuelta de Microsoft",
+  cuenta_exportar: "Cuenta · descargar datos", cuenta_borrar: "Cuenta · borrar",
+};
+const nombre = (c) => NOMBRES[c] || c;
+let CLAVE = null;
+try { CLAVE = sessionStorage.getItem("fp_admin"); } catch {}
+let datos = null, cuentasPorId = {}, correoActivo = false, mostrar = 100;
+
+$("formLogin").onsubmit = async (e) => {
+  e.preventDefault();
+  CLAVE = $("clave").value; $("loginError").textContent = "";
+  if (await cargar()) { try { sessionStorage.setItem("fp_admin", CLAVE); } catch {} }
+};
+$("salir").onclick = () => { try { sessionStorage.removeItem("fp_admin"); } catch {} CLAVE = null; datos = null; verLogin(); };
+function verLogin(msg) { $("panel").hidden = true; $("login").hidden = false; $("loginError").textContent = msg || ""; $("clave").focus(); }
+
+const diaLocal = (d) => new Intl.DateTimeFormat("en-CA", { timeZone: ZONA, year: "numeric", month: "2-digit", day: "2-digit" }).format(d);
+const sumarDias = (dia, n) => { const d = new Date(dia + "T12:00:00Z"); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+const horaLocal = (ts) => ts ? new Intl.DateTimeFormat("es-CL", { timeZone: ZONA, day: "numeric", month: "numeric", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(new Date(ts)) : "—";
+function ponerPeriodo(d) {
+  const hoy = diaLocal(new Date());
+  $("hasta").value = hoy; $("desde").value = sumarDias(hoy, -(d - 1));
+  document.querySelectorAll("#periodos button").forEach((b) => b.classList.toggle("on", +b.dataset.d === d));
+}
+document.querySelectorAll("#periodos button").forEach((b) => b.onclick = () => { ponerPeriodo(+b.dataset.d); cargar(); });
+$("desde").onchange = $("hasta").onchange = () => { document.querySelectorAll("#periodos button").forEach((b) => b.classList.remove("on")); cargar(); };
+$("verFiltros").onclick = () => $("verFiltros").setAttribute("aria-expanded", $("masFiltros").classList.toggle("abierto"));
+
+async function api(ruta, metodo = "GET", cuerpo) {
+  const r = await fetch(ruta, { method: metodo, headers: { "X-Admin-Clave": CLAVE, ...(cuerpo ? { "Content-Type": "application/json" } : {}) },
+    body: cuerpo ? JSON.stringify(cuerpo) : undefined });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.detail?.mensaje || (typeof j.detail === "string" ? j.detail : `El servidor respondió ${r.status}.`));
+  return j;
+}
+async function cargar() {
+  if (!CLAVE) { verLogin(); return false; }
+  $("contenido").innerHTML = '<div class="cargando">Cargando…</div>';
+  let r;
+  try { r = await fetch(`/api/admin/eventos?desde=${$("desde").value}&hasta=${$("hasta").value}`, { headers: { "X-Admin-Clave": CLAVE } }); }
+  catch { $("contenido").innerHTML = '<div class="vacio">No pude conectar con el servidor (¿Render está despertando? Prueba de nuevo en unos segundos).</div>'; return false; }
+  if (r.status === 404) { verLogin("Clave incorrecta."); return false; }
+  if (!r.ok) { $("contenido").innerHTML = `<div class="vacio">El servidor respondió ${r.status}.</div>`; return false; }
+  const j = await r.json();
+  datos = { ...j, filas: j.filas.map((f) => Object.fromEntries(j.columnas.map((c, i) => [c, f[i]]))) };
+  if ($("panel").hidden) { acceso(); cargarUsuarios(); }
+  api("/api/admin/consumo").then(pintarBase).catch(() => {});
+  $("login").hidden = true; $("panel").hidden = false;
+  const a = $("almacen");
+  a.className = "almacen" + (j.almacen !== "postgres" || j.error_almacen ? " mal" : "");
+  a.textContent = j.error_almacen ? `Base de datos con problemas: ${j.error_almacen}`
+    : j.almacen === "postgres" ? "Guardado en Postgres (Neon)" : "Sin DATABASE_URL: se borra cuando Render duerme";
+  llenarFiltros(); mostrar = 100; pintar();
+  return true;
+}
+$("actualizar").onclick = () => { cargar(); acceso(); cargarUsuarios(); };
+
+// ── Acceso beta, correo y configuración (sólo nombres de variables, nunca valores) ──
+function pintarAcceso(a) {
+  $("accActivo").checked = a.activo;
+  $("accEstado").innerHTML = a.activo ? '<b class="on">Activado</b> · sólo entran las cuentas con beta (abajo)'
+    : "<b>Desactivado</b> · cualquiera puede crear su cuenta y entrar";
+  correoActivo = !!a.correo_activo;
+  const fila = (t, ok, txt) => `<div><b>${t}</b><span class="${ok ? "on" : "off"}">${txt}</span></div>`;
+  $("accConfig").innerHTML = fila("Dominio (FUELPATH_URL)", !!a.url, a.url ? esc(a.url) : "Sin definir: los enlaces usan la dirección de Render")
+    + fila("Entrar con Google", a.proveedores?.google, a.proveedores?.google ? "Configurado" : "Falta GOOGLE_CLIENT_ID/SECRET")
+    + fila("Entrar con Microsoft", a.proveedores?.microsoft, a.proveedores?.microsoft ? "Configurado" : "Falta MICROSOFT_CLIENT_ID/SECRET")
+    + (a.libre ? fila("FUELPATH_ACCESO_LIBRE", false, "¡Está en 1! Sólo para tests y desarrollo: quítala de Render") : "");
+  $("accCorreo").innerHTML = a.correo_activo ? 'Correos de verificación y recuperación: <b class="on">encendidos</b>'
+    : "Correos de verificación y recuperación: <b>apagados</b> (mientras, si alguien olvida su clave, pónle una nueva con «Editar»)"
+      + (a.correo_faltan?.length ? `<br><span class="faltan">En Render falta: ${a.correo_faltan.map(esc).join(", ")}</span>` : "");
+  const ce = a.correo_estado || {};
+  if (a.correo_activo && ce.error) $("accCorreo").innerHTML += `<br><span class="faltan">Último envío falló (${new Date(ce.error_ts * 1000).toLocaleString("es-CL")}): ${esc(ce.error)}</span>`;
+  else if (a.correo_activo && ce.ok_ts) $("accCorreo").innerHTML += ` · último envío bien ${new Date(ce.ok_ts * 1000).toLocaleString("es-CL")}`;
+  $("accPrueba").hidden = !a.correo_activo;
+}
+function avisoAcceso(texto, mal) { $("accAviso").textContent = texto; $("accAviso").className = "acc-aviso" + (mal ? " mal" : ""); }
+async function acceso(cuerpo) {
+  try { const a = await api("/api/admin/acceso", cuerpo ? "POST" : "GET", cuerpo); pintarAcceso(a); avisoAcceso(""); return a; }
+  catch (e) { avisoAcceso(e.message, true); return null; }
+}
+$("accActivo").onchange = async () => { const q = $("accActivo").checked; if (!await acceso({ activo: q })) $("accActivo").checked = !q; };
+$("accPrueba").onsubmit = async (e) => {
+  e.preventDefault();
+  const b = $("accPrueba").querySelector("button"); b.disabled = true; avisoAcceso("Mandando…");
+  let msg, mal = false;
+  try { await api("/api/admin/correo/prueba", "POST", { para: $("pruebaPara").value.trim() }); msg = `Listo: revisa ${$("pruebaPara").value.trim()} (y Spam).`; }
+  catch (err) { msg = err.message; mal = true; }
+  await acceso(); avisoAcceso(msg, mal); b.disabled = false;
+};
+
+// ── Usuarios ──
+let usuarios = [], editando = null;
+async function cargarUsuarios() {
+  try { usuarios = await api("/api/admin/usuarios"); cuentasPorId = Object.fromEntries(usuarios.map((u) => [u.id, u.correo])); pintarUsuarios();
+    if (datos) { llenarFiltros(); pintar(); } }
+  catch (e) { $("usrLista").innerHTML = `<div class="vacio">${esc(e.message)}</div>`; }
+}
+function pintarUsuarios() {
+  const q = $("usrBuscar").value.trim().toLowerCase(), f = $("usrFiltro").value;
+  const lista = usuarios.filter((u) => (!q || u.correo.includes(q) || (u.nombre || "").toLowerCase().includes(q))
+    && (!f || (f === "beta" ? u.beta : f === "sinbeta" ? !u.beta : f === "sinconsentimiento" ? !u.consentimiento : !u.activo)));
+  $("usrResumen").textContent = `${num(usuarios.length)} cuentas · ${num(usuarios.filter((u) => u.beta).length)} con beta · ${num(usuarios.filter((u) => !u.consentimiento).length)} sin consentimiento`;
+  $("usrLista").innerHTML = lista.length ? `<div class="tabla"><table class="usr"><thead><tr>
+      <th>Correo</th><th>Nombre</th><th class="metodos">Entra con</th><th>Consentimiento</th><th>Beta</th><th>Activo</th><th class="creado">Creado</th><th>Último ingreso</th><th></th></tr></thead><tbody>
+    ${lista.map((u) => `<tr class="${u.activo ? "" : "apagado"}" data-id="${u.id}">
+      <td>${esc(u.correo)}</td><td>${esc(u.nombre || "—")}</td>
+      <td class="metodos">${u.metodos.length ? u.metodos.map((m) => `<span class="tag">${{ clave: "correo", google: "Google", microsoft: "Microsoft" }[m]}</span>`).join("") : '<span class="tag">pendiente</span>'}</td>
+      <td class="nowrap">${u.consentimiento ? horaLocal(u.consentimiento) : '<span class="tag">no</span>'}</td>
+      <td><label class="interruptor chico"><input type="checkbox" data-campo="beta" ${u.beta ? "checked" : ""} aria-label="Beta"><span></span></label></td>
+      <td><label class="interruptor chico"><input type="checkbox" data-campo="activo" ${u.activo ? "checked" : ""} aria-label="Activo"><span></span></label></td>
+      <td class="creado nowrap">${horaLocal(u.creado)}</td><td class="nowrap">${horaLocal(u.ultimo)}</td>
+      <td class="acc nowrap"><button type="button" data-editar>Editar</button><button type="button" data-borrar>Borrar</button></td></tr>`).join("")}
+    </tbody></table></div>` : '<div class="vacio">No hay usuarios con ese filtro.</div>';
+}
+$("usrBuscar").oninput = $("usrFiltro").onchange = pintarUsuarios;
+$("usrLista").addEventListener("change", async (e) => {
+  const chk = e.target.closest("input[data-campo]"); if (!chk) return;
+  const id = chk.closest("tr").dataset.id;
+  try { const u = await api(`/api/admin/usuarios/${id}`, "PATCH", { [chk.dataset.campo]: chk.checked }); usuarios = usuarios.map((x) => x.id === id ? u : x); pintarUsuarios(); }
+  catch (err) { chk.checked = !chk.checked; alert(err.message); }
+});
+$("usrLista").addEventListener("click", async (e) => {
+  const fila = e.target.closest("tr[data-id]"); if (!fila) return;
+  const u = usuarios.find((x) => x.id === fila.dataset.id);
+  if (e.target.closest("[data-editar]")) abrirUsuario(u);
+  if (e.target.closest("[data-borrar]") && confirm(`¿Borrar la cuenta de ${u.correo} y todos sus datos? No se puede deshacer.`)) {
+    try { await api(`/api/admin/usuarios/${u.id}`, "DELETE"); usuarios = usuarios.filter((x) => x.id !== u.id); pintarUsuarios(); }
+    catch (err) { alert(err.message); }
+  }
+});
+function abrirUsuario(u) {
+  editando = u || null;
+  $("usrTitulo").textContent = u ? "Editar usuario" : "Nuevo usuario";
+  $("uCorreo").value = u?.correo || ""; $("uNombre").value = u?.nombre || ""; $("uClave").value = "";
+  $("uClaveEt").textContent = u ? "Clave nueva (vacía = no cambia)" : "Clave (opcional)";
+  $("uBeta").checked = u ? u.beta : true; $("uError").textContent = "";
+  $("uAvisar").checked = true; $("uAvisarFila").hidden = !correoActivo;
+  $("usrDialogo").showModal();
+}
+$("usrNuevo").onclick = () => abrirUsuario(null);
+$("uCancelar").onclick = () => $("usrDialogo").close();
+$("usrForm").onsubmit = async (e) => {
+  e.preventDefault();
+  const cuerpo = { correo: $("uCorreo").value.trim(), nombre: $("uNombre").value.trim(), beta: $("uBeta").checked, avisar: $("uAvisar").checked };
+  if ($("uClave").value) cuerpo.clave = $("uClave").value;
+  try {
+    const u = editando ? await api(`/api/admin/usuarios/${editando.id}`, "PATCH", cuerpo) : await api("/api/admin/usuarios", "POST", cuerpo);
+    usuarios = editando ? usuarios.map((x) => x.id === u.id ? u : x) : [u, ...usuarios];
+    pintarUsuarios(); $("usrDialogo").close();
+  } catch (err) { $("uError").textContent = err.message; }
+};
+
+// ── Base de datos (Neon gratis: 0,5 GB) ──
+const tam = (b) => b == null ? "—" : b > 1048576 ? `${(b / 1048576).toLocaleString("es-CL", { maximumFractionDigits: 1 })} MB` : `${Math.round(b / 1024)} KB`;
+function pintarBase(c) {
+  cuentasPorId = { ...cuentasPorId, ...c.cuentas };
+  const b = c.base, pct = b.total_bytes / (512 * 1048576) * 100;
+  $("baseResumen").textContent = `${b.almacen === "postgres" ? "Postgres (Neon)" : "SQLite local"} · ${tam(b.total_bytes)} de 512 MB (${pct.toLocaleString("es-CL", { maximumFractionDigits: 1 })} %)`;
+  $("baseTablas").innerHTML = `<div class="limite"><i style="width:${Math.min(100, pct).toFixed(1)}%;background:${pct > 80 ? "var(--error)" : "var(--ok)"}"></i></div>
+    <div class="tabla"><table><thead><tr><th>Tabla</th><th class="num">Filas</th><th class="num">Tamaño</th></tr></thead><tbody>
+    ${b.tablas.map((t) => `<tr><td class="mono">${esc(t.tabla)}</td><td class="num">${num(t.filas)}</td><td class="num">${tam(t.bytes)}</td></tr>`).join("")}</tbody></table></div>`;
+}
+
+// ── Registro de consultas ──
+function opciones(sel, valores, todos, etiqueta = (v) => v) {
+  const actual = sel.value;
+  sel.innerHTML = `<option value="">${todos}</option>` + valores.map(([v, n]) => `<option value="${esc(v)}">${esc(etiqueta(v))} (${num(n)})</option>`).join("");
+  if (valores.some(([v]) => String(v) === actual)) sel.value = actual;
+}
+const contar = (filas, k) => [...filas.reduce((m, f) => f[k] != null && f[k] !== "" ? m.set(f[k], (m.get(f[k]) || 0) + 1) : m, new Map())].sort((a, b) => b[1] - a[1]);
+const quien = (id) => id ? (cuentasPorId[id] || id) : "sin cuenta";
+function llenarFiltros() {
+  const F = datos.filas;
+  opciones($("fConsulta"), contar(F, "consulta"), "Todas las consultas", nombre);
+  opciones($("fCuenta"), contar(F, "cuenta"), "Todas las cuentas", quien);
+  opciones($("fDisp"), contar(F, "disp"), "Todos los dispositivos");
+}
+["fConsulta", "fResultado", "fCuenta", "fDisp"].forEach((id) => $(id).onchange = () => { mostrar = 100; pintar(); });
+let tTexto; $("fTexto").oninput = () => { clearTimeout(tTexto); tTexto = setTimeout(() => { mostrar = 100; pintar(); }, 200); };
+function filtradas() {
+  const c = $("fConsulta").value, r = $("fResultado").value, cu = $("fCuenta").value, d = $("fDisp").value, q = $("fTexto").value.trim().toLowerCase();
+  return datos.filas.filter((f) => (!c || f.consulta === c) && (r === "" || String(f.exito) === r) && (!cu || f.cuenta === cu)
+    && (!d || f.disp === d) && (!q || `${f.detalle || ""} ${f.error || ""} ${f.evento || ""} ${f.tipo || ""}`.toLowerCase().includes(q)));
+}
+const insignia = (f) => `<span class="res ${f.exito ? "ok" : "mal"}" title="HTTP ${f.estado ?? "?"}">${f.exito ? "✓" : "✕"}${f.estado ? " " + f.estado : ""}</span>`;
+function pintar() {
+  const F = filtradas();
+  $("resumenFiltro").textContent = `${num(F.length)} de ${num(datos.filas.length)} consultas${datos.truncado ? " (el periodo tiene más: se muestran las más recientes)" : ""}`;
+  if (!datos.filas.length) { $("contenido").innerHTML = '<div class="tarjeta vacio">No hay consultas en este periodo.</div>'; return; }
+  const errores = F.filter((f) => !f.exito), cuentas = new Set(F.map((f) => f.cuenta).filter(Boolean));
+  const ms = F.map((f) => f.ms).filter((x) => x != null).sort((a, b) => a - b), mediana = ms.length ? ms[ms.length >> 1] : 0;
+  const porTipo = contar(F, "consulta"), porDist = contar(F.filter((f) => f.consulta === "carga"), "tipo");
+  $("contenido").innerHTML = `
+    <div class="kpis">
+      <div class="kpi"><span>Consultas</span><b>${num(F.length)}</b></div>
+      <div class="kpi"><span>Cuentas</span><b>${num(cuentas.size)}</b></div>
+      <div class="kpi"><span>Pautas armadas</span><b>${num(F.filter((f) => f.consulta === "carga" && f.exito).length)}</b></div>
+      <div class="kpi"><span>Recálculos</span><b>${num(F.filter((f) => f.consulta === "reparto" && f.exito).length)}</b></div>
+      <div class="kpi"><span>Con error</span><b>${num(errores.length)}</b></div>
+      <div class="kpi"><span>Tiempo mediano</span><b>${num(mediana)} ms</b></div>
+    </div>
+    <div class="grid">
+      <div class="tarjeta"><h2>Por tipo de consulta</h2><div class="tabla"><table><tbody>${porTipo.map(([k, n]) => `<tr><td>${esc(nombre(k))}</td><td class="num">${num(n)}</td></tr>`).join("")}</tbody></table></div></div>
+      <div class="tarjeta"><h2>Pautas por distancia</h2>${porDist.length ? `<div class="tabla"><table><tbody>${porDist.map(([k, n]) => `<tr><td>${esc(k)}</td><td class="num">${num(n)}</td></tr>`).join("")}</tbody></table></div>` : '<div class="vacio">Todavía no hay pautas.</div>'}</div>
+    </div>
+    <div class="tarjeta"><h2>Registro</h2><p class="sub">Las más recientes primero</p><div id="tRegistro"></div></div>`;
+  const vista = F.slice(0, mostrar);
+  $("tRegistro").innerHTML = `<div class="tabla alta"><table><thead><tr><th>Hora</th><th>Cuenta</th><th>Consulta</th><th>Tipo</th><th>Resultado</th><th class="num">Tiempo</th><th>Error</th></tr></thead><tbody>
+    ${vista.map((f) => `<tr><td class="nowrap">${horaLocal(f.ts)}</td><td>${esc(quien(f.cuenta))}</td>
+      <td class="nowrap">${esc(nombre(f.consulta))}${f.evento && f.evento !== f.consulta ? ` <span class="tag">${esc(f.evento)}</span>` : ""}</td>
+      <td>${esc(f.tipo || "")}</td><td>${insignia(f)}</td><td class="num nowrap">${f.ms != null ? num(f.ms) + " ms" : ""}</td>
+      <td class="err">${esc(f.error || "")}</td></tr>`).join("")}</tbody></table></div>
+    ${F.length > mostrar ? `<button class="mas" id="mas" type="button">Mostrar más (${num(F.length - mostrar)} restantes)</button>` : ""}`;
+  if ($("mas")) $("mas").onclick = () => { mostrar += 300; pintar(); };
+}
+$("csv").onclick = () => {
+  const F = filtradas(), cols = datos.columnas;
+  const celda = (v) => { const s = String(v ?? ""); return /[",\n;]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
+  const csv = [cols.join(","), ...F.map((f) => cols.map((c) => celda(f[c])).join(","))].join("\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" }));
+  a.download = `fuelpath_consultas_${$("desde").value}_${$("hasta").value}.csv`;
+  a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+};
+ponerPeriodo(30);
+if (CLAVE) cargar(); else verLogin();
+</script>
+</body>
+</html>

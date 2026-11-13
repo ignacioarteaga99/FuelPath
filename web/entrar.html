@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<title>FuelPath · Entrar</title>
+<link rel="icon" type="image/svg+xml" href="/icons/icono.svg">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<!-- Copiada de PacePath (web/entrar.html, commit 58ecb41) y adaptada: marca y textos de FuelPath,
+     y el consentimiento para tratar datos de salud (peso, comidas). -->
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --a: #f2541b; --a2: #ff8a1f; --tinta: #1d1d21; --suave: #6b6b75; --linea: #e6e6ea; --error: #d03b3b; --gris: #f5f5f7; }
+  @font-face { font-family: "PP Display"; src: url("/vendor/fuentes/InterDisplay-Bold.woff2") format("woff2"); font-weight: 700; font-display: swap; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { min-height: 100vh; min-height: 100dvh; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+    color: var(--tinta); -webkit-font-smoothing: antialiased;
+    background: radial-gradient(900px 460px at 85% -80px, #ffe3d6 0, #fff 70%), #fff; }
+  main { max-width: 520px; margin: 0 auto; padding: calc(22px + env(safe-area-inset-top)) 20px calc(26px + env(safe-area-inset-bottom)); }
+  em { font-style: normal; background: linear-gradient(90deg, var(--a), var(--a2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .marca { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 20px; letter-spacing: -.3px; }
+  .marca svg { width: 34px; height: 34px; }
+  .idioma { border: 1px solid var(--linea); background: #fff; border-radius: 999px; padding: 6px 12px; font: inherit; font-size: 13px; font-weight: 700; color: var(--suave); cursor: pointer; }
+  .tag { display: inline-flex; align-items: center; gap: 7px; margin-top: 30px; font-size: 11.5px; font-weight: 800; letter-spacing: 1.2px;
+    text-transform: uppercase; color: #b8400f; background: #fff1ea; border: 1px solid #ffd9c7; padding: 5px 11px; border-radius: 999px; }
+  .tag i { width: 7px; height: 7px; border-radius: 50%; background: var(--a); animation: late 1.6s ease-in-out infinite; }
+  @keyframes late { 50% { opacity: .25; } }
+  h1 { font-family: "PP Display", -apple-system, sans-serif; font-size: clamp(32px, 9vw, 42px); line-height: 1.05; letter-spacing: -1.3px; font-weight: 700; margin-top: 14px; }
+  .sub { font-size: 15.5px; line-height: 1.5; color: var(--suave); margin-top: 14px; }
+  .sub b { color: var(--tinta); }
+  .datos { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px; }
+  .datos span { font-size: 12px; font-weight: 700; color: #b8400f; padding: 5px 10px; border-radius: 999px; background: #fff; border: 1px solid #ffd9c7; }
+  .tarjeta { margin-top: 20px; background: #fff; border: 1px solid var(--linea); border-radius: 18px; padding: 18px;
+    box-shadow: 0 14px 34px rgba(20, 20, 30, .07); display: grid; gap: 12px; }
+  .tarjeta form { display: grid; gap: 12px; }
+  label { display: grid; gap: 5px; font-size: 13px; font-weight: 700; color: var(--suave); }
+  input { font: inherit; font-size: 16px; color: var(--tinta); border: 1px solid #dcdce2; border-radius: 12px; padding: 12px 13px; background: #fff; width: 100%; min-height: 48px; }
+  input:focus { outline: 2px solid #f7c5b2; border-color: var(--a); }
+  .clave-caja { position: relative; }
+  .clave-caja input { padding-right: 48px; }
+  .ojo { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; padding: 8px;
+    border: 0; background: none; color: var(--suave); cursor: pointer; border-radius: 10px; }
+  .ojo svg { width: 22px; height: 22px; display: block; }
+  .ojo .cerrado, .ojo[aria-pressed="true"] .abierto { display: none; }
+  .ojo[aria-pressed="true"] .cerrado { display: inline; }
+  button.entrar { font: inherit; font-size: 16px; font-weight: 800; color: #fff; border: 0; border-radius: 12px; padding: 14px;
+    background: linear-gradient(90deg, var(--a), var(--a2)); cursor: pointer; }
+  button.entrar:disabled { opacity: .55; cursor: default; }
+  .mal { color: var(--error); font-size: 13.5px; text-align: center; }
+  .mal:empty { display: none; }
+  .mal.ok { color: #0b8a0b; }
+  .mal .prov { margin-top: 10px; }
+  .prov { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; font: inherit; font-size: 15.5px; min-height: 48px;
+    font-weight: 700; color: var(--tinta); background: #fff; border: 1px solid #dcdce2; border-radius: 12px; padding: 12px; cursor: pointer; text-decoration: none; }
+  .prov svg { width: 20px; height: 20px; flex: none; }
+  .o { display: flex; align-items: center; gap: 10px; color: #a0a0aa; font-size: 12.5px; }
+  .o:before, .o:after { content: ""; flex: 1; height: 1px; background: var(--linea); }
+  .pestanas { display: flex; gap: 4px; background: #f3f3f6; border-radius: 12px; padding: 3px; }
+  .pestanas button { flex: 1; font: inherit; font-size: 14px; font-weight: 700; color: var(--suave); background: none; border: 0; border-radius: 9px; padding: 10px; cursor: pointer; }
+  .pestanas button.on { background: #fff; color: var(--tinta); box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+  .consiento { display: flex; gap: 10px; align-items: flex-start; font-size: 13.5px; line-height: 1.45; color: var(--tinta); font-weight: 400;
+    background: var(--gris); border-radius: 12px; padding: 11px 12px; cursor: pointer; }
+  .consiento input { width: 22px; height: 22px; min-height: 0; flex: none; margin-top: 1px; accent-color: var(--a); padding: 0; }
+  .consiento a { color: var(--tinta); }
+  .espera { text-align: center; }
+  .espera b { font-size: 17px; }
+  .espera p, .nota { color: var(--suave); font-size: 14.5px; line-height: 1.5; }
+  .espera .consiento { text-align: left; }
+  .enlace { font: inherit; font-size: 13.5px; color: var(--suave); background: none; border: 0; text-decoration: underline; cursor: pointer; justify-self: center; padding: 6px; }
+  .sec { font: inherit; font-size: 15px; font-weight: 700; color: var(--tinta); background: #fff; border: 1px solid var(--linea); border-radius: 12px; padding: 12px; cursor: pointer; }
+  .aviso { background: #fff6e5; border-radius: 10px; padding: 9px 11px; color: #8a5a00; font-size: 13px; line-height: 1.45; margin-top: 16px; }
+  footer { margin-top: 26px; padding-top: 14px; border-top: 1px solid var(--linea); display: flex; flex-wrap: wrap; gap: 6px 14px;
+    justify-content: space-between; font-size: 12.5px; color: var(--suave); }
+  footer a { color: var(--suave); }
+  footer nav { display: flex; gap: 12px; }
+  [hidden] { display: none !important; }
+  @media (min-width: 700px) { main { padding-top: 48px; } }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="marca"><svg viewBox="0 0 26 26" aria-hidden="true"><rect width="26" height="26" rx="7" fill="#f2541b"/>
+      <path d="M13 5.5c3 3.6 5 6.4 5 9a5 5 0 0 1-10 0c0-2.6 2-5.4 5-9z" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/>
+      <path d="M11 15.5a2.2 2.2 0 0 0 2 2" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>FuelPath</div>
+    <button class="idioma" id="idioma" type="button"></button>
+  </header>
+
+  <span class="tag"><i></i><span data-t="tag"></span></span>
+  <h1 data-t="h1"></h1>
+  <p class="sub" data-t="sub"></p>
+  <div class="datos" id="datos"></div>
+
+  <div class="tarjeta" id="ingreso">
+    <label class="consiento"><input type="checkbox" id="consiento"><span data-t="consiento"></span></label>
+    <a class="prov" id="conGoogle" href="/api/auth/google" hidden><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.3 0-9.7-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg><span data-t="google"></span></a>
+    <a class="prov" id="conMicrosoft" href="/api/auth/microsoft" hidden><svg viewBox="0 0 21 21" aria-hidden="true"><path fill="#f25022" d="M1 1h9v9H1z"/><path fill="#7fba00" d="M11 1h9v9h-9z"/><path fill="#00a4ef" d="M1 11h9v9H1z"/><path fill="#ffb900" d="M11 11h9v9h-9z"/></svg><span data-t="microsoft"></span></a>
+    <div class="o" id="separador" hidden><span data-t="o"></span></div>
+    <div class="pestanas" role="tablist"><button type="button" id="tabEntrar" class="on" data-t="entrar"></button><button type="button" id="tabCrear" data-t="crear"></button></div>
+    <form id="form">
+      <label id="campoNombre" hidden><span data-t="nombre"></span><input id="nombre" name="name" autocomplete="name" maxlength="80"></label>
+      <label><span data-t="correo"></span><input id="correo" name="email" type="email" autocomplete="email" autocapitalize="none" spellcheck="false" required></label>
+      <label><span data-t="clave"></span><div class="clave-caja"><input id="clave" name="password" type="password" autocomplete="current-password" required minlength="8"><button type="button" class="ojo" aria-pressed="false" data-t-aria="verClave"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="abierto" d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle class="abierto" cx="12" cy="12" r="3"/><path class="cerrado" d="M3 3l18 18M10.6 5.1A10 10 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.3 4.2M6.6 6.6C3.9 8.4 2 12 2 12s3.6 7 10 7a9.7 9.7 0 0 0 5.4-1.6M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg></button></div></label>
+      <button class="entrar" type="submit" id="boton" data-t="entrar"></button>
+      <div class="mal" id="mal" role="alert"></div>
+      <button class="enlace" type="button" id="olvide" data-t="olvide" hidden></button>
+    </form>
+  </div>
+  <form class="tarjeta" id="recuperar" hidden>
+    <b data-t="recTitulo"></b>
+    <p class="nota" data-t="recTexto"></p>
+    <label><span data-t="correo"></span><input id="recCorreo" type="email" autocomplete="email" autocapitalize="none" required></label>
+    <button class="entrar" type="submit" data-t="recBoton"></button>
+    <div class="mal ok" id="recMsg" role="status"></div>
+    <button class="enlace" type="button" id="recVolver" data-t="volver"></button>
+  </form>
+  <form class="tarjeta" id="nuevaClave" hidden>
+    <b data-t="nuevaTitulo"></b>
+    <label><span data-t="clave"></span><div class="clave-caja"><input id="nueva" type="password" autocomplete="new-password" minlength="8" required><button type="button" class="ojo" aria-pressed="false" data-t-aria="verClave"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="abierto" d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle class="abierto" cx="12" cy="12" r="3"/><path class="cerrado" d="M3 3l18 18M10.6 5.1A10 10 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.3 4.2M6.6 6.6C3.9 8.4 2 12 2 12s3.6 7 10 7a9.7 9.7 0 0 0 5.4-1.6M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg></button></div></label>
+    <button class="entrar" type="submit" data-t="nuevaBoton"></button>
+    <div class="mal" id="nuevaMsg" role="alert"></div>
+  </form>
+  <div class="tarjeta espera" id="esperando" hidden>
+    <b id="hola"></b>
+    <p id="esperaTexto"></p>
+    <label class="consiento" id="cajaConsiento" hidden><input type="checkbox" id="consiento2"><span data-t="consiento"></span></label>
+    <button class="entrar" type="button" id="aceptar" data-t="aceptar" hidden></button>
+    <button class="sec" type="button" id="reenviar" data-t="reenviar" hidden></button>
+    <div class="mal ok" id="esperaMsg" role="status"></div>
+    <button class="sec" type="button" id="salir" data-t="salir"></button>
+    <button class="enlace" type="button" id="borrarCuenta" data-t="borrar" hidden></button>
+  </div>
+
+  <p class="aviso" data-t="aviso"></p>
+
+  <footer>
+    <span data-t="hecho"></span>
+    <nav><a href="/privacidad" data-t="privacidad"></a><a href="/terminos" data-t="terminos"></a></nav>
+  </footer>
+</main>
+<script>
+// ── Textos (español / inglés / portugués) ──
+const T = {
+  es: { tag: "Beta privada", h1: "Tu carga de carbohidratos, <em>comida a comida</em>.",
+    sub: "FuelPath está en <b>beta</b>: mientras la afinamos, sólo entran los testers. Entra con tu cuenta; si te invitaron, usa el correo con que te invitaron.",
+    subAbierta: "Entra o crea tu cuenta para armar la pauta de tu próxima carrera.",
+    datos: ["Agenda de 36–48 h", "Medidas caseras", "Recálculo con topes", "Sodio y geles en carrera"],
+    consiento: 'Acepto los <a href="/terminos" target="_blank">Términos</a> y la <a href="/privacidad" target="_blank">Privacidad</a>, y consiento que FuelPath guarde mis datos de salud (peso y comidas) para armar mi pauta. Puedo borrarlos cuando quiera.',
+    faltaConsiento: "Marca la casilla para crear tu cuenta: FuelPath guarda tu peso y tus comidas.",
+    consentimiento: "Para usar FuelPath necesitamos tu consentimiento: guardamos tu peso y tus comidas para armar tu pauta.",
+    aceptar: "Aceptar y entrar", borrar: "No acepto: borrar mi cuenta", borrada: "Tu cuenta quedó borrada.",
+    espera: "Tu cuenta ya está creada, pero todavía no está habilitada para la beta. Avísale a FuelPath con el correo de tu cuenta y te habilitamos.",
+    esperaCorreo: "Te mandamos un correo para confirmar tu cuenta: abre el enlace y vuelve aquí.",
+    esperaCorreoBeta: "Te mandamos un correo para confirmar tu cuenta. FuelPath está en beta privada: después de confirmarla quedas en la lista de espera.",
+    reenviar: "Mandar el correo de nuevo", reenviado: "Listo: revisa tu correo (y la carpeta de spam).",
+    olvide: "¿Olvidaste tu clave?", recTitulo: "Recuperar tu clave",
+    recTexto: "Escribe el correo de tu cuenta y te mandamos un enlace para elegir una clave nueva.",
+    recBoton: "Mandar enlace", recEnviado: "Si hay una cuenta con ese correo, te llegará un enlace en unos minutos.",
+    volver: "Volver", nuevaTitulo: "Elige tu clave nueva", nuevaBoton: "Guardar y entrar",
+    verificado: "¡Listo! Tu correo quedó confirmado.", codigo_invalido: "El enlace venció o ya se usó: pide uno nuevo.",
+    google: "Continuar con Google", microsoft: "Continuar con Microsoft", o: "o con tu correo",
+    entrar: "Entrar", crear: "Crear cuenta", nombre: "Nombre", correo: "Correo", clave: "Clave (mínimo 8 caracteres)", verClave: "Mostrar clave", ocultarClave: "Ocultar clave",
+    entrando: "Un momento…", red: "No pude conectar. Prueba de nuevo en unos segundos.", hola: "Hola, {n}",
+    salir: "Cerrar sesión", cancelada: "Cancelaste el inicio de sesión.", fallo: "No se pudo iniciar sesión. Prueba de nuevo.",
+    aviso: "FuelPath es una guía general basada en consensos de nutrición deportiva. No reemplaza a tu nutricionista.",
+    hecho: "Hecho en Santiago de Chile", privacidad: "Privacidad", terminos: "Términos", otro: "EN" },
+  en: { tag: "Private beta", h1: "Your carb load, <em>meal by meal</em>.",
+    sub: "FuelPath is in <b>beta</b>: while we fine-tune it, only testers can get in. Sign in with your account; if you were invited, use the email you were invited with.",
+    subAbierta: "Sign in or create your account to build the plan for your next race.",
+    datos: ["36–48 h schedule", "Household measures", "Recalculation with caps", "Sodium and gels on race day"],
+    consiento: 'I accept the <a href="/terminos?lang=en" target="_blank">Terms</a> and <a href="/privacidad?lang=en" target="_blank">Privacy</a>, and I consent to FuelPath storing my health data (weight and meals) to build my plan. I can delete it whenever I want.',
+    faltaConsiento: "Tick the box to create your account: FuelPath stores your weight and meals.",
+    consentimiento: "To use FuelPath we need your consent: we store your weight and meals to build your plan.",
+    aceptar: "Accept and continue", borrar: "I don't accept: delete my account", borrada: "Your account has been deleted.",
+    espera: "Your account is created, but it isn't enabled for the beta yet. Tell FuelPath your account's email and we'll enable it.",
+    esperaCorreo: "We sent you an email to confirm your account: open the link and come back here.",
+    esperaCorreoBeta: "We sent you an email to confirm your account. FuelPath is in private beta: after confirming you'll be on the waiting list.",
+    reenviar: "Send the email again", reenviado: "Done: check your inbox (and spam folder).",
+    olvide: "Forgot your password?", recTitulo: "Reset your password",
+    recTexto: "Enter your account's email and we'll send you a link to choose a new password.",
+    recBoton: "Send link", recEnviado: "If there's an account with that email, a link will arrive in a few minutes.",
+    volver: "Back", nuevaTitulo: "Choose your new password", nuevaBoton: "Save and sign in",
+    verificado: "Done! Your email is confirmed.", codigo_invalido: "The link expired or was already used: ask for a new one.",
+    google: "Continue with Google", microsoft: "Continue with Microsoft", o: "or with your email",
+    entrar: "Sign in", crear: "Create account", nombre: "Name", correo: "Email", clave: "Password (at least 8 characters)", verClave: "Show password", ocultarClave: "Hide password",
+    entrando: "One moment…", red: "Couldn't connect. Try again in a few seconds.", hola: "Hi, {n}",
+    salir: "Sign out", cancelada: "You cancelled the sign-in.", fallo: "Couldn't sign in. Try again.",
+    aviso: "FuelPath is general guidance based on sports nutrition consensus. It doesn't replace your dietitian.",
+    hecho: "Made in Santiago, Chile", privacidad: "Privacy", terminos: "Terms", otro: "PT" },
+  pt: { tag: "Beta fechado", h1: "Sua carga de carboidratos, <em>refeição por refeição</em>.",
+    sub: "O FuelPath está em <b>beta</b>: enquanto o ajustamos, só os testers entram. Entre com sua conta; se você foi convidado, use o e-mail do convite.",
+    subAbierta: "Entre ou crie sua conta para montar o plano da sua próxima prova.",
+    datos: ["Agenda de 36–48 h", "Medidas caseiras", "Recálculo com tetos", "Sódio e géis na prova"],
+    consiento: 'Aceito os <a href="/terminos?lang=pt" target="_blank">Termos</a> e a <a href="/privacidad?lang=pt" target="_blank">Privacidade</a>, e consinto que o FuelPath guarde meus dados de saúde (peso e refeições) para montar meu plano. Posso apagá-los quando quiser.',
+    faltaConsiento: "Marque a caixa para criar sua conta: o FuelPath guarda seu peso e suas refeições.",
+    consentimiento: "Para usar o FuelPath precisamos do seu consentimento: guardamos seu peso e suas refeições para montar seu plano.",
+    aceptar: "Aceitar e entrar", borrar: "Não aceito: apagar minha conta", borrada: "Sua conta foi apagada.",
+    espera: "Sua conta já foi criada, mas ainda não está liberada para o beta. Avise o FuelPath com o e-mail da sua conta e liberamos.",
+    esperaCorreo: "Enviamos um e-mail para confirmar sua conta: abra o link e volte aqui.",
+    esperaCorreoBeta: "Enviamos um e-mail para confirmar sua conta. O FuelPath está em beta fechado: depois de confirmar você fica na lista de espera.",
+    reenviar: "Enviar o e-mail de novo", reenviado: "Pronto: confira seu e-mail (e a pasta de spam).",
+    olvide: "Esqueceu sua senha?", recTitulo: "Recuperar sua senha",
+    recTexto: "Digite o e-mail da sua conta e enviamos um link para escolher uma senha nova.",
+    recBoton: "Enviar link", recEnviado: "Se houver uma conta com esse e-mail, um link chegará em alguns minutos.",
+    volver: "Voltar", nuevaTitulo: "Escolha sua senha nova", nuevaBoton: "Salvar e entrar",
+    verificado: "Pronto! Seu e-mail foi confirmado.", codigo_invalido: "O link expirou ou já foi usado: peça um novo.",
+    google: "Continuar com o Google", microsoft: "Continuar com a Microsoft", o: "ou com seu e-mail",
+    entrar: "Entrar", crear: "Criar conta", nombre: "Nome", correo: "E-mail", clave: "Senha (mínimo 8 caracteres)", verClave: "Mostrar senha", ocultarClave: "Ocultar senha",
+    entrando: "Um momento…", red: "Não consegui conectar. Tente de novo em alguns segundos.", hola: "Olá, {n}",
+    salir: "Sair", cancelada: "Você cancelou o login.", fallo: "Não foi possível entrar. Tente de novo.",
+    aviso: "O FuelPath é um guia geral baseado em consensos de nutrição esportiva. Não substitui seu nutricionista.",
+    hecho: "Feito em Santiago, Chile", privacidad: "Privacidade", terminos: "Termos", otro: "ES" },
+};
+const $ = (id) => document.getElementById(id);
+let idioma = new URLSearchParams(location.search).get("lang");
+if (!T[idioma]) { try { idioma = JSON.parse(localStorage.getItem("fp_idioma")); } catch {} }
+if (!T[idioma]) idioma = (navigator.language || "es").toLowerCase().slice(0, 2);
+if (!T[idioma]) idioma = "es";
+function enlacesProveedor() {
+  const c = $("consiento").checked ? "&consiento=1" : "";
+  $("conGoogle").href = `/api/auth/google?lang=${idioma}${c}`;
+  $("conMicrosoft").href = `/api/auth/microsoft?lang=${idioma}${c}`;
+}
+function textos() {
+  const t = T[idioma];
+  document.documentElement.lang = idioma;
+  document.querySelectorAll("[data-t]").forEach((e) => { e.innerHTML = t[e.dataset.t]; });
+  document.querySelectorAll("[data-t-aria]").forEach((e) => { e.setAttribute("aria-label", t[e.dataset.tAria]); });
+  $("datos").innerHTML = t.datos.map((d) => `<span>${d}</span>`).join("");
+  $("idioma").textContent = t.otro;
+  enlacesProveedor();
+  for (const a of document.querySelectorAll("footer a")) a.href = a.getAttribute("href").split("?")[0] + "?lang=" + idioma;
+}
+$("idioma").onclick = () => {
+  idioma = { es: "en", en: "pt", pt: "es" }[idioma];
+  try { localStorage.setItem("fp_idioma", JSON.stringify(idioma)); } catch {}
+  textos(); pestana(creando);
+};
+$("consiento").onchange = enlacesProveedor;
+textos();
+
+// ── Entrar: Google, Microsoft o correo ──
+let creando = false;
+function pestana(crear) {
+  creando = crear;
+  $("tabEntrar").classList.toggle("on", !crear); $("tabCrear").classList.toggle("on", crear);
+  $("campoNombre").hidden = !crear;
+  $("clave").autocomplete = crear ? "new-password" : "current-password";
+  $("boton").textContent = T[idioma][crear ? "crear" : "entrar"];
+  $("mal").textContent = "";
+}
+for (const b of document.querySelectorAll(".ojo")) {
+  b.onclick = () => {
+    const input = b.previousElementSibling, ver = input.type === "password";
+    input.type = ver ? "text" : "password";
+    b.setAttribute("aria-pressed", String(ver));
+    b.dataset.tAria = ver ? "ocultarClave" : "verClave";
+    b.setAttribute("aria-label", T[idioma][b.dataset.tAria]);
+    input.focus();
+  };
+}
+$("tabEntrar").onclick = () => pestana(false);
+$("tabCrear").onclick = () => pestana(true);
+$("form").onsubmit = async (e) => {
+  e.preventDefault();
+  const t = T[idioma];
+  if (creando && !$("consiento").checked) { $("mal").classList.remove("ok"); $("mal").textContent = t.faltaConsiento; return; }
+  $("boton").disabled = true; $("boton").textContent = t.entrando; $("mal").textContent = "";
+  try {
+    const cuerpo = { correo: $("correo").value, clave: $("clave").value };
+    if (creando) Object.assign(cuerpo, { nombre: $("nombre").value, consiento: true });
+    const r = await fetch(creando ? "/api/auth/registro" : "/api/auth/entrar", { method: "POST",
+      headers: { "Content-Type": "application/json", "X-Idioma": idioma }, body: JSON.stringify(cuerpo) });
+    if (r.ok) { location.replace("/"); return; }
+    const j = await r.json().catch(() => ({}));
+    $("mal").textContent = j.detail?.mensaje || (Array.isArray(j.detail) ? t.fallo : j.detail) || t.fallo;
+    const prov = { usa_google: "conGoogle", usa_microsoft: "conMicrosoft" }[j.detail?.codigo];
+    if (prov && !$(prov).hidden) {
+      const b = $(prov).cloneNode(true);
+      b.removeAttribute("id"); b.hidden = false;
+      b.href = `${$(prov).getAttribute("href")}&correo=${encodeURIComponent($("correo").value.trim())}`;
+      $("mal").append(b);
+    }
+  } catch { $("mal").textContent = T[idioma].red; }
+  $("boton").disabled = false; $("boton").textContent = T[idioma][creando ? "crear" : "entrar"];
+};
+$("salir").onclick = async () => { await fetch("/api/auth/salir", { method: "POST" }).catch(() => {}); location.replace("/"); };
+const MENSAJE_VUELTA = {
+  es: { correo_existe_otro_metodo: "Ya hay una cuenta con ese correo: entra con el método que usaste al crearla.",
+        bloqueada: "Esta cuenta está desactivada.", sin_correo: "Tu cuenta no compartió un correo: prueba otro método." },
+  en: { correo_existe_otro_metodo: "There's already an account with that email: sign in the way you created it.",
+        bloqueada: "This account is disabled.", sin_correo: "Your account didn't share an email: try another method." },
+  pt: { correo_existe_otro_metodo: "Já existe uma conta com esse e-mail: entre do jeito que você a criou.",
+        bloqueada: "Esta conta está desativada.", sin_correo: "Sua conta não compartilhou um e-mail: tente outro método." },
+};
+const ver = (id) => ["ingreso", "esperando", "recuperar", "nuevaClave"].forEach((x) => { $(x).hidden = x !== id; });
+const postJson = (url, cuerpo) => fetch(url, { method: "POST", headers: { "Content-Type": "application/json", "X-Idioma": idioma },
+  body: cuerpo ? JSON.stringify(cuerpo) : undefined });
+const mensaje = async (r) => { const j = await r.json().catch(() => ({})); return j.detail?.mensaje || T[idioma].fallo; };
+$("olvide").onclick = () => { ver("recuperar"); $("recCorreo").value = $("correo").value; $("recMsg").textContent = ""; };
+$("recVolver").onclick = () => ver("ingreso");
+$("recuperar").onsubmit = async (e) => {
+  e.preventDefault();
+  const r = await postJson("/api/auth/recuperar", { correo: $("recCorreo").value }).catch(() => null);
+  $("recMsg").classList.toggle("ok", !!r?.ok);
+  $("recMsg").textContent = !r ? T[idioma].red : r.ok ? T[idioma].recEnviado : await mensaje(r);
+};
+const codigoRecuperar = new URLSearchParams(location.search).get("recuperar");
+$("nuevaClave").onsubmit = async (e) => {
+  e.preventDefault();
+  const r = await postJson("/api/auth/nueva-clave", { codigo: codigoRecuperar, clave: $("nueva").value }).catch(() => null);
+  if (r?.ok) { location.replace("/"); return; }
+  $("nuevaMsg").textContent = r ? await mensaje(r) : T[idioma].red;
+};
+$("reenviar").onclick = async () => {
+  const r = await postJson("/api/auth/reenviar").catch(() => null);
+  $("esperaMsg").textContent = !r ? T[idioma].red : r.ok ? T[idioma].reenviado : await mensaje(r);
+};
+// Entró con Google o Microsoft sin marcar la casilla: se la pedimos aquí.
+$("consiento2").onchange = () => { $("aceptar").disabled = !$("consiento2").checked; };
+$("aceptar").onclick = async () => {
+  const r = await postJson("/api/cuenta/consentimiento", { acepto: true }).catch(() => null);
+  if (r?.ok) { location.replace("/"); return; }
+  $("esperaMsg").classList.remove("ok");
+  $("esperaMsg").textContent = r ? await mensaje(r) : T[idioma].red;
+};
+$("borrarCuenta").onclick = async () => {
+  const r = await postJson("/api/cuenta/borrar", { confirmo: true }).catch(() => null);
+  if (r?.ok) { ver("ingreso"); $("mal").classList.add("ok"); $("mal").textContent = T[idioma].borrada; }
+};
+// Qué mostrar según la cuenta: entrar, esperar (correo, consentimiento o beta) o ir a la app.
+(async () => {
+  const q = new URLSearchParams(location.search), vuelta = q.get("cuenta");
+  if (vuelta) {
+    const t = T[idioma];
+    $("mal").classList.toggle("ok", vuelta === "verificado");
+    $("mal").textContent = t[vuelta] && ["cancelada", "verificado", "codigo_invalido"].includes(vuelta)
+      ? t[vuelta] : MENSAJE_VUELTA[idioma][vuelta] || t.fallo;
+    history.replaceState(null, "", location.pathname);
+  }
+  if (codigoRecuperar) { ver("nuevaClave"); return; }
+  try {
+    const c = await fetch("/api/cuenta", { headers: { "X-Idioma": idioma } }).then((r) => r.json());
+    if (c.usuario && !c.pendiente) { location.replace("/"); return; }
+    $("conGoogle").hidden = !c.proveedores?.google;
+    $("conMicrosoft").hidden = !c.proveedores?.microsoft;
+    $("separador").hidden = !(c.proveedores?.google || c.proveedores?.microsoft);
+    $("olvide").hidden = !c.correo_activo;
+    if (!c.beta_cerrada) {
+      document.querySelector(".tag").hidden = true;
+      document.querySelector('[data-t="sub"]').dataset.t = "subAbierta";
+      textos();
+    }
+    if (c.usuario) {
+      ver("esperando");
+      const t = T[idioma];
+      $("hola").textContent = t.hola.replace("{n}", c.usuario.nombre || c.usuario.correo);
+      const enEspera = c.beta_cerrada && !c.usuario.beta;
+      $("esperaTexto").textContent = c.pendiente === "consentimiento" ? t.consentimiento
+        : t[c.pendiente === "verificar" ? (enEspera ? "esperaCorreoBeta" : "esperaCorreo") : "espera"];
+      $("reenviar").hidden = c.pendiente !== "verificar";
+      const pideConsentimiento = c.pendiente === "consentimiento";
+      $("cajaConsiento").hidden = $("aceptar").hidden = $("borrarCuenta").hidden = !pideConsentimiento;
+      $("aceptar").disabled = true;
+    }
+  } catch {}
+})();
+</script>
+</body>
+</html>

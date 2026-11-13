@@ -77,7 +77,21 @@ render.yaml         Blueprint de Render · Dockerfile · .github/workflows/tests
 | `FUELPATH_ADMIN` | Clave del panel `/admin` | **sí** |
 | `DATABASE_URL` | Neon | **sí** |
 | `FUELPATH_CORREO_ACTIVO`, `_SMTP`, `_USUARIO`, `_CLAVE`, `_DE` | Correos. ACTIVO=«1» sólo con las otras cuatro | `_CLAVE` **sí** |
+| `FUELPATH_CORREO_AVISOS` | (Opcional) a quién avisar de cada cuenta nueva | no |
+| `FUELPATH_SOPORTE` | (Opcional) correo de soporte de los correos y las páginas legales; si no, el remitente | no |
+| `FUELPATH_ACCESO_LIBRE` | Sin cuenta obligatoria: **sólo tests y local, nunca en Render** | — |
 | `GOOGLE_CLIENT_ID/SECRET`, `MICROSOFT_CLIENT_ID/SECRET` | Entrar con Google o Microsoft | los SECRET **sí** |
+
+## Lo que ya se trajo de PacePath (Fase 0)
+
+- `registro.py`, `uso.py`, `acceso.py`, `cuentas.py`, `oauth.py`, `correo.py`: copiados del commit `58ecb41` con
+  tablas `fp_…`, cookies `fp_sesion` / `fp_oauth`, variables `FUELPATH_*` y sin Strava, comunas ni motor.
+- Lo propio de FuelPath:
+  - **consentimiento** para datos de salud (`fp_usuarios.consentimiento`). Se marca al crear la cuenta, antes de ir
+    a Google o Microsoft (`?consiento=1`) o después, en `POST /api/cuenta/consentimiento`. Sin él, `_pendiente`
+    devuelve `consentimiento` y la app no abre;
+  - el registro de consultas **no guarda datos de salud**: sólo la consulta, la distancia y si salió bien.
+- `DATOS_CUENTA` = `fp_perfil`, `fp_plan`, `fp_agua`, `fp_historial`, `fp_idioma`, `fp_noche` (tope `DATOS_MAX`, 1 MB).
 
 ## Despliegue
 

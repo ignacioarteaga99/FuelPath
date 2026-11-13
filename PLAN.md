@@ -21,13 +21,14 @@ Detalle y qué archivos traer de PacePath: `docs/ARQUITECTURA.md`.
 - [x] `pauta.py` con los rangos de los consensos y sus tests.
 - [x] App móvil con 4 pestañas (Hoy, Pauta, Carrera, Perfil), ES/EN/PT, modo
       noche, instalable (manifest + service worker), mismos tokens que PacePath.
-- [ ] Dominio y servicio en Render (¿fuelpathapp.com o subdominio de PacePath?).
-- [ ] Cuentas: correo y clave, Google y Microsoft. Se trae `cuentas.py`,
-      `oauth.py`, `entrar.html` y el middleware `_con_cuenta`.
-- [ ] Datos del teléfono en la cuenta (como `DATOS_CUENTA` de PacePath).
-- [ ] Registro y panel `/admin`: `registro.py`, `acceso.py` (beta cerrada) y `admin.html`.
-- [ ] Correos de verificación y recuperación (`correo.py`).
-- [ ] Páginas legales (privacidad y términos) adaptadas a datos de salud.
+- [ ] Dominio propio (¿fuelpathapp.com o subdominio de PacePath?). Mientras, la URL de Render.
+- [ ] Servicio en Render y base en Neon (lo crea Ignacio: ver «Puesta en marcha» en `README.md`).
+- [x] Cuentas: correo y clave, Google y Microsoft (`cuentas.py`, `oauth.py`,
+      `entrar.html`, middleware `_con_cuenta`), con consentimiento explícito para datos de salud.
+- [x] Datos del teléfono en la cuenta (`DATOS_CUENTA`: perfil, agenda, agua, planes anteriores).
+- [x] Registro y panel `/admin`: `registro.py`, `uso.py`, `acceso.py` (beta cerrada) y `admin.html`.
+- [x] Correos de verificación y recuperación (`correo.py`), apagados hasta configurar Resend.
+- [x] Páginas legales (privacidad y términos) adaptadas a datos de salud; descargar y borrar la cuenta.
 
 ## Fase 1 — La pauta (función principal)
 - [x] Formulario: evento, distancia (10K, 21K, 42K, 70.3, Ironman, gran
