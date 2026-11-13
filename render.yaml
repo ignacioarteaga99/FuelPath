@@ -1,0 +1,44 @@
+# Blueprint de Render (plan gratis). En render.com: New → Blueprint → este repo.
+#
+# Lecciones de PacePath:
+#   · 512 MB de RAM y el disco se borra al dormir (15 min sin uso): nada
+#     persistente en disco; cuentas, datos y registro en Postgres (Neon).
+#   · Los secretos se pegan en Render («sync: false»), nunca en el repositorio.
+services:
+  - type: web
+    name: fuelpath
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/salud
+    autoDeploy: true
+    envVars:
+      # URL pública (dominio propio); con ella se arman los enlaces de los correos.
+      - key: FUELPATH_URL
+        sync: false
+      # Panel /admin (Fase 0): clave larga inventada, pegada en Render.
+      - key: FUELPATH_ADMIN
+        sync: false
+      # Postgres (Neon gratis): cuentas, sesiones, datos sincronizados, registro.
+      - key: DATABASE_URL
+        sync: false
+      # Correos (Resend o SMTP, como PacePath). «1» sólo cuando estén las cuatro.
+      - key: FUELPATH_CORREO_ACTIVO
+        value: "0"
+      - key: FUELPATH_CORREO_SMTP
+        sync: false
+      - key: FUELPATH_CORREO_USUARIO
+        sync: false
+      - key: FUELPATH_CORREO_CLAVE
+        sync: false
+      - key: FUELPATH_CORREO_DE
+        sync: false
+      # Entrar con Google o Microsoft. Sin ellas, sólo correo y clave.
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: MICROSOFT_CLIENT_ID
+        sync: false
+      - key: MICROSOFT_CLIENT_SECRET
+        sync: false

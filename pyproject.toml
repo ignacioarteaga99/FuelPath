@@ -1,0 +1,27 @@
+[project]
+name = "fuelpath"
+version = "0.1.0"
+license = { file = "LICENSE" }
+description = "FuelPath — la pauta nutricional para llegar con todo a tu carrera"
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi>=0.115",
+  "uvicorn[standard]>=0.30",
+  "pydantic>=2.7",
+  "psycopg[binary]>=3.2",  # cuentas y registro en Postgres (Neon), como PacePath
+  "cryptography>=42",      # cookie cifrada con la conexión a Strava (Fase 3)
+  "tzdata>=2024.1",        # zona horaria de Santiago aunque la imagen no traiga zoneinfo
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "httpx>=0.27", "playwright>=1.45"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["fuelpath"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
