@@ -129,7 +129,7 @@ async def _con_cuenta(request: Request, call_next):
 # cada pocos segundos, ni la sincronización de datos, que va cada 20 s).
 CONSULTAS = {
     "/": "visita", "/privacidad": "privacidad", "/privacy": "privacidad", "/terminos": "terminos", "/terms": "terminos",
-    "/api/carga": "carga", "/api/reparto": "reparto", "/api/alimentos": "alimentos",
+    "/api/carga": "carga", "/api/reparto": "reparto", "/api/alimentos": "alimentos", "/api/desayuno": "desayuno",
     "/api/auth/registro": "cuenta_registro", "/api/auth/entrar": "cuenta_entrar", "/api/auth/salir": "cuenta_salir",
     "/api/auth/google/vuelta": "cuenta_google", "/api/auth/microsoft/vuelta": "cuenta_microsoft",
     "/api/cuenta/exportar": "cuenta_exportar", "/api/cuenta/borrar": "cuenta_borrar",
@@ -332,6 +332,34 @@ def api_carga(p: PedidoCarga):
     r["otra_restriccion"] = p.otra_restriccion.strip()
     uso.registrar("carga", tipo=p.distancia)
     return r
+
+
+class PedidoDesayuno(BaseModel):
+    peso_kg: float = Field(ge=30, le=200)
+    hora: time                                    # hora de largada
+    horas: float                                  # cuántas horas antes
+    g_kg: float | None = Field(default=None, ge=0.5, le=4)   # sin él: el recomendado para esas horas
+    elegidos: list[str] = Field(default_factory=list, max_length=len(alimentos.ALIMENTOS))
+    restricciones: list[str] = Field(default_factory=list, max_length=12)
+    estomago_sensible: bool = False
+
+
+@app.post("/api/desayuno")
+def api_desayuno(p: PedidoDesayuno):
+    """Rearma el desayuno del día de carrera con otras horas antes y otros g/kg."""
+    if p.horas not in carga.HORAS_DESAYUNO:
+        raise HTTPException(422, tr("Elige entre 1 y 4 horas antes.", "Choose between 1 and 4 hours before.",
+                                    "Escolha entre 1 e 4 horas antes."))
+    ops = carga.opciones_desayuno(p.horas)
+    g_kg = p.g_kg if p.g_kg is not None else ops[1]
+    if not ops[0] - 1e-6 <= g_kg <= ops[-1] + 1e-6:
+        raise HTTPException(422, tr("Con ese margen, la cantidad va de {a} a {b} g/kg.".format(a=ops[0], b=ops[-1]),
+                                    "With that much time, the amount goes from {a} to {b} g/kg.".format(a=ops[0], b=ops[-1]),
+                                    "Com esse tempo, a quantidade vai de {a} a {b} g/kg.".format(a=ops[0], b=ops[-1])))
+    r = tuple(x for x in p.restricciones if x in alimentos.RESTRICCIONES)
+    elegidos = {e for e in p.elegidos if e in alimentos.POR_ID and alimentos.permitido(alimentos.POR_ID[e], r, p.estomago_sensible)}
+    uso.registrar("desayuno", tipo=f"{p.horas:g}h {g_kg:g}g/kg")
+    return carga.desayuno_carrera(p.peso_kg, p.hora, p.horas, g_kg, elegidos | {"gel", "sales"})
 
 
 class ItemDia(BaseModel):

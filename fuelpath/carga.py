@@ -271,17 +271,37 @@ def dia_carga(p: Perfil, fecha: date, n: int, de: int, elegidos: set[str]) -> di
     return dia
 
 
+# Desayuno de carrera: 1–4 g/kg entre 1 y 4 h antes (ACSM 2016, COI 2018). Más
+# tiempo, más cantidad: unos 1 g/kg por hora de margen como máximo.
+HORAS_DESAYUNO = (1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0)
+
+
+def opciones_desayuno(horas: float) -> list[float]:
+    """Los g/kg que tiene sentido elegir con `horas` de margen: mínimo, recomendado y alto."""
+    hi = min(4.0, horas)
+    lo = max(0.5, hi - 1.0)
+    return [lo, (lo + hi) / 2, hi]
+
+
+def desayuno_carrera(peso_kg: float, hora: time, horas: float, g_kg: float, elegidos: set[str]) -> dict:
+    """El desayuno del día de carrera con `g_kg` y `horas` antes de la largada."""
+    esc = max(1.0, peso_kg / 70)
+    objetivo = g_kg * peso_kg
+    # Antes de largar: líquido justo (5–7 ml/kg), no más de una bebida.
+    items = armar_comida(PLANTILLA_CARRERA, elegidos, objetivo, objetivo * 1.15, esc=esc,
+                         topes_item={"isotonica": 1, "jugo": 1, "nectar": 1}, ml_max=ml_max("desayuno_carrera", esc))
+    return {"id": "desayuno_carrera", "hora": _hhmm(_min(hora) - horas * 60), "horas_antes": horas, "g_kg": g_kg,
+            "objetivo_g": round(gramos(items)), "tope_g": round(objetivo * 1.15), "min_g": round(objetivo * 0.5),
+            "items": items}
+
+
 def dia_carrera(p: Perfil, elegidos: set[str]) -> dict:
     tipo = tipo_carga(p)
     horas_antes = {"larga": 3.0, "corta": 2.5, None: 2.0}[tipo] + (0.5 if p.estomago_sensible else 0)
-    g_kg = {"larga": 2.5, "corta": 2.0, None: 1.5}[tipo] - (0.5 if p.estomago_sensible and tipo == "larga" else 0)
+    ops = opciones_desayuno(horas_antes)
+    g_kg = ops[0] if p.estomago_sensible else ops[1]           # con estómago sensible, el mínimo de la tabla
     salida = _min(p.hora)
-    objetivo = g_kg * p.peso_kg
-    # Antes de largar: líquido justo (5–7 ml/kg), no más de una bebida.
-    items = armar_comida(PLANTILLA_CARRERA, elegidos, objetivo, objetivo * 1.15, esc=escala(p),
-                         topes_item={"isotonica": 1, "jugo": 1, "nectar": 1}, ml_max=ml_max("desayuno_carrera", escala(p)))
-    comidas = [{"id": "desayuno_carrera", "hora": _hhmm(salida - horas_antes * 60), "objetivo_g": round(gramos(items)),
-                "tope_g": round(objetivo * 1.15), "min_g": round(objetivo * 0.5), "items": items}]
+    comidas = [desayuno_carrera(p.peso_kg, p.hora, horas_antes, g_kg, elegidos)]
     if p.sudor_salado:
         comidas.append({"id": "sodio", "hora": _hhmm(salida - 45, 5), "objetivo_g": 0, "tope_g": 0, "min_g": 0,
                         "items": [{"a": "sales", "p": 1}]})

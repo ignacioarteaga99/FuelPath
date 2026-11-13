@@ -530,6 +530,15 @@ const EN = {
   "O escríbela": "Or type it",
   "ej.: 1/2, 1 1/4, 0,3": "e.g. 1/2, 1 1/4, 0.3",
   "Listo": "Done",
+  // Desayuno de carrera
+  "Mínimo razonable": "Reasonable minimum",
+  "Si tu estómago lo tolera bien": "If your stomach handles it well",
+  "¿Cuántas horas antes de largar?": "How many hours before the start?",
+  "Comes a las {a} y largas a las {b}.": "You eat at {a} and start at {b}.",
+  "¿Cuánto? Para tus {k} kg": "How much? For your {k} kg",
+  "Guía general: 1–4 g/kg entre 1 y 4 h antes. Para un maratón, lo habitual es 2–3 g/kg unas 3 h antes.": "General guidance: 1–4 g/kg between 1 and 4 h before. For a marathon, 2–3 g/kg about 3 h before is typical.",
+  "Pruébalo antes en un entrenamiento largo: nada nuevo el día de la carrera.": "Try it first in a long session: nothing new on race day.",
+  "Elegir horas y cantidad del desayuno": "Choose breakfast timing and amount",
 };
 const PT = {
   "Hoy": "Hoje", "Pauta": "Plano", "Carrera": "Prova", "Perfil": "Perfil", "Tus datos": "Seus dados",
@@ -695,6 +704,15 @@ const PT = {
   "O escríbela": "Ou digite",
   "ej.: 1/2, 1 1/4, 0,3": "ex.: 1/2, 1 1/4, 0,3",
   "Listo": "Pronto",
+  // Desayuno de carrera
+  "Mínimo razonable": "Mínimo razoável",
+  "Si tu estómago lo tolera bien": "Se seu estômago tolera bem",
+  "¿Cuántas horas antes de largar?": "Quantas horas antes da largada?",
+  "Comes a las {a} y largas a las {b}.": "Você come às {a} e larga às {b}.",
+  "¿Cuánto? Para tus {k} kg": "Quanto? Para seus {k} kg",
+  "Guía general: 1–4 g/kg entre 1 y 4 h antes. Para un maratón, lo habitual es 2–3 g/kg unas 3 h antes.": "Guia geral: 1–4 g/kg entre 1 e 4 h antes. Para uma maratona, o comum é 2–3 g/kg cerca de 3 h antes.",
+  "Pruébalo antes en un entrenamiento largo: nada nuevo el día de la carrera.": "Teste antes num treino longo: nada novo no dia da prova.",
+  "Elegir horas y cantidad del desayuno": "Escolher horário e quantidade do café da manhã",
 };
 function t(es, vars) {
   let s = idioma === "en" ? (EN[es] ?? es) : idioma === "pt" ? (PT[es] ?? EN[es] ?? es) : es;
@@ -987,6 +1005,7 @@ function comidaHtml(di, ci, cm, d, ahora) {
   const pendientes = cm.items.some((it) => it.c == null);
   return `<div class="comida abierta"><div class="fila-cab" data-acc="abrir" data-d="${di}" data-c="${ci}">${anillo(cm)}
       <div class="txt"><b style="font-size:17px">${nombreComida(cm)}</b>${ci === ahora ? sub : `<small>${cm.hora}</small>`}</div><div class="der">${der}</div></div>
+    ${cm.id === "desayuno_carrera" && !marcada(cm) ? desayunoPanel(cm) : ""}
     ${cm.items.map((it, ii) => itemHtml(di, ci, ii, it, d)).join("")}
     <button type="button" class="agregar" data-acc="agregar" data-d="${di}" data-c="${ci}">+ ${t("Agregar")}</button>
     ${pendientes ? `<div class="marcar"><button type="button" class="sec" data-acc="todo" data-d="${di}" data-c="${ci}">${t("✓ Todo")}</button>
@@ -1154,6 +1173,42 @@ function pintarCantItem() {
     <div class="botones fijos"><button type="button" class="sec" data-acc="cerrar">${t("Cancelar")}</button>
       <button type="button" data-acc="cant-ok">${t("Listo")}</button></div>`);
   cantItem = { di, ci, ii, n };                       // abrirHoja→cerrarHoja no lo borra: se repone
+}
+
+// Desayuno del día de carrera: cuántas horas antes y cuántos g/kg (1–4 g/kg entre 1 y 4 h antes).
+// Mismo criterio que carga.opciones_desayuno: más margen, más cantidad.
+const HORAS_DESAYUNO = [1, 1.5, 2, 2.5, 3, 3.5, 4];
+const ETQ_DESAYUNO = [N("Mínimo razonable"), N("Recomendado"), N("Si tu estómago lo tolera bien")];
+function opcionesDesayuno(h) { const hi = Math.min(4, h), lo = Math.max(0.5, hi - 1); return [lo, (lo + hi) / 2, hi]; }
+const aMin = (hhmm) => { const [h, m] = hhmm.split(":").map(Number); return h * 60 + m; };
+const aHora = (m) => { m = ((Math.round(m) % 1440) + 1440) % 1440; return `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`; };
+function infoDesayuno(cm) {
+  const horas = cm.horas_antes ?? Math.round(((aMin(plan.hora) - aMin(cm.hora) + 1440) % 1440) / 30) / 2;
+  return { horas, g_kg: cm.g_kg ?? Math.round(cm.objetivo_g / plan.peso_kg * 4) / 4 };
+}
+function desayunoPanel(cm) {
+  const { horas, g_kg } = infoDesayuno(cm), ops = opcionesDesayuno(horas), peso = plan.peso_kg;
+  return `<div class="des-cfg"><h4 style="margin-top:6px">${t("¿Cuántas horas antes de largar?")}</h4>
+    <div class="chips">${HORAS_DESAYUNO.map((h) => `<button type="button" class="chip${Math.abs(h - horas) < 0.01 ? " on" : ""}" data-acc="des-horas" data-h="${h}">${casero(h)} h</button>`).join("")}</div>
+    <p class="pista" style="margin:8px 0 0">${t("Comes a las {a} y largas a las {b}.", { a: cm.hora, b: plan.hora })}</p>
+    <h4>${t("¿Cuánto? Para tus {k} kg", { k: fmt(peso, peso % 1 ? 1 : 0) })}</h4>
+    <div class="opciones">${ops.map((g, i) => `<button type="button" class="op${Math.abs(g - g_kg) < 0.01 ? " on" : ""}" data-acc="des-gkg" data-g="${g}">
+      <small class="et">${t(ETQ_DESAYUNO[i])}</small><b>${fmt(g, g % 1 ? (g * 4 % 2 ? 2 : 1) : 0)}</b><small>${t("g por kg")}</small>
+      <div class="g">~${fmt(Math.round(g * peso / 5) * 5)} g</div></button>`).join("")}</div>
+    <p class="pista" style="margin:8px 0 0">${t("Guía general: 1–4 g/kg entre 1 y 4 h antes. Para un maratón, lo habitual es 2–3 g/kg unas 3 h antes.")}</p>
+    ${Math.abs(g_kg - ops[2]) < 0.01 ? `<p class="aviso">${t("Pruébalo antes en un entrenamiento largo: nada nuevo el día de la carrera.")}</p>` : ""}</div>`;
+}
+async function cambiarDesayuno(horas, g_kg) {
+  const di = plan.dias.length - 1, d = plan.dias[di], ci = d.comidas.findIndex((cm) => cm.id === "desayuno_carrera");
+  if (ci < 0) return;
+  try {
+    const nueva = await api("/api/desayuno", { peso_kg: plan.peso_kg, hora: plan.hora, horas, g_kg, elegidos: plan.elegidos,
+      restricciones: perfil?.restricciones || [], estomago_sensible: !!perfil?.estomago_sensible });
+    d.comidas[ci] = nueva;
+    const total = Math.round(d.comidas.reduce((x, cm) => x + gPlan(cm), 0));
+    d.objetivo_g = total; d.rango_g = [Math.round(total * 0.85), Math.round(total * 1.15)];
+    refrescar();
+  } catch (e) { aviso(e.message || t("Sin conexión: quedó marcado. Puedes ajustar lo que queda más tarde.")); }
 }
 
 // Agregar algo que no venía en la pauta (palta en el pan) o un alimento propio con sus gramos.
@@ -1428,6 +1483,7 @@ function pintarCarrera() {
   $("carrera").innerHTML = `<span class="tipo">${esc(fechaLarga(d.fecha))} · ${plan.hora}</span><h2>${t("Día de carrera")}</h2>
     <div class="tarjeta" style="padding:2px 14px">${d.comidas.map((cm) => `<div class="linea-t"><span class="mono">${cm.hora}</span>
       <div class="txt"><b>${nombreComida(cm)}</b>${cm.items.map((it) => { const a = A(it.a); return a ? `<small>${cantidad(a, it.p)} · ${esc(a.nombre)} — ${gTexto(it, it.p)}</small>` : ""; }).join("")}</div></div>`).join("")}</div>
+    <div class="botones"><button type="button" class="sec chico" data-acc="ir-desayuno">✎ ${t("Elegir horas y cantidad del desayuno")}</button></div>
     <ul class="notas">${d.notas.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>
     <h4>${t("En carrera · {h}", { h: hm(plan.tiempo_min) })}</h4>
     <div class="trio"><div><small>${t("Carbos")}</small>${rg(r.carbo_g_h, t("g/h"))}</div><div><small>${t("Líquido")}</small>${rg(r.liquido_ml_h, t("ml/h"))}</div>
@@ -1565,6 +1621,10 @@ const ACC = {
   "agr-paso": (b) => { const a = agr.sel ? A(agr.sel) : { paso: 1, max: 99 };
     agr.n = Math.max(a.paso, Math.min(a.max * 2, +(agr.n + Number(b.dataset.s) * a.paso).toFixed(2))); pintarAgregar(); },
   "agr-ok": () => agregarOk(),
+  "des-horas": (b) => cambiarDesayuno(Number(b.dataset.h), null),
+  "des-gkg": (b) => { const cm = plan.dias.at(-1).comidas.find((x) => x.id === "desayuno_carrera");
+    cambiarDesayuno(infoDesayuno(cm).horas, Number(b.dataset.g)); },
+  "ir-desayuno": () => { diaSel = plan.dias.length - 1; abierta[diaSel] = plan.dias[diaSel].comidas.findIndex((x) => x.id === "desayuno_carrera"); cambiarVista("hoy"); },
   cant: (b) => { const c = cantContexto(); if (!c) return; c.poner(Number(b.dataset.n)); c.repintar(); },
   "cant-item": (b) => abrirCantItem(+b.dataset.d, +b.dataset.c, +b.dataset.i),
   "cant-ok": () => { const { di, ci, ii, n } = cantItem, it = plan.dias[di].comidas[ci].items[ii];

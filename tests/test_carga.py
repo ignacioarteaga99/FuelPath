@@ -309,3 +309,19 @@ def test_repartir_corrige_una_noche_con_demasiado_liquido():
     for c in r["cambios"]:
         nuevo["comidas"][c["comida"]]["items"][c["item"]]["p"] = c["p"]
     assert reparto.mililitros(nuevo["comidas"][5]["items"]) <= 250
+
+
+def test_desayuno_de_carrera_segun_horas_antes():
+    assert carga.opciones_desayuno(3) == [2.0, 2.5, 3.0]
+    assert carga.opciones_desayuno(1) == [0.5, 0.75, 1.0] and carga.opciones_desayuno(4) == [3.0, 3.5, 4.0]
+    d = _plan(peso_kg=61)["dias"][-1]["comidas"][0]
+    assert d["horas_antes"] == 3 and d["g_kg"] == 2.5 and d["hora"] == "04:00"
+    el = set(al.por_defecto())
+    for horas, g in ((2, 1.5), (3, 3.0), (4, 4.0)):
+        c = carga.desayuno_carrera(61, time(7, 0), horas, g, el)
+        assert c["hora"] == f"{7 - horas:02d}:00" and abs(gramos(c["items"]) - g * 61) <= 0.15 * g * 61, (horas, g, c)
+    cli = TestClient(app)
+    r = cli.post("/api/desayuno", json={"peso_kg": 61, "hora": "07:00", "horas": 2.5, "elegidos": sorted(el)}).json()
+    assert r["hora"] == "04:30" and r["g_kg"] == 2.0
+    assert cli.post("/api/desayuno", json={"peso_kg": 61, "hora": "07:00", "horas": 1, "g_kg": 3}).status_code == 422
+    assert cli.post("/api/desayuno", json={"peso_kg": 61, "hora": "07:00", "horas": 5}).status_code == 422

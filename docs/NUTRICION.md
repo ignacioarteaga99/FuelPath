@@ -38,6 +38,7 @@ profesional.
 | Agua | Unos 35 ml/kg al día, aparte de los jugos y la isotónica. Se lleva en vasos de 250 ml | `carga.dia_carga` |
 | Sodio en la carga | No se restringe. La referencia es 3 g/día (4 g si suda con sal). Si suda con sal, la cena lleva caldo | `carga.dia_carga` |
 | Desayuno de carrera | Carga larga: 2,5 g/kg 3 h antes. Corta: 2 g/kg 2,5 h antes. Sin carga: 1,5 g/kg 2 h antes. Con estómago sensible, 30 min más de margen y 0,5 g/kg menos. Como máximo 1 bebida (5–7 ml/kg) | `carga.dia_carrera` |
+| Elegir el desayuno | El corredor elige entre 1 y 4 h antes y, para ese margen, tres opciones de g/kg: mínimo, recomendado y alto. El tope es 1 g/kg por hora y el mínimo, 1 g/kg menos (3 h: 2 / 2,5 / 3 g/kg) | `carga.opciones_desayuno` |
 | Antes de largar | Si suda con sal: sales 45 min antes (unos 500 mg de sodio). Si la carrera dura más de 1 h: gel 20 min antes | `carga.dia_carrera` |
 | En carrera | Hasta 45 min, nada. De 45 a 75 min, hasta 30 g/h. Hasta 2,5 h, 30–60 g/h. Más de 2,5 h, 60–70 g/h, o 60–90 g/h con el intestino entrenado o en bici y triatlón | `carga.en_carrera` |
 | Líquido y sodio en carrera | 400–800 ml/h. Sodio: 300–600 mg/h, o 500–800 mg/h si suda con sal, con una dosis de sal cada hora | `carga.en_carrera` |
