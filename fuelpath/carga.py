@@ -35,7 +35,7 @@ from datetime import date, datetime, time, timedelta
 from . import alimentos as al
 from .alimentos import POR_ID
 from .idioma import tr
-from .reparto import ajustar, gramos
+from .reparto import ajustar, gramos, ml_max, proponer
 
 DISTANCIAS = {"10k": (10.0, "correr"), "21k": (21.1, "correr"), "42k": (42.2, "correr"),
               "703": (113.0, "tri"), "im": (226.0, "tri"), "fondo": (120.0, "bici"), "otra": (None, None)}
@@ -200,7 +200,7 @@ def escala(p: Perfil) -> float:
 
 def armar_comida(slots: list[list[str]], elegidos: set[str], objetivo: float, tope: float,
                  evitar: set[str] = frozenset(), extra: tuple[str, ...] = (), esc: float = 1.0,
-                 topes_item: dict[str, float] | None = None) -> list[dict]:
+                 topes_item: dict[str, float] | None = None, ml_max: float | None = None) -> list[dict]:
     items, usados = [], set()
     for cands in slots:
         a = _elegir(cands, elegidos, set(evitar) | usados)
@@ -213,7 +213,7 @@ def armar_comida(slots: list[list[str]], elegidos: set[str], objetivo: float, to
     for a in extra:
         if a in elegidos and a not in usados:
             items.append({"a": a, "p": POR_ID[a]["ini"]})
-    items = ajustar(items, objetivo, techo=tope, escala=esc)
+    items = ajustar(items, objetivo, techo=tope, escala=esc, ml_max=ml_max)
     return [it for it in items if it["p"] > 0]
 
 
@@ -232,7 +232,8 @@ def dia_carga(p: Perfil, fecha: date, n: int, de: int, elegidos: set[str]) -> di
         if m == "cena":
             evitar = {bases.get("base"), bases.get("proteina")} - {None}
         extra = ("caldo",) if m == "cena" and p.sudor_salado else ()
-        items = armar_comida(slots, elegidos, objs[m]["objetivo"], objs[m]["tope"], evitar, extra, escala(p))
+        items = armar_comida(slots, elegidos, objs[m]["objetivo"], objs[m]["tope"], evitar, extra, escala(p),
+                             ml_max=ml_max(m, escala(p)))
         if m == "almuerzo":
             for it in items:
                 rol = POR_ID[it["a"]]["rol"]
@@ -257,9 +258,17 @@ def dia_carga(p: Perfil, fecha: date, n: int, de: int, elegidos: set[str]) -> di
                         "Have an early dinner you already know. Nothing new the night before.",
                         "Jante cedo algo que você já conhece. Nada novo na véspera."))
     lo, hi = rango(p)
-    return {"fecha": fecha.isoformat(), "tipo": "carga", "n": n, "de": de, "objetivo_g": _r10(total),
-            "rango_g": [lo, hi], "escala": round(escala(p), 2), "agua_ml": int(round(35 * p.peso_kg / 250) * 250),
-            "sodio_mg": 4000 if p.sudor_salado else 3000, "reparto": True, "notas": notas, "comidas": comidas}
+    dia = {"fecha": fecha.isoformat(), "tipo": "carga", "n": n, "de": de, "objetivo_g": _r10(total),
+           "rango_g": [lo, hi], "escala": round(escala(p), 2), "agua_ml": int(round(35 * p.peso_kg / 250) * 250),
+           "sodio_mg": 4000 if p.sudor_salado else 3000, "reparto": True, "notas": notas, "comidas": comidas}
+    # Lo que no cupo en una comida (por su tope de gramos o de líquido) se reparte en las demás.
+    if sum(gramos(cm["items"]) for cm in comidas) < lo:
+        for c in proponer(dia, -1)["cambios"]:
+            comidas[c["comida"]]["items"][c["item"]]["p"] = c["p"]
+        for cm in comidas:
+            cm["items"] = [it for it in cm["items"] if it["p"] > 0]
+            cm["objetivo_g"] = round(gramos(cm["items"]))
+    return dia
 
 
 def dia_carrera(p: Perfil, elegidos: set[str]) -> dict:
@@ -270,7 +279,7 @@ def dia_carrera(p: Perfil, elegidos: set[str]) -> dict:
     objetivo = g_kg * p.peso_kg
     # Antes de largar: líquido justo (5–7 ml/kg), no más de una bebida.
     items = armar_comida(PLANTILLA_CARRERA, elegidos, objetivo, objetivo * 1.15, esc=escala(p),
-                         topes_item={"isotonica": 1, "jugo": 1, "nectar": 1})
+                         topes_item={"isotonica": 1, "jugo": 1, "nectar": 1}, ml_max=ml_max("desayuno_carrera", escala(p)))
     comidas = [{"id": "desayuno_carrera", "hora": _hhmm(salida - horas_antes * 60), "objetivo_g": round(gramos(items)),
                 "tope_g": round(objetivo * 1.15), "min_g": round(objetivo * 0.5), "items": items}]
     if p.sudor_salado:

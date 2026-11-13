@@ -277,3 +277,35 @@ def test_base_tiene_lo_comun_y_su_version():
     ids = {a["id"] for a in j["alimentos"]}
     assert {"palta", "queso", "mantequilla", "leche", "mote_huesillo", "queque"} <= ids
     assert len(j["version"]) == 10 and j["version"] == al.version()
+
+
+def test_nunca_un_litro_de_isotonica_antes_de_dormir():
+    """Las bebidas de cada comida tienen tope de ml (antes de dormir, 250), al armar y al recalcular."""
+    for kw in ({}, {"regimen": 12, "peso_kg": 95}, {"elegidos": ("pan_molde", "arroz", "isotonica", "platano")}):
+        for d in _plan(**kw)["dias"][:2]:
+            for c in d["comidas"]:
+                assert reparto.mililitros(c["items"]) <= reparto.ml_max(c["id"], d["escala"]) + 1, (kw, c["id"], c["items"])
+                if c["id"] == "noche":
+                    assert reparto.mililitros(c["items"]) <= 250
+    # Se salta la once completa y la noche sólo tiene isotónica: no se llena de líquido.
+    dia = copy.deepcopy(_plan()["dias"][0])
+    _comer(dia, 3)
+    for it in dia["comidas"][3]["items"]:
+        it["c"] = 0
+    dia["comidas"][5]["items"] = [{"a": "isotonica", "p": 0.5}]
+    r = reparto.proponer(dia, 3)
+    nuevo = copy.deepcopy(dia)
+    for c in r["cambios"]:
+        nuevo["comidas"][c["comida"]]["items"][c["item"]]["p"] = c["p"]
+    assert reparto.mililitros(nuevo["comidas"][5]["items"]) <= 250
+    assert reparto.mililitros(nuevo["comidas"][4]["items"]) <= 400
+
+
+def test_repartir_corrige_una_noche_con_demasiado_liquido():
+    dia = copy.deepcopy(_plan()["dias"][0])
+    dia["comidas"][5]["items"] = [{"a": "isotonica", "p": 2}]               # pauta vieja: 1 litro
+    r = reparto.proponer(dia, -1)
+    nuevo = copy.deepcopy(dia)
+    for c in r["cambios"]:
+        nuevo["comidas"][c["comida"]]["items"][c["item"]]["p"] = c["p"]
+    assert reparto.mililitros(nuevo["comidas"][5]["items"]) <= 250

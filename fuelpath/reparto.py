@@ -42,19 +42,49 @@ def maximo(a: dict, escala: float = 1.0, it: dict | None = None) -> float:
     return max(a["max"], int(a["max"] * escala / a["paso"]) * a["paso"])
 
 
+# Líquido máximo por comida (ml de bebidas: jugo, isotónica, leche…). Los gramos
+# no bastan: sin este tope, el recálculo podía llenar la colación de la noche con
+# un litro de isotónica. Antes de dormir, poco: no despertarse a orinar.
+ML_MAX = {"desayuno": 600, "colacion": 500, "almuerzo": 500, "once": 500, "cena": 400, "noche": 250,
+          "desayuno_carrera": 500}
+
+
+def ml_max(comida: str, escala: float = 1.0) -> float | None:
+    """Tope de bebidas de una comida: crece con el peso, salvo antes de dormir (ahí manda dormir bien)."""
+    base = ML_MAX.get(comida)
+    return None if base is None else base if comida == "noche" else base * max(1.0, escala)
+
+
+def mililitros(items: list[dict]) -> float:
+    return sum(it["p"] * (de_item(it).get("ml") or 0) for it in items)
+
+
 def ajustar(items: list[dict], objetivo: float, techo: float | None = None, piso: float | None = None,
-            escala: float = 1.0) -> list[dict]:
+            escala: float = 1.0, ml_max: float | None = None) -> list[dict]:
     """Sube o baja porciones de a un paso hasta quedar lo más cerca posible del objetivo.
 
-    Nunca pasa el `techo` al subir ni baja del `piso` al bajar. Devuelve una
-    copia; los ítems pueden quedar en 0 (quien llama decide si los saca).
+    Nunca pasa el `techo` (g) ni `ml_max` (ml de bebidas) al subir, ni baja del
+    `piso` al bajar. Si las bebidas ya pasan `ml_max`, primero las baja.
+    Devuelve una copia; los ítems pueden quedar en 0 (quien llama decide si los saca).
     Un ítem puede traer `mx` (máximo propio, p. ej. 1 isotónica antes de largar).
     """
     items = [dict(it) for it in items]
     iniciales = [it["p"] for it in items]
     techo = float("inf") if techo is None else techo
     piso = 0.0 if piso is None else piso
+    ml_max = float("inf") if ml_max is None else ml_max
+    # Demasiado líquido: bajar la bebida que más aporta, de a un paso.
+    for _ in range(50):
+        if mililitros(items) <= ml_max + _EPS:
+            break
+        bebidas = [i for i, it in enumerate(items) if (de_item(it).get("ml") or 0) > 0 and it["p"] > 0
+                   and it.get("c") is None and de_item(it)["rol"] not in FIJOS]
+        if not bebidas:
+            break
+        i = max(bebidas, key=lambda j: items[j]["p"] * de_item(items[j])["ml"])
+        items[i]["p"] = round(max(0.0, items[i]["p"] - de_item(items[i])["paso"]), 2)
     s = gramos(items)
+    ml = mililitros(items)
     for _ in range(400):
         forzar = s > techo + _EPS                 # pasado del tope (por las porciones iniciales): bajar sí o sí
         err = (techo - s) if forzar else objetivo - s
@@ -64,7 +94,8 @@ def ajustar(items: list[dict], objetivo: float, techo: float | None = None, piso
             if a["rol"] in FIJOS or a["cho"] <= 0:
                 continue
             prio, paso, inc, mx = ROLES.get(a["rol"], 9), a["paso"], a["paso"] * a["cho"], maximo(a, escala, it)
-            if err > 0 and it["p"] + paso <= mx + _EPS and s + inc <= techo + _EPS \
+            ml_inc = paso * (a.get("ml") or 0)
+            if err > 0 and it["p"] + paso <= mx + _EPS and s + inc <= techo + _EPS and ml + ml_inc <= ml_max + _EPS \
                     and abs(err - inc) < abs(err) - _EPS:
                 clave = (it["p"] / mx, prio, i)          # reparte: primero lo menos usado
                 cand = (clave, i, paso, inc)
@@ -81,6 +112,7 @@ def ajustar(items: list[dict], objetivo: float, techo: float | None = None, piso
         _, i, dp, dg = mejor
         items[i]["p"] = round(items[i]["p"] + dp, 2)
         s += dg
+        ml += dp * (de_item(items[i]).get("ml") or 0)
     return items
 
 
@@ -119,17 +151,24 @@ def proponer(dia: dict, desde: int) -> dict:
         holgura = {i: max(0.0, actuales[i] - comidas[i]["min_g"]) for i in futuras}
     total_holgura = sum(holgura.values())
     cambios, movido, en_tope = [], 0.0, []
-    if abs(dif) >= 1 and total_holgura > 0:
+    # Comidas que vienen con demasiado líquido (p. ej. una pauta armada antes de los topes de ml).
+    exceso = [i for i in futuras if mililitros(comidas[i]["items"]) > (ml_max(comidas[i]["id"], escala) or float("inf")) + _EPS]
+    if (abs(dif) >= 1 and total_holgura > 0) or exceso:
         por_repartir = min(abs(dif), total_holgura)
         for i in futuras:
-            parte = por_repartir * holgura[i] / total_holgura
+            parte = por_repartir * holgura[i] / total_holgura if total_holgura > 0 else 0.0
             cm = comidas[i]
-            if parte < 1:
+            if parte < 1 and i in exceso:
+                nuevos = ajustar(cm["items"], actuales[i], techo=cm["tope_g"], escala=escala,
+                                 ml_max=ml_max(cm["id"], escala))
+            elif parte < 1:
                 nuevos = cm["items"]
             elif dif > 0:
-                nuevos = ajustar(cm["items"], actuales[i] + parte, techo=cm["tope_g"], escala=escala)
+                nuevos = ajustar(cm["items"], actuales[i] + parte, techo=cm["tope_g"], escala=escala,
+                                 ml_max=ml_max(cm["id"], escala))
             else:
-                nuevos = ajustar(cm["items"], actuales[i] - parte, piso=cm["min_g"], escala=escala)
+                nuevos = ajustar(cm["items"], actuales[i] - parte, piso=cm["min_g"], escala=escala,
+                                 ml_max=ml_max(cm["id"], escala))
             if dif > 0 and cm["tope_g"] - gramos(nuevos) < _paso_minimo(cm):
                 en_tope.append(cm["id"])          # ya no le cabe ni un paso más
             for j, (antes, despues) in enumerate(zip(cm["items"], nuevos)):
