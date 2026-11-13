@@ -184,8 +184,9 @@ ALIMENTOS = [
     _a("gaseosa", ("Bebida gaseosa", "Soft drink", "Refrigerante"), VASO, 250,
        26, 0, 0, 0, 10, "liquido", ml=250, paso=0.5, ini=1, mx=2),
     # Agregados: lo que el corredor suma por su cuenta (no los propone la pauta)
-    _a("palta", ("Palta", "Avocado", "Abacate"), CDA, 15,
-       1.3, 1, 2.2, 0.3, 1, "agregado", ini=2, mx=8, tags={"grasa_alta"}),
+    # Palta Hass mediana (~150 g de pulpa), en cuartos: «¼ de palta» es como se come en el pan.
+    _a("palta", ("Palta", "Avocado", "Abacate"), _u("palta", "paltas", "avocado", "avocados", "abacate", "abacates"), 150,
+       13, 10, 22, 3, 10, "agregado", paso=0.25, ini=0.25, mx=1, tags={"grasa_alta"}),
     _a("mantequilla", ("Mantequilla", "Butter", "Manteiga"), CDTA, 5,
        0, 0, 4, 0, 30, "agregado", ini=1, mx=6, tags={"grasa_alta", "lacteo"}),
     _a("queso", ("Queso", "Cheese", "Queijo"), LAMINA, 20,
@@ -284,10 +285,17 @@ def unidad(a: dict, n: float) -> str:
 
 
 def cantidad(a: dict, n: float) -> str:
-    """2.5 → «2 ½ tazas» · 0.5 → «½ taza» · 3 → «3 rebanadas»."""
-    entero, medio = int(n), abs(n - int(n)) >= 0.25
-    num = ("½" if not entero else f"{entero} ½") if medio else str(entero)
-    return f"{num} {unidad(a, n)}"
+    """2.5 → «2 ½ tazas» · 0.5 → «½ taza» · 0.25 → «¼ palta» · 3 → «3 rebanadas»."""
+    return f"{casero(n)} {unidad(a, n)}"
+
+
+def casero(n: float) -> str:
+    """El número como se dice en la cocina: ¼, ½, ¾ y enteros."""
+    entero, resto = int(n), round((n - int(n)) * 4) / 4
+    if resto >= 1:
+        entero, resto = entero + 1, 0
+    frac = {0.25: "¼", 0.5: "½", 0.75: "¾"}.get(resto, "")
+    return f"{entero} {frac}" if entero and frac else frac or str(entero)
 
 
 def catalogo() -> list[dict]:

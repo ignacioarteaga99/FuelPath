@@ -52,6 +52,7 @@ def test_cantidades_caseras():
     assert al.cantidad(al.POR_ID["arroz"], 2.5) == "2 ½ tazas"
     assert al.cantidad(al.POR_ID["arroz"], 0.5) == "½ taza"
     assert al.cantidad(al.POR_ID["pan_molde"], 4) == "4 rebanadas"
+    assert al.cantidad(al.POR_ID["palta"], 0.25) == "¼ palta" and al.cantidad(al.POR_ID["palta"], 1.75) == "1 ¾ paltas"
     idioma.usar("en")
     assert al.cantidad(al.POR_ID["jugo"], 1) == "1 glass"
     idioma.usar("es")
@@ -255,10 +256,10 @@ def test_agregados_y_propios_cuentan_pero_no_se_escalan():
     dia = copy.deepcopy(_plan()["dias"][1])
     _comer(dia, 0)
     des = dia["comidas"][0]
-    des["items"].append({"a": "palta", "p": 3, "c": 3})                      # palta en el pan
+    des["items"].append({"a": "palta", "p": 0.25, "c": 0.25})                # ¼ de palta en el pan
     des["items"].append({"a": "p_kuchen", "p": 1, "c": 1, "cho": 40})        # alimento propio
     antes = reparto.proyectado(copy.deepcopy(_plan()["dias"][1]))
-    assert abs(reparto.proyectado(dia) - antes - (3 * 1.3 + 40)) < 0.5
+    assert abs(reparto.proyectado(dia) - antes - (0.25 * 13 + 40)) < 0.5
     r = reparto.proponer(dia, 0)
     assert r["dif_g"] < 0 and all(c["comida"] > 0 for c in r["cambios"])   # baja lo que viene
     assert not any(c["a"] in ("palta", "p_kuchen") for c in r["cambios"])

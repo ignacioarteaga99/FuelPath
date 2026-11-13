@@ -518,6 +518,14 @@ const EN = {
   "Buscar alimento…": "Search food…",
   "Escribe el nombre y los gramos de carbohidratos.": "Enter the name and the grams of carbs.",
   "Agregaste {g} g": "You added {g} g",
+  // Editar lo marcado
+  "Tu alimento": "Your food",
+  "Guardar cambios": "Save changes",
+  "Cuánto comiste": "How much you ate",
+  "Sacar": "Remove",
+  "Desmarcar": "Untick",
+  "Guardar": "Save",
+  "La diferencia es chica: no hace falta mover nada.": "The difference is small: nothing needs to move.",
 };
 const PT = {
   "Hoy": "Hoje", "Pauta": "Plano", "Carrera": "Prova", "Perfil": "Perfil", "Tus datos": "Seus dados",
@@ -671,6 +679,14 @@ const PT = {
   "Buscar alimento…": "Buscar alimento…",
   "Escribe el nombre y los gramos de carbohidratos.": "Escreva o nome e os gramas de carboidratos.",
   "Agregaste {g} g": "Você adicionou {g} g",
+  // Editar lo marcado
+  "Tu alimento": "Seu alimento",
+  "Guardar cambios": "Salvar alterações",
+  "Cuánto comiste": "Quanto você comeu",
+  "Sacar": "Tirar",
+  "Desmarcar": "Desmarcar",
+  "Guardar": "Salvar",
+  "La diferencia es chica: no hace falta mover nada.": "A diferença é pequena: não precisa mover nada.",
 };
 function t(es, vars) {
   let s = idioma === "en" ? (EN[es] ?? es) : idioma === "pt" ? (PT[es] ?? EN[es] ?? es) : es;
@@ -726,8 +742,17 @@ async function cargarCatalogo(restr = [], sensible = false) {
 }
 
 // ── Cuentas de la agenda ───────────────────────────────────────────────────
-function casero(n) { const e = Math.trunc(n), m = Math.abs(n - e) >= 0.25; return m ? (e ? `${e} ½` : "½") : String(e); }
-function cantidad(a, n) { return `${casero(n)} ${n <= 1 ? a.unidad[0] : a.unidad[1]}`; }
+// El número como se dice en la cocina: ¼, ½, ¾ y enteros (igual que alimentos.casero en el servidor).
+function casero(n) {
+  let e = Math.trunc(n), r = Math.round((n - e) * 4) / 4;
+  if (r >= 1) { e += 1; r = 0; }
+  const f = { 0.25: "¼", 0.5: "½", 0.75: "¾" }[r] || "";
+  return e && f ? `${e} ${f}` : f || String(e);
+}
+function cantidad(a, n) {
+  const u = n <= 1 ? a.unidad[0] : a.unidad[1];
+  return `${casero(n)} ${/^[\d.,½\s]*$/.test(u || "") ? t(n <= 1 ? "porción" : "porciones") : u}`;   // porción escrita como «1»
+}
 const maximo = (a, escala = 1, it) => it?.mx ?? Math.max(a.max, Math.floor(a.max * escala / a.paso) * a.paso);
 const gIt = (it, n = it.p) => n * (A(it.a)?.cho || 0);
 const gPlan = (cm) => cm.items.reduce((s, it) => s + gIt(it), 0);
@@ -919,7 +944,7 @@ function itemHtml(di, ci, ii, it, d) {
       ${editable ? `<div class="paso"><button type="button" data-acc="menos" data-d="${di}" data-c="${ci}" data-i="${ii}" aria-label="${t("Menos")}" ${n <= 0 ? "disabled" : ""}>−</button>
         <b>${cantidad(a, n)}</b><button type="button" data-acc="mas" data-d="${di}" data-c="${ci}" data-i="${ii}" aria-label="${t("Más")}" ${n + a.paso > maximo(a, d.escala, it) + 1e-6 ? "disabled" : ""}>+</button></div>` : ""}</div>
     <span class="g">${gTexto(it, n)}</span>
-    ${!marcado && d.tipo !== "carrera" ? `<button type="button" class="mas" data-acc="opciones" data-d="${di}" data-c="${ci}" data-i="${ii}" aria-label="${t("Más opciones")}">⋯</button>` : ""}</div>`;
+    <button type="button" class="mas" data-acc="opciones" data-d="${di}" data-c="${ci}" data-i="${ii}" aria-label="${t("Más opciones")}">⋯</button></div>`;
 }
 
 function comidaHtml(di, ci, cm, d, ahora) {
@@ -988,7 +1013,9 @@ function pintarPropuesta(di, ci, titulo, r) {
   }).join("");
   $("hoja").innerHTML = `<div class="asa"></div><span class="tipo">${nombreComida(d.comidas[ci])} · ${d.comidas[ci].hora}</span>
     <h2 style="font-size:20px">${esc(titulo)}</h2>
-    <p class="pista" style="margin:0">${r.cambios.length ? t("¿Lo repartimos en las comidas que vienen? Lo que ya comiste no cambia.") : t("No hay nada que mover: ya no quedan comidas por delante.")}</p>
+    <p class="pista" style="margin:0">${r.cambios.length ? t("¿Lo repartimos en las comidas que vienen? Lo que ya comiste no cambia.")
+      : d.comidas.some((x, j) => j > ci && !marcada(x)) ? t("La diferencia es chica: no hace falta mover nada.")
+      : t("No hay nada que mover: ya no quedan comidas por delante.")}</p>
     <div class="comparar"><div class="${r.cambios.length ? "" : "on"}"><small>${t("Dejar así")}</small><b>${fmt(r.sin)} g</b><span class="estado ${r.estado_sin}">${est(r.sin, r.estado_sin)}</span></div>
       ${r.cambios.length ? `<div class="on"><small>${t("Recalcular")}</small><b>${fmt(r.con)} g</b><span class="estado ${r.estado_con}">${est(r.con, r.estado_con)}</span></div>` : ""}</div>
     ${rangoHtml(d, Math.max(r.sin, r.con), hecho, [{ g: r.sin, c: r.estado_sin === "ok" ? "" : "bajo" }, ...(r.cambios.length ? [{ g: r.con, c: "ok" }] : [])])}
@@ -1033,9 +1060,17 @@ function pasoItem(di, ci, ii, s) {
 }
 
 // Opciones de un alimento: cambiarlo, moverlo o sacarlo.
+function editarPropio(a) {
+  if (!a?.id?.startsWith("p_")) return "";
+  return `<h4 style="margin-top:8px">${t("Tu alimento")}</h4><div class="form">
+    <div class="fila"><label>${t("Nombre")}<input data-opc="nombre" value="${esc(a.nombre)}" maxlength="40" autocomplete="off"></label>
+      <label>${t("Carbohidratos por porción (g)")}<input data-opc="cho" type="number" inputmode="decimal" min="0" max="300" value="${a.cho}"></label></div>
+    <button type="button" class="sec chico" data-acc="opc-propio">✓ ${t("Guardar cambios")}</button></div>`;
+}
 function abrirOpciones(di, ci, ii) {
   const d = plan.dias[di], cm = d.comidas[ci], it = cm.items[ii], a = A(it.a), g = gIt(it);
-  opciones = { di, ci, ii };
+  opciones = { di, ci, ii, n: it.c ?? it.p };
+  if (it.c != null) return pintarOpcionesMarcado();
   const permit = new Set(cat.permitidos), enComida = new Set(cm.items.map((x) => x.a));
   const alts = cat.alimentos.filter((x) => x.rol === a.rol && x.id !== a.id && !x.oculto && permit.has(x.id) && !enComida.has(x.id) && x.cho > 0)
     .map((x) => { const n = Math.min(maximo(x, d.escala), Math.max(x.paso, redondearPaso(g / x.cho, x))); return { x, n }; }).slice(0, 8);
@@ -1049,8 +1084,21 @@ function abrirOpciones(di, ci, ii) {
       return `<button type="button" data-acc="mover" data-j="${j}" ${cabe ? "" : "disabled"}><span>${nombreComida(x)} · ${x.hora}</span>
         <small>${cabe ? `${fmt(gPlan(x))} → ${fmt(queda)} g` : t("No cabe: quedaría en {g} g (tope {t} g)", { g: fmt(queda), t: fmt(x.tope_g) })}</small></button>`; }).join("")
       : `<p class="pista">${t("No hay comidas más adelante con espacio.")}</p>`}</div>
+    ${editarPropio(a)}
     <div class="botones"><button type="button" class="sec" data-acc="sacar" data-repartir="0">${t("Sacar sin repartir")}</button>
       ${d.reparto ? `<button type="button" data-acc="sacar" data-repartir="1">${t("Sacar y repartir en lo que queda")}</button>` : ""}</div>`);
+}
+function pintarOpcionesMarcado() {
+  const { di, ci, ii, n } = opciones, d = plan.dias[di], cm = d.comidas[ci], it = cm.items[ii], a = A(it.a);
+  abrirHoja(`<span class="tipo">${nombreComida(cm)} · ${cm.hora}</span><h2 style="font-size:20px">${esc(a.nombre)}</h2>
+    <h4 style="margin-top:8px">${t("Cuánto comiste")}</h4>
+    <div class="agr-sel"><div class="paso"><button type="button" data-acc="opc-paso" data-s="-1" aria-label="${t("Menos")}" ${n <= 0 ? "disabled" : ""}>−</button>
+      <b>${cantidad(a, n)}</b><button type="button" data-acc="opc-paso" data-s="1" aria-label="${t("Más")}">+</button></div>
+      <div class="grande">${gTexto(it, n) || "0 g"}</div></div>
+    ${editarPropio(a)}
+    <div class="botones fijos"><button type="button" class="sec" data-acc="opc-sacar">✕ ${t("Sacar")}</button>
+      <button type="button" class="sec" data-acc="opc-desmarcar">${t("Desmarcar")}</button>
+      <button type="button" data-acc="opc-guardar">${t("Guardar")}</button></div>`);
 }
 
 // Agregar algo que no venía en la pauta (palta en el pan) o un alimento propio con sus gramos.
@@ -1106,7 +1154,7 @@ function agregarOk() {
     const cho = Number(String(agr.cho).replace(",", "."));
     if (!agr.nombre.trim() || !(cho >= 0)) return aviso(t("Escribe el nombre y los gramos de carbohidratos."));
     id = "p_" + Date.now().toString(36);
-    const porcion = agr.porcion.trim();
+    const porcion = /[a-záéíóúñ]/i.test(agr.porcion) ? agr.porcion.trim().replace(/^[\d.,½\s]+/, "") : "";
     plan.propios = { ...(plan.propios || {}), [id]: { id, nombre: agr.nombre.trim(), cho: Math.min(300, cho), sodio: 0, paso: 1, ini: 1, max: 99,
       rol: "agregado", tags: [], ml: 0, peso: 0, unidad: [porcion || t("porción"), porcion || t("porciones")] } };
   }
@@ -1423,6 +1471,18 @@ const ACC = {
     delete plan.dias[di].comidas[ci].items[ii].v; cerrarHoja(); refrescar(); },
   mover: (b) => { const { di, ci, ii } = opciones, d = plan.dias[di], [it] = d.comidas[ci].items.splice(ii, 1), dest = d.comidas[+b.dataset.j];
     delete it.v; const igual = dest.items.find((x) => x.a === it.a); if (igual) igual.p += it.p; else dest.items.push(it); cerrarHoja(); refrescar(); },
+  "opc-paso": (b) => { const { di, ci, ii } = opciones, it = plan.dias[di].comidas[ci].items[ii], a = A(it.a);
+    opciones.n = Math.max(0, Math.min(maximo(a, plan.dias[di].escala, it) * 2, +(opciones.n + Number(b.dataset.s) * a.paso).toFixed(2)));
+    pintarOpcionesMarcado(); },
+  "opc-guardar": () => { const { di, ci, ii, n } = opciones, it = plan.dias[di].comidas[ci].items[ii], dg = gIt(it, n) - gIt(it, it.c);
+    it.c = n; cerrarHoja(); refrescar(); if (Math.abs(dg) >= 5) proponer(di, ci, tituloDif(dg)); },
+  "opc-desmarcar": () => { const { di, ci, ii } = opciones; delete plan.dias[di].comidas[ci].items[ii].c; cerrarHoja(); refrescar(); },
+  "opc-sacar": () => { const { di, ci, ii } = opciones, [it] = plan.dias[di].comidas[ci].items.splice(ii, 1), g = gIt(it, it.c ?? it.p);
+    cerrarHoja(); refrescar(); if (g >= 5) proponer(di, ci, t("Sacaste {g} g", { g: fmt(g) })); },
+  "opc-propio": () => { const { di, ci, ii } = opciones, it = plan.dias[di].comidas[ci].items[ii], a = plan.propios?.[it.a];
+    const nombre = document.querySelector("[data-opc=nombre]")?.value.trim(), cho = Number(String(document.querySelector("[data-opc=cho]")?.value).replace(",", "."));
+    if (!a || !nombre || !(cho >= 0)) return aviso(t("Escribe el nombre y los gramos de carbohidratos."));
+    Object.assign(a, { nombre, cho: Math.min(300, cho) }); cerrarHoja(); refrescar(); },
   sacar: (b) => { const { di, ci, ii } = opciones, d = plan.dias[di], [it] = d.comidas[ci].items.splice(ii, 1), g = gIt(it);
     cerrarHoja(); refrescar(); if (b.dataset.repartir === "1" && g >= 5) proponer(di, ci, t("Sacaste {g} g", { g: fmt(g) })); },
   "sim-paso": (b) => { const cm = sim.d.comidas[+b.dataset.c], it = cm.items[+b.dataset.i], a = A(it.a);
