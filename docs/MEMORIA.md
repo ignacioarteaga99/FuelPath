@@ -52,6 +52,15 @@ Complementa `CLAUDE.md`.
   adaptan, no se importan.
 - **Pauta:** basada en consensos (ACSM 2016, COI 2018). Es una guía general:
   la del nutricionista manda.
+- **Pauta (definida con Ignacio, nov 2026):** ver `docs/NUTRICION.md`.
+  - Agenda tipo B (tarjetas por comida, se abre la de ahora) con KPIs arriba y
+    agua aparte. El desayuno parte con pan de molde.
+  - Subir o bajar gramos de un alimento; al marcarlo, ventana para recalcular
+    **sólo en las comidas que vienen**, con topes. Si come de más, baja lo que
+    viene sin dejar comidas muy chicas.
+  - En PC: menú a la izquierda y panel a la derecha.
+  - Al terminar la carrera: feedback y plan guardado como plan anterior.
+  - Mockups en `docs/mockups/`.
 - **Pendiente de decidir:** dominio propio (¿fuelpathapp.com?) o subdominio de
   pacepathapp.com.
 - **Próximo paso sugerido:**

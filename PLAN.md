@@ -30,20 +30,28 @@ Detalle y qué archivos traer de PacePath: `docs/ARQUITECTURA.md`.
 - [ ] Páginas legales (privacidad y términos) adaptadas a datos de salud.
 
 ## Fase 1 — La pauta (función principal)
-- [x] Carga de carbohidratos por día según la duración de la carrera.
-- [x] Comida previa: dos opciones (3 h y 2 h antes) con gramos.
-- [x] En carrera: g/h, líquido, sodio y minuto y km de cada gel.
-- [x] Hoy: gramos del día con botones +25/+50/+100.
-- [ ] Registrar comidas con alimentos comunes de Chile, cada uno con sus
-      gramos de carbohidratos (marraqueta, arroz, fideos, plátano, jugo,
-      barra…). Una porción con un toque, en vez de sumar gramos a mano.
-- [ ] Cambiar el gel por el del usuario: marca, gramos, cafeína y sodio. Mezclar
-      geles y bebida isotónica.
+- [x] Formulario: evento, distancia (10K, 21K, 42K, 70.3, Ironman, gran
+      fondo u otra), tiempo, fecha y hora, peso en kg o lb, régimen
+      (8/10/12 g/kg o 7/8/10 en 21K), horarios, estómago sensible, sudor
+      salado, restricciones y alergias, y derivación si hay condición médica.
+- [x] Base de ~45 alimentos con medida casera (rebanada, taza, vaso…), sus
+      nutrientes y alérgenos. Se eligen al armar la pauta.
+- [x] Agenda de 36–48 h (o 24 h) comida a comida, con hora, medidas caseras y
+      topes por comida. El día de carrera: desayuno, sales y refuerzo.
+- [x] Marcar como hecho, a medias o no. Subir o bajar porciones y, al marcar,
+      proponer el recálculo hacia las comidas que vienen (con topes).
+- [x] Cambiar, mover o sacar un alimento. «Ajustar lo que queda» a mano con
+      la suma y el rango.
+- [x] KPIs del día (hecho, proyectado, rango, sodio, g/kg) y agua aparte.
+- [x] En carrera: g/h, líquido y sodio por hora, y minuto y km de cada gel y
+      cada dosis de sal.
+- [x] Vista para PC (menú lateral y panel a la derecha).
+- [x] Al terminar: feedback, plan anterior guardado y consejos para la próxima.
 - [ ] Sodio y líquido personales con un test de sudor: peso antes y después
       de un entrenamiento de 1 h, más lo que tomó.
 - [ ] Recordatorios: comida previa y geles. Notificaciones web; en iOS sólo
       funcionan con la app instalada.
-- [ ] Varias carreras (temporada) y la próxima como principal.
+- [ ] Alimentos propios (con los datos de la etiqueta) y más alimentos en la base.
 - [ ] Ritmo en vez de tiempo, y millas (como en PacePath).
 
 ## Fase 2 — La pauta del nutricionista

@@ -8,7 +8,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="FuelPath">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="description" content="Tu pauta nutricional para llegar con todo a la carrera.">
+<meta name="description" content="Tu carga de carbohidratos antes de la carrera, comida a comida.">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
 <title>FuelPath</title>
@@ -19,15 +19,24 @@
     --acento: #f2541b; --acento-osc: #c9410f; --tinta: #1d1d21; --suave: #6b6b75;
     --linea: #e6e6ea; --fondo: #ffffff; --gris: #f5f5f7; --ok: #1f9d55;
     --panel: #ffffff; --sombra: rgba(0,0,0,.10);
+    --acento-claro: #fdeae2; --ok-claro: #e3f4ea; --ok-osc: #136b3a; --azul: #2a6fdb; --azul-claro: #e6effc;
+    --azul-txt: #3a5a8c; --sal: #6b3fc4; --sal-claro: #f1e9ff; --sal-barra: #e3d7fb;
+    --ambar: #9a6200; --ambar-claro: #fff1d6; --rojo: #b42323; --rojo-claro: #fde3e3;
+    --banda: #cfeedd; --proy1: #f7b79b; --proy2: #fbd3c1; --lado: #fbfbfc;
   }
   body.noche { --tinta: #f4f4f6; --suave: #9a9aa6; --linea: #2a2a31; --gris: #22222a;
-    --fondo: #141418; --panel: #141418; --sombra: rgba(0,0,0,.5); }
+    --fondo: #141418; --panel: #141418; --sombra: rgba(0,0,0,.5);
+    --acento-claro: #3a2016; --ok-claro: #173826; --ok-osc: #8fe0b2; --azul: #5b93f0; --azul-claro: #1b2740;
+    --azul-txt: #a9c3ee; --sal: #b195f0; --sal-claro: #2a2140; --sal-barra: #3b3060;
+    --ambar: #ffd28a; --ambar-claro: #3a2a10; --rojo: #ff9a9a; --rojo-claro: #3d1a1a;
+    --banda: #1f4a33; --proy1: #8a4a2c; --proy2: #5a3020; --lado: #18181d; }
   @font-face { font-family: "PP Display"; src: url("/vendor/fuentes/InterDisplay-SemiBold.woff2") format("woff2"); font-weight: 600; font-display: swap; }
   @font-face { font-family: "PP Display"; src: url("/vendor/fuentes/InterDisplay-Bold.woff2") format("woff2"); font-weight: 700; font-display: swap; }
   @font-face { font-family: "PP Mono"; src: url("/vendor/fuentes/JetBrainsMono-Bold.woff2") format("woff2"); font-weight: 700; font-display: swap; }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { margin: 0; min-height: 100%; background: var(--fondo); color: var(--tinta);
     font: 15px/1.4 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif; }
+  body.bloq { overflow: hidden; }
 
   header { position: sticky; z-index: 10; top: 0; background: var(--panel);
     padding: calc(env(safe-area-inset-top) + 10px) 16px 10px; border-bottom: 1px solid var(--linea); }
@@ -36,49 +45,252 @@
   .marca .der { margin-left: auto; display: flex; gap: 6px; }
   .marca .der button { padding: 6px 10px; font-size: 13px; }
 
-  main { padding: 14px 16px calc(env(safe-area-inset-bottom) + 90px); max-width: 640px; margin: 0 auto; }
+  main { padding: 14px 16px calc(env(safe-area-inset-bottom) + 96px); max-width: 640px; margin: 0 auto; }
   section[hidden] { display: none; }
   .tipo { color: var(--acento); font-weight: 800; font-size: 12px; letter-spacing: .6px; text-transform: uppercase; }
   h2 { margin: 2px 0 6px; font-size: 22px; letter-spacing: -.3px; }
-  .pista { color: var(--suave); margin: 4px 0 12px; }
-  .aviso { background: #fff6e5; border-radius: 10px; padding: 8px 10px; color: #8a5a00; font-size: 13px; margin: 12px 0; }
+  h4 { margin: 18px 0 8px; font-size: 13px; color: var(--suave); text-transform: uppercase; letter-spacing: .5px; }
+  .pista { color: var(--suave); margin: 4px 0 12px; font-size: 14px; }
+  .aviso { background: #fff6e5; border-radius: 10px; padding: 9px 11px; color: #8a5a00; font-size: 13px; margin: 12px 0; }
   body.noche .aviso { background: #3a2a10; color: #ffd28a; }
-
+  .aviso-ok { background: var(--ok-claro); border-radius: 10px; padding: 9px 11px; color: var(--ok-osc); font-size: 13px; margin: 12px 0; }
   .tarjeta { background: var(--gris); border-radius: 16px; padding: 14px; margin: 10px 0; }
   .tarjeta h3 { margin: 0 0 4px; font-size: 16px; }
-  .tarjeta ul { margin: 6px 0 0; padding-left: 18px; color: var(--suave); }
-  .grande { font-family: "PP Display", -apple-system, sans-serif; font-weight: 700; font-size: 44px;
-    letter-spacing: -1.5px; line-height: 1; }
-  .grande small { font-size: 18px; letter-spacing: 0; color: var(--suave); }
+  .tarjeta ul, ul.notas { margin: 6px 0 0; padding-left: 18px; color: var(--suave); font-size: 14px; }
+  .grande { font-family: "PP Display", -apple-system, sans-serif; font-weight: 700; font-size: 44px; letter-spacing: -1.5px; line-height: 1; }
+  .grande small { font-size: 16px; letter-spacing: 0; color: var(--suave); font-weight: 600; }
   .mono { font-family: "PP Mono", ui-monospace, monospace; font-weight: 700; }
   .barra { height: 10px; border-radius: 5px; background: var(--linea); overflow: hidden; margin: 10px 0 4px; }
   .barra i { display: block; height: 100%; background: var(--acento); border-radius: 5px; transition: width .3s; }
+  .barra.fina { height: 6px; margin: 6px 0 2px; }
 
-  form { display: grid; gap: 10px; }
+  form, .form { display: grid; gap: 10px; }
   .fila { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 10px; }
   label { display: grid; gap: 4px; font-size: 12px; font-weight: 700; color: var(--suave); }
   /* 16 px: con menos, Safari iOS hace zoom al enfocar. */
   input, select { font: inherit; font-size: 16px; padding: 11px 12px; border-radius: 12px; min-width: 0; width: 100%;
-    border: 1px solid var(--linea); background: var(--gris); color: var(--tinta); }
+    border: 1px solid var(--linea); background: var(--gris); color: var(--tinta); min-height: 46px; }
   input:focus, select:focus { outline: 2px solid #f7c5b2; background: var(--panel); }
-  .interruptor { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--tinta); }
-  .interruptor input { width: 22px; height: 22px; accent-color: var(--acento); }
   button { font: inherit; font-size: 16px; border: 0; border-radius: 12px; padding: 11px 16px;
     font-weight: 700; background: var(--acento); color: #fff; cursor: pointer; white-space: nowrap; }
   button:active { background: var(--acento-osc); }
   button.sec { background: var(--gris); color: var(--tinta); border: 1px solid var(--linea); }
-  .botones { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  button.sec:active { background: var(--linea); }
+  button:disabled { opacity: .45; cursor: default; }
+  button.chico { padding: 9px 12px; font-size: 15px; }
+  .botones { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  .botones > button { flex: 1; }
+  .seg { display: flex; background: var(--gris); border: 1px solid var(--linea); border-radius: 12px; padding: 3px; gap: 3px; min-height: 46px; }
+  .seg button { flex: 1; padding: 8px 4px; border-radius: 9px; font-size: 15px; font-weight: 600; color: var(--suave); background: transparent; }
+  .seg button.on { background: var(--panel); color: var(--tinta); box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+  .opciones { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; }
+  .op { border: 1.5px solid var(--linea); border-radius: 14px; padding: 10px 6px; text-align: center; background: var(--panel); color: var(--tinta); }
+  .op b { display: block; font-family: "PP Display"; font-size: 24px; letter-spacing: -.5px; }
+  .op small { display: block; font-size: 11px; color: var(--suave); font-weight: 600; white-space: normal; }
+  .op .g { font-size: 13px; font-weight: 700; margin-top: 4px; }
+  .op.on { border-color: var(--acento); background: var(--acento-claro); }
+  .op.on small.et { color: var(--acento); }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { padding: 8px 12px; border-radius: 20px; background: var(--gris); border: 1px solid var(--linea); font-size: 14px; font-weight: 600; color: var(--tinta); }
+  .chip.on { background: var(--tinta); color: var(--fondo); border-color: var(--tinta); }
+  .interruptor { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 15px; font-weight: 600;
+    color: var(--tinta); padding: 10px 0; border-bottom: 1px solid var(--linea); cursor: pointer; }
+  .interruptor small { display: block; font-weight: 400; color: var(--suave); font-size: 13px; }
+  .interruptor input { position: absolute; opacity: 0; width: 1px; height: 1px; min-height: 0; }
+  .sw { width: 46px; height: 28px; border-radius: 14px; background: var(--linea); position: relative; flex: none; transition: background .2s; }
+  .sw::after { content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,.2); transition: left .2s; }
+  .interruptor input:checked + .sw { background: var(--ok); }
+  .interruptor input:checked + .sw::after { left: 21px; }
+  .interruptor input:focus-visible + .sw { outline: 2px solid #f7c5b2; }
 
-  .gel { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--linea); }
+  /* Lista de alimentos */
+  .alim { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--linea); cursor: pointer; }
+  .alim:last-child { border-bottom: 0; }
+  .alim .txt { flex: 1; min-width: 0; }
+  .alim .txt b { display: block; font-size: 15px; }
+  .alim .txt small { color: var(--suave); font-size: 13px; }
+  .alim .g { font-family: "PP Mono"; font-size: 14px; }
+  .tick { width: 26px; height: 26px; border-radius: 8px; border: 2px solid var(--linea); flex: none; display: grid; place-items: center;
+    font-size: 15px; font-weight: 800; color: #fff; background: var(--panel); }
+  .tick.on { background: var(--acento); border-color: var(--acento); }
+  .alim.no { cursor: default; } .alim.no b { text-decoration: line-through; color: var(--suave); }
+  .alim.no .tick { background: var(--gris); }
+  .etq { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 6px; background: var(--azul-claro); color: var(--azul); margin-left: 4px; vertical-align: 1px; }
+  .etq.gris { background: var(--linea); color: var(--suave); }
+  .etq.sal { background: var(--sal-claro); color: var(--sal); }
+
+  /* Agenda */
+  .dias { display: flex; gap: 8px; margin: 10px 0 4px; }
+  .dia { flex: 1; text-align: center; border-radius: 12px; padding: 7px 4px; background: var(--gris); font-size: 12px; font-weight: 700; color: var(--suave); }
+  .dia b { display: block; font-size: 15px; color: var(--tinta); }
+  .dia.on { background: var(--tinta); color: var(--linea); } .dia.on b { color: var(--fondo); }
+  .dia .ok { color: var(--ok); }
+  .usa { display: flex; align-items: center; gap: 10px; background: var(--gris); border-radius: 14px; padding: 10px 12px; margin: 10px 0; font-size: 13px; }
+  .usa div { flex: 1; min-width: 0; color: var(--suave); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .usa div b { color: var(--tinta); }
+  .kpi { background: var(--gris); border-radius: 16px; padding: 14px; margin: 10px 0; }
+  .kpi .fila-k { display: flex; align-items: baseline; gap: 8px; }
+  .estado { margin-left: auto; font-size: 12px; font-weight: 800; padding: 3px 8px; border-radius: 8px; white-space: nowrap; }
+  .estado.bajo { background: var(--ambar-claro); color: var(--ambar); }
+  .estado.ok { background: var(--ok-claro); color: var(--ok-osc); }
+  .estado.sobre { background: var(--rojo-claro); color: var(--rojo); }
+  .rango { position: relative; height: 12px; border-radius: 6px; background: var(--linea); margin: 14px 0 6px; }
+  .rango .banda { position: absolute; top: 0; bottom: 0; background: var(--banda); }
+  .rango .hecho { position: absolute; left: 0; top: 0; bottom: 0; background: var(--acento); border-radius: 6px 0 0 6px; }
+  .rango .proy { position: absolute; top: 0; bottom: 0; background: repeating-linear-gradient(45deg, var(--proy1) 0 4px, var(--proy2) 4px 8px); }
+  .rango .marca { position: absolute; top: -5px; width: 3px; height: 22px; margin-left: -1px; background: var(--tinta); border-radius: 2px; }
+  .rango .marca.ok { background: var(--ok); } .rango .marca.bajo { background: var(--ambar); }
+  .escala { display: flex; justify-content: space-between; gap: 8px; font-size: 11px; color: var(--suave); font-family: "PP Mono"; }
+  .ley { display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; color: var(--suave); margin-top: 6px; }
+  .ley i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 4px; vertical-align: -1px; }
+  .mini { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; margin-top: 10px; }
+  .mini > div { background: var(--panel); border-radius: 12px; padding: 8px 10px; }
+  .mini small { display: block; font-size: 11px; font-weight: 700; color: var(--suave); text-transform: uppercase; }
+  .mini b { font-family: "PP Display"; font-size: 18px; }
+  .mini span { font-size: 12px; color: var(--suave); }
+  .mini .sal small { color: var(--sal); }
+  .agua { background: var(--azul-claro); border-radius: 16px; padding: 12px 14px; margin: 10px 0; }
+  .agua .cab-a { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .agua .cab-a b { font-size: 16px; }
+  .agua .cab-a .der { margin-left: auto; font-family: "PP Mono"; font-size: 14px; color: var(--azul); }
+  .agua .pista { margin: 0; font-size: 13px; color: var(--azul-txt); }
+  .vasos { display: flex; gap: 6px; margin: 10px 0 8px; flex-wrap: wrap; }
+  .vasos svg { width: 24px; height: 28px; flex: none; }
+  .agua .fila-a { display: flex; align-items: center; gap: 8px; }
+  .agua .fila-a .pista { flex: 1; }
+  .agua button { background: var(--azul); }
+  .agua button.sec { background: var(--panel); color: var(--azul); border-color: transparent; }
+
+  .comida { background: var(--gris); border-radius: 16px; padding: 12px 14px; margin: 10px 0; display: flex; align-items: center; gap: 12px; cursor: pointer; }
+  .comida .anillo { width: 44px; height: 44px; flex: none; }
+  .comida .txt { flex: 1; min-width: 0; }
+  .comida .txt b { font-size: 16px; }
+  .comida .txt small { display: block; color: var(--suave); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .comida .txt small.ahora { color: var(--acento); font-weight: 700; }
+  .comida .der { text-align: right; font-family: "PP Mono"; font-size: 13px; color: var(--suave); white-space: nowrap; }
+  .comida .der b { display: block; color: var(--tinta); font-size: 15px; }
+  .comida.abierta { display: block; background: var(--panel); border: 1.5px solid var(--acento); cursor: default; }
+  .comida.abierta .fila-cab { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; cursor: pointer; }
+  .item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--linea); }
+  .item:last-of-type { border-bottom: 0; }
+  .item.editado { background: var(--acento-claro); margin: 0 -14px; padding: 10px 14px; border-bottom-color: transparent; }
+  .ck { width: 30px; height: 30px; border-radius: 50%; border: 2px solid #c8c8d0; flex: none; display: grid; place-items: center;
+    font-size: 14px; font-weight: 800; color: transparent; background: transparent; padding: 0; }
+  .ck.si { background: var(--ok); border-color: var(--ok); color: #fff; }
+  .ck.medio { border-color: var(--ok); background: linear-gradient(90deg, var(--ok) 50%, transparent 50%); color: #fff; }
+  .ck.no { background: var(--linea); border-color: var(--linea); color: var(--suave); }
+  .item .col { flex: 1; min-width: 0; display: grid; gap: 6px; justify-items: start; }
+  .item .txt { font-size: 14px; }
+  .item .txt b { font-size: 15px; }
+  .item .txt small { display: block; color: var(--suave); font-size: 12px; }
+  .item .txt small.cambio { color: var(--acento); font-weight: 700; }
+  .item .g { font-family: "PP Mono"; font-size: 13px; white-space: nowrap; }
+  .item .mas { background: transparent; color: var(--suave); font-size: 18px; padding: 6px 4px; letter-spacing: -1px; }
+  .paso { display: inline-flex; align-items: center; border: 1px solid var(--linea); border-radius: 10px; background: var(--panel); overflow: hidden; flex: none; }
+  .paso button { width: 40px; height: 36px; padding: 0; border-radius: 0; font-size: 20px; font-weight: 700; color: var(--acento); background: transparent; }
+  .paso b { min-width: 86px; padding: 0 6px; text-align: center; font-size: 14px; border-left: 1px solid var(--linea); border-right: 1px solid var(--linea); line-height: 36px; white-space: nowrap; }
+  .marcar { display: flex; gap: 8px; margin-top: 8px; }
+  .marcar button { flex: 1; padding: 10px 6px; font-size: 15px; }
+
+  .trio { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; }
+  .trio > div { background: var(--gris); border-radius: 14px; padding: 10px; }
+  .trio small { display: block; font-size: 11px; font-weight: 700; color: var(--suave); text-transform: uppercase; }
+  .trio b { font-family: "PP Display"; font-size: 20px; letter-spacing: -.5px; }
+  .trio span { font-size: 12px; color: var(--suave); }
+  .trio > div.sal { background: var(--sal-claro); } .trio > div.sal small { color: var(--sal); }
+  .gel { display: flex; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--linea); font-size: 14px; }
   .gel:last-child { border-bottom: 0; }
-  .gel .mono { min-width: 64px; color: var(--acento); }
+  .gel .mono { min-width: 52px; color: var(--acento); }
+  .gel .km { margin-left: auto; font-family: "PP Mono"; color: var(--suave); font-size: 13px; }
+  .linea-t { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--linea); }
+  .linea-t:last-child { border-bottom: 0; }
+  .linea-t .mono { min-width: 52px; color: var(--acento); padding-top: 1px; }
+  .linea-t .txt { flex: 1; font-size: 14px; } .linea-t .txt b { font-size: 15px; }
+  .linea-t .txt small { display: block; color: var(--suave); font-size: 13px; }
 
+  /* Hoja (abajo) y pantalla de ajuste */
+  .velo { position: fixed; inset: 0; background: rgba(20,20,24,.45); z-index: 30; }
+  .hoja { position: fixed; left: 0; right: 0; bottom: 0; z-index: 31; background: var(--panel); border-radius: 22px 22px 0 0;
+    padding: 10px 16px calc(env(safe-area-inset-bottom) + 18px); max-height: 88vh; overflow-y: auto; }
+  .asa { width: 40px; height: 5px; border-radius: 3px; background: var(--linea); margin: 0 auto 12px; }
+  .comparar { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 8px; margin: 10px 0; }
+  .comparar > div { border: 1.5px solid var(--linea); border-radius: 14px; padding: 10px; }
+  .comparar > div.on { border-color: var(--ok); background: var(--ok-claro); }
+  .comparar small { display: block; font-size: 11px; font-weight: 700; color: var(--suave); text-transform: uppercase; }
+  .hoja .botones.fijos { position: sticky; bottom: calc(-18px - env(safe-area-inset-bottom)); background: var(--panel); margin: 12px -16px 0;
+    padding: 10px 16px calc(env(safe-area-inset-bottom) + 12px); border-top: 1px solid var(--linea); }
+  .comparar b { font-family: "PP Display"; font-size: 26px; letter-spacing: -.6px; display: block; line-height: 1.1; margin: 2px 0 6px; }
+  .comparar .estado { margin-left: 0; display: inline-block; }
+  .cambios { background: var(--gris); border-radius: 14px; padding: 2px 12px; }
+  .reparto { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--linea); font-size: 14px; }
+  .reparto:last-child { border-bottom: 0; }
+  .reparto .txt { flex: 1; min-width: 0; } .reparto .txt small { display: block; color: var(--suave); font-size: 12px; }
+  .reparto .mono { color: var(--ok); white-space: nowrap; } .reparto .mono.menos { color: var(--ambar); }
+  .tope { font-size: 11px; font-weight: 700; color: var(--suave); background: var(--linea); border-radius: 6px; padding: 2px 6px; }
+  .alts { display: flex; gap: 8px; overflow-x: auto; margin: 6px -16px; padding: 0 16px 4px; scrollbar-width: none; }
+  .alts button { flex: none; width: 140px; text-align: left; white-space: normal; background: var(--gris); color: var(--tinta); border: 1px solid var(--linea);
+    border-radius: 14px; padding: 10px; font-size: 13px; font-weight: 400; }
+  .alts button b { display: block; font-size: 14px; }
+  .alts button .mono { color: var(--acento); font-size: 13px; }
+  .destinos button { display: flex; width: 100%; justify-content: space-between; flex-wrap: wrap; gap: 2px 8px; margin: 6px 0; background: var(--gris); color: var(--tinta);
+    border: 1px solid var(--linea); font-weight: 600; white-space: normal; text-align: left; }
+  .destinos button small { color: var(--suave); font-weight: 400; }
+  .ajuste { position: fixed; inset: 0; z-index: 25; background: var(--fondo); overflow-y: auto; }
+  .ajuste .cuerpo { max-width: 640px; margin: 0 auto; padding: calc(env(safe-area-inset-top) + 16px) 16px 0; }
+  .sim { background: var(--gris); border-radius: 16px; padding: 4px 14px 8px; margin: 10px 0; }
+  .sim .cab-s { display: flex; align-items: baseline; gap: 8px; padding: 10px 0 4px; flex-wrap: wrap; }
+  .sim .cab-s b { font-size: 16px; }
+  .sim .cab-s .der { margin-left: auto; font-family: "PP Mono"; font-size: 14px; }
+  .sim .cab-s .mas { color: var(--ok); } .sim .cab-s .menos { color: var(--ambar); }
+  .sim .it { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--linea); font-size: 14px; }
+  .sim .it .txt { flex: 1; min-width: 0; }
+  .sim .it .g { font-family: "PP Mono"; font-size: 13px; min-width: 44px; text-align: right; }
+  .sim.pasada { opacity: .55; padding-bottom: 10px; }
+  .suma { position: sticky; bottom: 0; background: var(--panel); border-top: 1px solid var(--linea);
+    padding: 12px 16px calc(env(safe-area-inset-bottom) + 14px); margin: 12px -16px 0; box-shadow: 0 -6px 16px rgba(0,0,0,.06); }
+  .suma .linea-s { display: flex; align-items: baseline; gap: 6px; font-size: 14px; color: var(--suave); }
+  .suma .linea-s b { font-family: "PP Display"; font-size: 26px; color: var(--tinta); letter-spacing: -.5px; }
+  .toast { position: fixed; left: 16px; right: 16px; bottom: calc(env(safe-area-inset-bottom) + 84px); z-index: 40; max-width: 480px; margin: 0 auto;
+    background: var(--tinta); color: var(--fondo); border-radius: 12px; padding: 11px 14px; font-size: 14px; box-shadow: 0 6px 20px var(--sombra); }
+
+  .fin { border: 1.5px solid var(--acento); background: var(--panel); border-radius: 16px; padding: 14px; margin: 10px 0; }
+  .fin h3 { margin: 0 0 4px; font-size: 18px; }
+  .fin .chips { margin: 6px 0 4px; }
+  .fin label { margin-top: 10px; }
+  .pasado { display: flex; align-items: center; gap: 12px; background: var(--gris); border-radius: 16px; padding: 12px 14px; margin: 10px 0; cursor: pointer; }
+  .pasado .txt { flex: 1; min-width: 0; } .pasado .txt b { font-size: 16px; } .pasado .txt small { display: block; color: var(--suave); font-size: 13px; }
+  .pasado .pct { font-family: "PP Display"; font-weight: 700; font-size: 22px; letter-spacing: -.4px; }
+  .dato { display: flex; justify-content: space-between; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--linea); font-size: 14px; }
+  .dato:last-child { border-bottom: 0; } .dato span:first-child { color: var(--suave); }
+  .dato span:last-child { text-align: right; font-weight: 600; }
   nav { position: fixed; z-index: 10; left: 0; right: 0; bottom: 0; background: var(--panel);
     border-top: 1px solid var(--linea); display: flex; padding: 6px 0 calc(env(safe-area-inset-bottom) + 6px); }
   nav a { flex: 1; text-align: center; color: var(--suave); font-size: 11px; font-weight: 600; text-decoration: none; }
   nav a svg { width: 24px; height: 24px; display: block; margin: 0 auto 2px; }
   nav a.on { color: var(--acento); }
   body.noche nav a.on { color: #ff6a2b; }
+
+  /* PC: menú a la izquierda, comidas al centro y el panel a la derecha. */
+  @media (min-width: 900px) {
+    header { padding-left: 24px; }
+    nav { top: 57px; bottom: 0; right: auto; width: 220px; flex-direction: column; padding: 18px 14px; border-top: 0; border-right: 1px solid var(--linea); gap: 2px; }
+    nav a { flex: none; display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 10px; font-size: 15px; text-align: left; }
+    nav a svg { margin: 0; width: 22px; height: 22px; }
+    nav a.on { background: var(--acento-claro); }
+    main { margin-left: 220px; max-width: none; padding: 24px 32px 48px; }
+    #v-pauta, #v-carrera, #v-perfil { max-width: 680px; }
+    .hoy-grid { display: grid; grid-template-columns: minmax(0,1fr) 360px; gap: 28px; align-items: start; }
+    .hoy-grid .lado { grid-column: 2; grid-row: 1; position: sticky; top: 80px; }
+    .hoy-grid .centro { grid-column: 1; grid-row: 1; }
+    .comidas { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 0 14px; align-items: start; }
+    .comidas .comida.abierta { grid-column: 1 / -1; }
+    .dias { max-width: 460px; }
+    .hoja { left: 50%; right: auto; bottom: 50%; transform: translate(-50%, 50%); width: 520px; border-radius: 22px; padding-bottom: 18px; }
+    .asa { display: none; }
+    .ajuste { left: 220px; top: 57px; }
+    .toast { bottom: 24px; }
+  }
 </style>
 </head>
 <body>
@@ -94,45 +306,16 @@
 </header>
 
 <main>
-  <section id="v-hoy">
-    <div id="hoy"></div>
-  </section>
-
-  <section id="v-pauta" hidden>
-    <span class="tipo" data-i18n>Mi carrera</span>
-    <h2 data-i18n>Arma tu pauta</h2>
-    <p class="pista" data-i18n>Con tu peso, la carrera y la hora de salida calculamos la carga de carbohidratos, la comida previa y el plan en carrera.</p>
-    <form id="form">
-      <label><span data-i18n>Nombre de la carrera</span><input id="f-nombre" placeholder="Maratón de Santiago" autocomplete="off"></label>
-      <div class="fila">
-        <label><span data-i18n>Fecha</span><input id="f-fecha" type="date" required></label>
-        <label><span data-i18n>Hora de salida</span><input id="f-hora" type="time" value="08:00" required></label>
-      </div>
-      <div class="fila">
-        <label><span data-i18n>Distancia (km)</span>
-          <select id="f-dist"><option value="5">5K</option><option value="10">10K</option><option value="21.1">21K</option>
-            <option value="42.2" selected>42K</option><option value="50">50K</option></select></label>
-        <label><span data-i18n>Tiempo estimado</span><input id="f-tiempo" placeholder="3:30" inputmode="numeric" required></label>
-      </div>
-      <div class="fila">
-        <label><span data-i18n>Peso (kg)</span><input id="f-peso" type="number" inputmode="decimal" min="30" max="200" step="0.5" required></label>
-        <label><span data-i18n>Carbohidratos por gel (g)</span><input id="f-gel" type="number" inputmode="numeric" value="25" min="5" max="100"></label>
-      </div>
-      <label class="interruptor"><input id="f-intestino" type="checkbox"><span data-i18n>Ya probé más de 60 g por hora en mis fondos</span></label>
-      <button type="submit" data-i18n>Calcular mi pauta</button>
-    </form>
-    <div id="pauta"></div>
-  </section>
-
-  <section id="v-carrera" hidden>
-    <div id="carrera"></div>
-  </section>
-
+  <section id="v-hoy"><div id="hoy"></div></section>
+  <section id="v-pauta" hidden><div id="pauta"></div></section>
+  <section id="v-carrera" hidden><div id="carrera"></div></section>
   <section id="v-perfil" hidden>
     <span class="tipo" data-i18n>Perfil</span>
     <h2 data-i18n>Tus datos</h2>
     <p class="pista" data-i18n>Por ahora todo se guarda en este teléfono. Con cuenta (pronto) se sincroniza entre tus aparatos.</p>
     <div class="botones"><button class="sec" id="borrar" type="button" data-i18n>Borrar mi pauta</button></div>
+    <div id="historial"></div>
+    <p class="pista" id="fuente"></p>
   </section>
 </main>
 
@@ -147,59 +330,279 @@
      stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span data-i18n>Perfil</span></a>
 </nav>
 
+<div id="capa" hidden><div class="velo" data-acc="cerrar"></div><div class="hoja" id="hoja" role="dialog" aria-modal="true"></div></div>
+<div class="ajuste" id="ajuste" hidden></div>
+<div class="toast" id="toast" hidden></div>
+
 <script>
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 function pref(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch { return d; } }
 function guardar(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+function borrarClave(k) { try { localStorage.removeItem(k); } catch {} }
 
 // ── Idiomas (mismo esquema que PacePath: clave = texto en español) ─────────
+// N(texto) marca un texto que se traduce después con t() (los tests revisan que esté en EN y PT).
+const N = (s) => s;
 const IDIOMAS = ["es", "en", "pt"];
 const LOCALE = { es: "es-CL", en: "en-US", pt: "pt-BR" };
 let idioma = pref("fp_idioma", IDIOMAS.includes(navigator.language.slice(0, 2)) ? navigator.language.slice(0, 2) : "es");
 const EN = {
-  "Mi carrera": "My race", "Arma tu pauta": "Build your plan", "Hoy": "Today", "Pauta": "Plan", "Carrera": "Race",
-  "Perfil": "Profile", "Tus datos": "Your data",
-  "Con tu peso, la carrera y la hora de salida calculamos la carga de carbohidratos, la comida previa y el plan en carrera.":
-    "With your weight, the race and the start time we work out your carb load, pre-race meal and race-day fuelling.",
-  "Nombre de la carrera": "Race name", "Fecha": "Date", "Hora de salida": "Start time", "Distancia (km)": "Distance (km)",
-  "Tiempo estimado": "Estimated time", "Peso (kg)": "Weight (kg)", "Carbohidratos por gel (g)": "Carbs per gel (g)",
-  "Ya probé más de 60 g por hora en mis fondos": "I've already tried more than 60 g per hour on long runs",
-  "Calcular mi pauta": "Work out my plan", "Borrar mi pauta": "Delete my plan",
+  "Hoy": "Today", "Pauta": "Plan", "Carrera": "Race", "Perfil": "Profile", "Tus datos": "Your data",
   "Por ahora todo se guarda en este teléfono. Con cuenta (pronto) se sincroniza entre tus aparatos.":
     "For now everything is saved on this phone. With an account (soon) it syncs across your devices.",
-  "Aún no tienes pauta": "No plan yet", "Arma tu pauta en la pestaña Pauta con tu carrera y tu peso.":
-    "Build your plan in the Plan tab with your race and your weight.", "Armar mi pauta": "Build my plan",
-  "Faltan {n} días para {c}": "{n} days to {c}", "Hoy es {c}": "Today is {c}", "Carbohidratos de hoy": "Today's carbs",
-  "Llevas {g} g": "{g} g so far", "Hoy come normal": "Eat normally today", "Comida previa": "Pre-race meal",
-  "{h} h antes, a las {t}": "{h} h before, at {t}", "Durante la carrera": "During the race",
-  "por hora": "per hour", "líquido": "fluid", "sodio": "sodium", "Geles": "Gels", "min": "min",
+  "Borrar mi pauta": "Delete my plan", "Modo noche": "Night mode", "Modo día": "Day mode",
+  "Aún no tienes pauta": "No plan yet", "Armar mi pauta": "Build my plan",
+  "Con tu carrera, tu peso y tus horarios armamos la carga de carbohidratos comida a comida.":
+    "With your race, your weight and your schedule we build your carb load meal by meal.",
+  // Formulario
+  "Paso 1 de 2 · Tu carrera": "Step 1 of 2 · Your race", "Arma tu pauta": "Build your plan",
+  "Con esto calculamos la carga de carbohidratos, el desayuno del día y el plan en carrera.":
+    "With this we work out your carb load, race-day breakfast and in-race plan.",
+  "Evento": "Event", "Maratón de Santiago": "Santiago Marathon", "Distancia": "Distance", "Tiempo esperado": "Expected time",
+  "Fecha": "Date", "Hora de largada": "Start time", "Peso": "Weight", "Km": "Km", "Deporte": "Sport",
+  "Correr": "Run", "Bici": "Bike", "Triatlón": "Triathlon", "Gran fondo (bici)": "Gran fondo (bike)", "Otra": "Other",
+  "Régimen de carga": "Loading regime", "Conservador": "Conservative", "Recomendado": "Recommended", "Alto": "High",
+  "g por kg": "g per kg", "{g} g/día": "{g} g/day",
+  "Para esta carrera el consenso es 10–12 g/kg durante 36–48 h. Si es tu primera carga, 10 g/kg es buen punto de partida.":
+    "For this race the consensus is 10–12 g/kg over 36–48 h. If it's your first load, 10 g/kg is a good starting point.",
+  "Para un 21K basta con 7–8 g/kg las 24 h previas. 10 g/kg si vas a más de 2 h y ya lo probaste.":
+    "For a half marathon 7–8 g/kg over the previous 24 h is enough. 10 g/kg if you'll be out over 2 h and have tried it.",
+  "Para esta distancia no necesitas carga: armamos el desayuno del día y el plan en carrera.":
+    "At this distance you don't need to load: we build race-day breakfast and the in-race plan.",
+  "Tus horarios": "Your schedule", "Me levanto": "I get up", "Me acuesto": "I go to bed",
+  "Cómo te cae": "How it sits", "Es mi primera carga": "It's my first carb load",
+  "Partimos con más líquidos y porciones repartidas": "We start with more drinks and spread-out portions",
+  "Tengo el estómago sensible": "I have a sensitive stomach",
+  "Menos fibra, más colaciones y más tiempo antes de largar": "Less fibre, more snacks and more time before the start",
+  "Sudo mucho o con sal": "I sweat a lot or salty", "Manchas blancas en la polera o la jockey": "White marks on your shirt or cap",
+  "En carrera (opcional)": "During the race (optional)", "Carbohidratos de tu gel (g)": "Carbs in your gel (g)",
+  "Ya probé más de 60 g por hora en mis fondos": "I've already tried more than 60 g per hour in long sessions",
+  "Restricciones y alergias": "Restrictions and allergies", "Otra restricción o alergia": "Other restriction or allergy",
+  "Sin gluten": "Gluten-free", "Sin lactosa": "Lactose-free", "Vegetariano": "Vegetarian", "Vegano": "Vegan",
+  "Maní": "Peanuts", "Frutos secos": "Tree nuts", "Huevo": "Egg", "Soya": "Soy",
+  "Tengo diabetes, un trastorno alimentario o estoy embarazada": "I have diabetes, an eating disorder or I'm pregnant",
+  "En ese caso no armamos pauta: te recomendamos verlo con un profesional": "In that case we don't build a plan: we recommend seeing a professional",
+  "Siguiente: tus alimentos": "Next: your foods", "Tiempo como 3:30 o 45:00": "Time like 3:30 or 45:00",
+  "Falta la fecha de la carrera.": "The race date is missing.", "La fecha ya pasó.": "That date has passed.",
+  "Revisa tu peso.": "Check your weight.", "Indica los km de tu carrera.": "Enter your race distance in km.",
+  // Alimentos
+  "Paso 2 de 2 · Tus alimentos": "Step 2 of 2 · Your foods", "Con esto armamos tu carga": "This is what we'll load with",
+  "Marcamos lo que mejor funciona: alto en carbohidratos, bajo en fibra y grasa. Saca lo que no te guste y suma lo que quieras.":
+    "We've ticked what works best: high in carbs, low in fibre and fat. Untick what you don't like and add what you want.",
+  "Según tus restricciones, dejamos fuera lo que no corresponde y marcamos los reemplazos.":
+    "Based on your restrictions, we've left out what doesn't fit and ticked the replacements.",
+  "Anotaste «{x}»: revisa la lista y desmarca lo que no puedas comer.": "You noted «{x}»: check the list and untick anything you can't eat.",
+  "Pan y cereales": "Bread and cereals", "Arroz, pastas y papas": "Rice, pasta and potatoes", "Para acompañar": "On the side",
+  "Frutas y dulces": "Fruit and sweets", "Líquidos": "Drinks", "Salados": "Salty", "ayudan a llegar": "help you get there",
+  "sodio": "sodium", "mucha fibra": "lots of fibre", "no va con tus restricciones": "doesn't fit your restrictions",
+  "Volver": "Back", "Armar mi agenda": "Build my schedule", "Elige al menos un pan o una base (arroz, fideos, papas).":
+    "Pick at least one bread or one base (rice, pasta, potatoes).",
+  "Vas a rehacer tu agenda: se borra lo que marcaste. ¿Seguimos?": "You're rebuilding your schedule: what you ticked will be cleared. Continue?",
+  "No pude armar la pauta. Revisa tu conexión.": "I couldn't build the plan. Check your connection.",
+  // Resumen de la pauta
+  "Tu pauta": "Your plan", "{n} días de carga a {r} g/kg": "{n} loading days at {r} g/kg", "1 día de carga a {r} g/kg": "1 loading day at {r} g/kg",
+  "Sin carga": "No load", "La carga parte el {d}.": "Loading starts on {d}.", "Editar mi carrera": "Edit my race",
+  "Alimentos ({n})": "Foods ({n})", "Ver mi agenda": "See my schedule",
+  // Agenda
+  "faltan {n} días": "{n} days to go", "faltan {n} h": "{n} h to go", "es hoy": "it's today", "ya pasó": "it's over",
+  "{d}: día de carga {n} de {de}": "{d}: loading day {n} of {de}", "{d}: día de carrera": "{d}: race day",
+  "Tu pauta usa:": "Your plan uses:", "Cambiar": "Change",
+  "Carga del día": "Today's load", "hecho": "done", "va a quedar en {g} g": "you'll end up at {g} g",
+  "Bajo el rango": "Below range", "En el rango": "In range", "Sobre el rango": "Above range",
+  "rango {a}–{b} · objetivo {o}": "range {a}–{b} · target {o}", "Hecho": "Done", "Lo que queda": "Still to come", "Rango": "Range", "Objetivo": "Target",
+  "Sodio": "Sodium", "de {g} g": "of {g} g", "Por kilo": "Per kilo", "g/kg proyectado": "g/kg projected",
+  "Ajustar lo que queda": "Adjust what's left", "Antes de largar": "Before the start", "Plan en carrera": "In-race plan",
+  "Agua": "Water", "aparte de jugos e isotónica": "on top of juice and sports drinks", "1 vaso = 250 ml. Orina clara: vas bien.":
+    "1 glass = 250 ml. Pale urine: you're on track.", "+ 1 vaso": "+ 1 glass", "Quitar un vaso": "Remove a glass",
+  "Comidas": "Meals", "AHORA": "NOW", "{n} ítems": "{n} items", "de {g}": "of {g}",
+  "Plan: {q} · {g} g": "Plan: {q} · {g} g", "✓ Todo": "✓ All", "A medias": "Half", "✕ No": "✕ No",
+  "Marcar": "Tick", "Más opciones": "More options", "Menos": "Less", "Más": "More",
+  "Desayuno": "Breakfast", "Colación": "Snack", "Almuerzo": "Lunch", "Once": "Afternoon tea", "Cena": "Dinner",
+  "Antes de dormir": "Before bed", "Sodio extra": "Extra sodium", "Refuerzo": "Top-up",
+  // Recálculo
+  "Comiste {g} g menos de lo planeado": "You ate {g} g less than planned", "Comiste {g} g más de lo planeado": "You ate {g} g more than planned",
+  "Sacaste {g} g": "You removed {g} g", "¿Lo repartimos en las comidas que vienen? Lo que ya comiste no cambia.":
+    "Shall we spread it over the meals to come? What you've already eaten doesn't change.",
+  "Dejar así": "Leave it", "Recalcular": "Recalculate", "Ajustar a mano": "Adjust by hand", "Así quedaría": "This is how it would look",
+  "{g} g bajo el rango": "{g} g below range", "{g} g sobre el rango": "{g} g above range",
+  "No hay nada que mover: ya no quedan comidas por delante.": "Nothing to move: there are no meals left.",
+  "Sin conexión: quedó marcado. Puedes ajustar lo que queda más tarde.": "Offline: it's ticked. You can adjust what's left later.",
+  "Calculando…": "Working it out…", "tope": "cap",
+  // Opciones de un alimento
+  "Cambiar por algo parecido": "Swap for something similar", "Mover a otra comida": "Move to another meal",
+  "No cabe: quedaría en {g} g (tope {t} g)": "Doesn't fit: it would reach {g} g (cap {t} g)",
+  "Sacar y repartir en lo que queda": "Remove and spread over what's left", "Sacar sin repartir": "Remove without spreading",
+  "Son {g} g.": "That's {g} g.", "No hay comidas más adelante con espacio.": "No later meals with room.",
+  // Ajuste a mano
+  "Ajustar lo que queda · {d}": "Adjust what's left · {d}", "Cómo quedaría tu día": "How your day would look",
+  "Mueve los gramos de las comidas que vienen. Las que ya pasaron no cambian.": "Move the grams of the meals to come. Past meals don't change.",
+  "ya hecha": "already done", "tope {g} g": "cap {g} g", "Cancelar": "Cancel", "Aplicar": "Apply", "Repartir solo": "Spread for me",
+  "hecho {a} + por venir {b}": "done {a} + to come {b}",
+  // Carrera
+  "Día de carrera": "Race day", "En carrera · {h}": "During the race · {h}", "Carbos": "Carbs", "Líquido": "Fluid",
+  "g/h": "g/h", "ml/h": "ml/h", "mg/h": "mg/h", "Gel {n}": "Gel {n}", "Sal": "Salt", "Total en carrera: {g} g": "Total during the race: {g} g",
   "Sin geles: en esta distancia basta con lo que comiste antes.": "No gels: at this distance what you ate beforehand is enough.",
-  "Total en carrera: {g} g": "Total during the race: {g} g", "Tiempo como 3:30 o 45:00": "Time like 3:30 or 45:00",
-  "No pude calcular la pauta.": "I couldn't work out the plan.", "Modo noche": "Night mode", "Modo día": "Day mode",
-  "La carrera ya pasó.": "The race is over.",
+  "km {k}": "km {k}",
+  // Fin del plan e historial
+  "Energía en carrera": "Energy during the race",
+  "Con energía hasta el final": "Energy to the finish",
+  "Bajón al final": "Faded at the end",
+  "Me quedé sin energía": "I ran out of energy",
+  "Estómago": "Stomach",
+  "Bien": "Fine",
+  "Molestias leves": "Mild discomfort",
+  "Problemas": "Problems",
+  "La carga": "The load",
+  "Cómoda": "Comfortable",
+  "Me sentí pesado": "I felt heavy",
+  "Me quedé con hambre": "I was still hungry",
+  "¿Cómo te fue?": "How did it go?",
+  "Cumpliste el {x}% de la carga.": "You completed {x}% of the load.",
+  "Cuéntanos cómo te sentiste: queda guardado para la próxima.": "Tell us how you felt: it's saved for next time.",
+  "Tiempo final (opcional)": "Finish time (optional)",
+  "¿Qué cambiarías la próxima vez?": "What would you change next time?",
+  "Guardar y cerrar el plan": "Save and close the plan",
+  "Guardado en tus planes anteriores.": "Saved to your past plans.",
+  "Planes anteriores": "Past plans",
+  "Ver todos": "See all",
+  "Plan anterior": "Past plan",
+  "Carga cumplida": "Load completed",
+  "Tiempo final": "Finish time",
+  "Para la próxima": "For next time",
+  "Borrar": "Delete",
+  "Usar como base": "Use as a starting point",
+  "¿Borrar este plan anterior?": "Delete this past plan?",
+  "Llegaste al {x}% de la carga y te faltó energía: la próxima vez apunta a cumplirla completa.": "You reached {x}% of the load and ran short on energy: next time aim to complete it.",
+  "Cumpliste la carga y aun así te faltó energía al final: revisa los carbohidratos en carrera y pruébalos en tus fondos.": "You completed the load and still ran short at the end: review your in-race carbs and test them in long sessions.",
+  "Para el estómago: marca «estómago sensible», baja la fibra y prueba el desayuno y los geles en tus fondos.": "For your stomach: tick «sensitive stomach», cut back on fibre and test the breakfast and gels in long sessions.",
+  "Si te sentiste pesado, prueba el régimen conservador o más líquidos con carbohidratos.": "If you felt heavy, try the conservative regime or more carb drinks.",
+  "Si te quedaste con hambre y lo toleraste bien, puedes probar un régimen más alto.": "If you were still hungry and tolerated it well, you can try a higher regime.",
+  "Te funcionó: repite este plan en tu próxima carrera.": "It worked: repeat this plan at your next race.",
 };
 const PT = {
-  "Mi carrera": "Minha prova", "Arma tu pauta": "Monte seu plano", "Hoy": "Hoje", "Pauta": "Plano", "Carrera": "Prova",
-  "Perfil": "Perfil", "Tus datos": "Seus dados",
-  "Con tu peso, la carrera y la hora de salida calculamos la carga de carbohidratos, la comida previa y el plan en carrera.":
-    "Com seu peso, a prova e o horário da largada calculamos a carga de carboidratos, a refeição pré-prova e o plano na prova.",
-  "Nombre de la carrera": "Nome da prova", "Fecha": "Data", "Hora de salida": "Largada", "Distancia (km)": "Distância (km)",
-  "Tiempo estimado": "Tempo estimado", "Peso (kg)": "Peso (kg)", "Carbohidratos por gel (g)": "Carboidratos por gel (g)",
-  "Ya probé más de 60 g por hora en mis fondos": "Já testei mais de 60 g por hora nos longões",
-  "Calcular mi pauta": "Calcular meu plano", "Borrar mi pauta": "Apagar meu plano",
+  "Hoy": "Hoje", "Pauta": "Plano", "Carrera": "Prova", "Perfil": "Perfil", "Tus datos": "Seus dados",
   "Por ahora todo se guarda en este teléfono. Con cuenta (pronto) se sincroniza entre tus aparatos.":
     "Por enquanto tudo fica salvo neste celular. Com conta (em breve) sincroniza entre seus aparelhos.",
-  "Aún no tienes pauta": "Você ainda não tem plano", "Arma tu pauta en la pestaña Pauta con tu carrera y tu peso.":
-    "Monte seu plano na aba Plano com sua prova e seu peso.", "Armar mi pauta": "Montar meu plano",
-  "Faltan {n} días para {c}": "Faltam {n} dias para {c}", "Hoy es {c}": "Hoje é {c}", "Carbohidratos de hoy": "Carboidratos de hoje",
-  "Llevas {g} g": "Você já comeu {g} g", "Hoy come normal": "Hoje coma normalmente", "Comida previa": "Refeição pré-prova",
-  "{h} h antes, a las {t}": "{h} h antes, às {t}", "Durante la carrera": "Durante a prova",
-  "por hora": "por hora", "líquido": "líquido", "sodio": "sódio", "Geles": "Géis", "min": "min",
+  "Borrar mi pauta": "Apagar meu plano", "Modo noche": "Modo noite", "Modo día": "Modo dia",
+  "Aún no tienes pauta": "Você ainda não tem plano", "Armar mi pauta": "Montar meu plano",
+  "Con tu carrera, tu peso y tus horarios armamos la carga de carbohidratos comida a comida.":
+    "Com sua prova, seu peso e seus horários montamos a carga de carboidratos refeição por refeição.",
+  "Paso 1 de 2 · Tu carrera": "Passo 1 de 2 · Sua prova", "Arma tu pauta": "Monte seu plano",
+  "Con esto calculamos la carga de carbohidratos, el desayuno del día y el plan en carrera.":
+    "Com isso calculamos a carga de carboidratos, o café da manhã da prova e o plano na prova.",
+  "Evento": "Evento", "Maratón de Santiago": "Maratona de Santiago", "Distancia": "Distância", "Tiempo esperado": "Tempo esperado",
+  "Fecha": "Data", "Hora de largada": "Horário da largada", "Peso": "Peso", "Km": "Km", "Deporte": "Esporte",
+  "Correr": "Corrida", "Bici": "Bike", "Triatlón": "Triatlo", "Gran fondo (bici)": "Gran fondo (bike)", "Otra": "Outra",
+  "Régimen de carga": "Regime de carga", "Conservador": "Conservador", "Recomendado": "Recomendado", "Alto": "Alto",
+  "g por kg": "g por kg", "{g} g/día": "{g} g/dia",
+  "Para esta carrera el consenso es 10–12 g/kg durante 36–48 h. Si es tu primera carga, 10 g/kg es buen punto de partida.":
+    "Para esta prova o consenso é 10–12 g/kg durante 36–48 h. Se é sua primeira carga, 10 g/kg é um bom ponto de partida.",
+  "Para un 21K basta con 7–8 g/kg las 24 h previas. 10 g/kg si vas a más de 2 h y ya lo probaste.":
+    "Para uma meia maratona bastam 7–8 g/kg nas 24 h anteriores. 10 g/kg se for passar de 2 h e já tiver testado.",
+  "Para esta distancia no necesitas carga: armamos el desayuno del día y el plan en carrera.":
+    "Nessa distância você não precisa de carga: montamos o café da manhã da prova e o plano na prova.",
+  "Tus horarios": "Seus horários", "Me levanto": "Acordo", "Me acuesto": "Vou dormir",
+  "Cómo te cae": "Como você tolera", "Es mi primera carga": "É minha primeira carga",
+  "Partimos con más líquidos y porciones repartidas": "Começamos com mais líquidos e porções distribuídas",
+  "Tengo el estómago sensible": "Tenho estômago sensível",
+  "Menos fibra, más colaciones y más tiempo antes de largar": "Menos fibra, mais lanches e mais tempo antes da largada",
+  "Sudo mucho o con sal": "Suo muito ou salgado", "Manchas blancas en la polera o la jockey": "Manchas brancas na camiseta ou no boné",
+  "En carrera (opcional)": "Na prova (opcional)", "Carbohidratos de tu gel (g)": "Carboidratos do seu gel (g)",
+  "Ya probé más de 60 g por hora en mis fondos": "Já testei mais de 60 g por hora nos treinos longos",
+  "Restricciones y alergias": "Restrições e alergias", "Otra restricción o alergia": "Outra restrição ou alergia",
+  "Sin gluten": "Sem glúten", "Sin lactosa": "Sem lactose", "Vegetariano": "Vegetariano", "Vegano": "Vegano",
+  "Maní": "Amendoim", "Frutos secos": "Castanhas", "Huevo": "Ovo", "Soya": "Soja",
+  "Tengo diabetes, un trastorno alimentario o estoy embarazada": "Tenho diabetes, um transtorno alimentar ou estou grávida",
+  "En ese caso no armamos pauta: te recomendamos verlo con un profesional": "Nesse caso não montamos plano: recomendamos ver com um profissional",
+  "Siguiente: tus alimentos": "Próximo: seus alimentos", "Tiempo como 3:30 o 45:00": "Tempo como 3:30 ou 45:00",
+  "Falta la fecha de la carrera.": "Falta a data da prova.", "La fecha ya pasó.": "Essa data já passou.",
+  "Revisa tu peso.": "Confira seu peso.", "Indica los km de tu carrera.": "Informe os km da sua prova.",
+  "Paso 2 de 2 · Tus alimentos": "Passo 2 de 2 · Seus alimentos", "Con esto armamos tu carga": "Com isso montamos sua carga",
+  "Marcamos lo que mejor funciona: alto en carbohidratos, bajo en fibra y grasa. Saca lo que no te guste y suma lo que quieras.":
+    "Marcamos o que funciona melhor: rico em carboidratos, pobre em fibra e gordura. Tire o que não gosta e inclua o que quiser.",
+  "Según tus restricciones, dejamos fuera lo que no corresponde y marcamos los reemplazos.":
+    "De acordo com suas restrições, deixamos de fora o que não serve e marcamos as substituições.",
+  "Anotaste «{x}»: revisa la lista y desmarca lo que no puedas comer.": "Você anotou «{x}»: confira a lista e desmarque o que não pode comer.",
+  "Pan y cereales": "Pães e cereais", "Arroz, pastas y papas": "Arroz, massas e batatas", "Para acompañar": "Para acompanhar",
+  "Frutas y dulces": "Frutas e doces", "Líquidos": "Líquidos", "Salados": "Salgados", "ayudan a llegar": "ajudam a chegar lá",
+  "sodio": "sódio", "mucha fibra": "muita fibra", "no va con tus restricciones": "não combina com suas restrições",
+  "Volver": "Voltar", "Armar mi agenda": "Montar minha agenda", "Elige al menos un pan o una base (arroz, fideos, papas).":
+    "Escolha pelo menos um pão ou uma base (arroz, massa, batata).",
+  "Vas a rehacer tu agenda: se borra lo que marcaste. ¿Seguimos?": "Você vai refazer sua agenda: o que marcou será apagado. Continuar?",
+  "No pude armar la pauta. Revisa tu conexión.": "Não consegui montar o plano. Confira sua conexão.",
+  "Tu pauta": "Seu plano", "{n} días de carga a {r} g/kg": "{n} dias de carga a {r} g/kg", "1 día de carga a {r} g/kg": "1 dia de carga a {r} g/kg",
+  "Sin carga": "Sem carga", "La carga parte el {d}.": "A carga começa em {d}.", "Editar mi carrera": "Editar minha prova",
+  "Alimentos ({n})": "Alimentos ({n})", "Ver mi agenda": "Ver minha agenda",
+  "faltan {n} días": "faltam {n} dias", "faltan {n} h": "faltam {n} h", "es hoy": "é hoje", "ya pasó": "já passou",
+  "{d}: día de carga {n} de {de}": "{d}: dia de carga {n} de {de}", "{d}: día de carrera": "{d}: dia de prova",
+  "Tu pauta usa:": "Seu plano usa:", "Cambiar": "Trocar",
+  "Carga del día": "Carga do dia", "hecho": "feito", "va a quedar en {g} g": "vai ficar em {g} g",
+  "Bajo el rango": "Abaixo da faixa", "En el rango": "Na faixa", "Sobre el rango": "Acima da faixa",
+  "rango {a}–{b} · objetivo {o}": "faixa {a}–{b} · meta {o}", "Hecho": "Feito", "Lo que queda": "O que falta", "Rango": "Faixa", "Objetivo": "Meta",
+  "Sodio": "Sódio", "de {g} g": "de {g} g", "Por kilo": "Por quilo", "g/kg proyectado": "g/kg projetado",
+  "Ajustar lo que queda": "Ajustar o que falta", "Antes de largar": "Antes da largada", "Plan en carrera": "Plano na prova",
+  "Agua": "Água", "aparte de jugos e isotónica": "além de sucos e isotônico", "1 vaso = 250 ml. Orina clara: vas bien.":
+    "1 copo = 250 ml. Urina clara: você vai bem.", "+ 1 vaso": "+ 1 copo", "Quitar un vaso": "Tirar um copo",
+  "Comidas": "Refeições", "AHORA": "AGORA", "{n} ítems": "{n} itens", "de {g}": "de {g}",
+  "Plan: {q} · {g} g": "Plano: {q} · {g} g", "✓ Todo": "✓ Tudo", "A medias": "Pela metade", "✕ No": "✕ Não",
+  "Marcar": "Marcar", "Más opciones": "Mais opções", "Menos": "Menos", "Más": "Mais",
+  "Desayuno": "Café da manhã", "Colación": "Lanche", "Almuerzo": "Almoço", "Once": "Lanche da tarde", "Cena": "Jantar",
+  "Antes de dormir": "Antes de dormir", "Sodio extra": "Sódio extra", "Refuerzo": "Reforço",
+  "Comiste {g} g menos de lo planeado": "Você comeu {g} g a menos do planejado", "Comiste {g} g más de lo planeado": "Você comeu {g} g a mais do planejado",
+  "Sacaste {g} g": "Você tirou {g} g", "¿Lo repartimos en las comidas que vienen? Lo que ya comiste no cambia.":
+    "Distribuímos nas próximas refeições? O que você já comeu não muda.",
+  "Dejar así": "Deixar assim", "Recalcular": "Recalcular", "Ajustar a mano": "Ajustar à mão", "Así quedaría": "Ficaria assim",
+  "{g} g bajo el rango": "{g} g abaixo da faixa", "{g} g sobre el rango": "{g} g acima da faixa",
+  "No hay nada que mover: ya no quedan comidas por delante.": "Nada para mover: não restam refeições.",
+  "Sin conexión: quedó marcado. Puedes ajustar lo que queda más tarde.": "Sem conexão: ficou marcado. Você pode ajustar o que falta depois.",
+  "Calculando…": "Calculando…", "tope": "teto",
+  "Cambiar por algo parecido": "Trocar por algo parecido", "Mover a otra comida": "Mover para outra refeição",
+  "No cabe: quedaría en {g} g (tope {t} g)": "Não cabe: ficaria em {g} g (teto {t} g)",
+  "Sacar y repartir en lo que queda": "Tirar e distribuir no que falta", "Sacar sin repartir": "Tirar sem distribuir",
+  "Son {g} g.": "São {g} g.", "No hay comidas más adelante con espacio.": "Não há refeições mais adiante com espaço.",
+  "Ajustar lo que queda · {d}": "Ajustar o que falta · {d}", "Cómo quedaría tu día": "Como ficaria seu dia",
+  "Mueve los gramos de las comidas que vienen. Las que ya pasaron no cambian.": "Mexa nos gramas das próximas refeições. As que já passaram não mudam.",
+  "ya hecha": "já feita", "tope {g} g": "teto {g} g", "Cancelar": "Cancelar", "Aplicar": "Aplicar", "Repartir solo": "Distribuir sozinho",
+  "hecho {a} + por venir {b}": "feito {a} + por vir {b}",
+  "Día de carrera": "Dia de prova", "En carrera · {h}": "Na prova · {h}", "Carbos": "Carbos", "Líquido": "Líquido",
+  "g/h": "g/h", "ml/h": "ml/h", "mg/h": "mg/h", "Gel {n}": "Gel {n}", "Sal": "Sal", "Total en carrera: {g} g": "Total na prova: {g} g",
   "Sin geles: en esta distancia basta con lo que comiste antes.": "Sem géis: nessa distância basta o que você comeu antes.",
-  "Total en carrera: {g} g": "Total na prova: {g} g", "Tiempo como 3:30 o 45:00": "Tempo como 3:30 ou 45:00",
-  "No pude calcular la pauta.": "Não consegui calcular o plano.", "Modo noche": "Modo noite", "Modo día": "Modo dia",
-  "La carrera ya pasó.": "A prova já passou.",
+  "km {k}": "km {k}",
+  "Energía en carrera": "Energia na prova",
+  "Con energía hasta el final": "Com energia até o fim",
+  "Bajón al final": "Caí no final",
+  "Me quedé sin energía": "Fiquei sem energia",
+  "Estómago": "Estômago",
+  "Bien": "Bem",
+  "Molestias leves": "Desconforto leve",
+  "Problemas": "Problemas",
+  "La carga": "A carga",
+  "Cómoda": "Confortável",
+  "Me sentí pesado": "Me senti pesado",
+  "Me quedé con hambre": "Fiquei com fome",
+  "¿Cómo te fue?": "Como foi?",
+  "Cumpliste el {x}% de la carga.": "Você cumpriu {x}% da carga.",
+  "Cuéntanos cómo te sentiste: queda guardado para la próxima.": "Conte como se sentiu: fica salvo para a próxima.",
+  "Tiempo final (opcional)": "Tempo final (opcional)",
+  "¿Qué cambiarías la próxima vez?": "O que você mudaria na próxima?",
+  "Guardar y cerrar el plan": "Salvar e fechar o plano",
+  "Guardado en tus planes anteriores.": "Salvo nos seus planos anteriores.",
+  "Planes anteriores": "Planos anteriores",
+  "Ver todos": "Ver todos",
+  "Plan anterior": "Plano anterior",
+  "Carga cumplida": "Carga cumprida",
+  "Tiempo final": "Tempo final",
+  "Para la próxima": "Para a próxima",
+  "Borrar": "Apagar",
+  "Usar como base": "Usar como base",
+  "¿Borrar este plan anterior?": "Apagar este plano anterior?",
+  "Llegaste al {x}% de la carga y te faltó energía: la próxima vez apunta a cumplirla completa.": "Você chegou a {x}% da carga e faltou energia: na próxima, tente cumpri-la inteira.",
+  "Cumpliste la carga y aun así te faltó energía al final: revisa los carbohidratos en carrera y pruébalos en tus fondos.": "Você cumpriu a carga e mesmo assim faltou energia no final: revise os carboidratos na prova e teste-os nos treinos longos.",
+  "Para el estómago: marca «estómago sensible», baja la fibra y prueba el desayuno y los geles en tus fondos.": "Para o estômago: marque «estômago sensível», reduza a fibra e teste o café da manhã e os géis nos treinos longos.",
+  "Si te sentiste pesado, prueba el régimen conservador o más líquidos con carbohidratos.": "Se você se sentiu pesado, experimente o regime conservador ou mais líquidos com carboidratos.",
+  "Si te quedaste con hambre y lo toleraste bien, puedes probar un régimen más alto.": "Se ficou com fome e tolerou bem, pode testar um regime mais alto.",
+  "Te funcionó: repite este plan en tu próxima carrera.": "Funcionou: repita este plano na sua próxima prova.",
 };
 function t(es, vars) {
   let s = idioma === "en" ? (EN[es] ?? es) : idioma === "pt" ? (PT[es] ?? EN[es] ?? es) : es;
@@ -209,132 +612,700 @@ function t(es, vars) {
 // Toda llamada a la API lleva el idioma: el servidor responde en él.
 const _fetch = window.fetch.bind(window);
 window.fetch = (u, o = {}) => _fetch(u, { ...o, headers: { ...(o.headers || {}), "X-Idioma": idioma } });
-
-// ── Estado (en el teléfono; luego viaja con la cuenta, como DATOS_CUENTA de PacePath) ──
-// fp_carrera: lo que pidió el usuario · fp_pauta: la respuesta del servidor · fp_comido: {fecha: gramos}
-let carrera = pref("fp_carrera", null), datos = pref("fp_pauta", null), comido = pref("fp_comido", {});
-let vista = "hoy";
-const hoyISO = () => new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
-const diasHasta = (iso) => Math.round((new Date(iso + "T12:00") - new Date(hoyISO() + "T12:00")) / 86400000);
-const fechaLarga = (iso) => new Date(iso + "T12:00").toLocaleDateString(LOCALE[idioma], { weekday: "long", day: "numeric", month: "short" });
-const rango = (r, u = "g") => r ? (r[0] === r[1] ? `${r[0]} ${u}` : `${r[0]}–${r[1]} ${u}`) : "–";
-
-function minutos(txt) {           // «3:30» → 210 · «45:00» → 45 · «45» → 45
-  const p = String(txt).trim().split(/[:.,h]/).map(Number);
-  if (p.some(isNaN) || !p[0]) return null;
-  if (p.length === 1) return p[0];
-  return p[0] < 10 ? p[0] * 60 + p[1] : p[0] + p[1] / 60;
+async function api(url, cuerpo) {
+  const r = await fetch(url, cuerpo === undefined ? {} : { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(cuerpo) });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(typeof j.detail === "string" ? j.detail : t("No pude armar la pauta. Revisa tu conexión."));
+  return j;
 }
 
-async function calcular(c) {
-  const r = await fetch("/api/pauta", { method: "POST", headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ peso_kg: c.peso, distancia_km: c.dist, tiempo_min: c.min, fecha: c.fecha, hora: c.hora,
-                           gel_g: c.gel, intestino_entrenado: c.intestino }) });
-  if (!r.ok) throw new Error((await r.json().catch(() => ({}))).detail || t("No pude calcular la pauta."));
-  return r.json();
+// ── Formato ───────────────────────────────────────────────────────────────
+const fmt = (n, d = 0) => Number(n).toLocaleString(LOCALE[idioma], { minimumFractionDigits: d, maximumFractionDigits: d });
+const kg = (g) => fmt(g / 1000, 1);
+const hoyISO = () => new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+const diaCorto = (iso) => new Date(iso + "T12:00").toLocaleDateString(LOCALE[idioma], { weekday: "short" }).replace(".", "");
+const diaNum = (iso) => new Date(iso + "T12:00").getDate();
+const diaLargo = (iso) => { const s = new Date(iso + "T12:00").toLocaleDateString(LOCALE[idioma], { weekday: "long" }); return s[0].toUpperCase() + s.slice(1); };
+const fechaLarga = (iso) => new Date(iso + "T12:00").toLocaleDateString(LOCALE[idioma], { weekday: "long", day: "numeric", month: "long" });
+const hm = (min) => `${Math.floor(min / 60)}:${String(Math.round(min % 60)).padStart(2, "0")}`;
+function minutos(txt) {           // «3:30» → 210 · «11:45» → 705 · «45:00» → 45 · «45» → 45
+  const p = String(txt).trim().split(/[:.,h]/).filter((x) => x !== "").map(Number);
+  if (!p.length || p.some(isNaN) || !p[0]) return null;
+  if (p.length === 1) return p[0] <= 24 ? p[0] * 60 : p[0];
+  return p[0] >= 24 ? p[0] + p[1] / 60 : p[0] * 60 + p[1];
+}
+
+// ── Estado (en el teléfono; luego viaja con la cuenta, como DATOS_CUENTA de PacePath) ──
+// fp_perfil: lo que llenó en el formulario · fp_plan: la agenda (con lo marcado)
+// fp_alimentos: base de alimentos en el idioma de la app · fp_agua: {fecha: vasos}
+let perfil = pref("fp_perfil", null), plan = pref("fp_plan", null), cat = pref("fp_alimentos", null), agua = pref("fp_agua", {});
+let vista = "hoy", diaSel = null, abierta = {}, paso = 1, editando = false, form = null, lista = null;
+let propuesta = null, opciones = null, sim = null;
+// fp_historial: planes terminados con lo cumplido y el feedback del corredor (los 20 últimos)
+let historial = pref("fp_historial", []), fb = {};
+const porId = () => cat?._porId || (cat && (cat._porId = Object.fromEntries(cat.alimentos.map((a) => [a.id, a]))));
+const A = (id) => porId()?.[id];
+const guardarPlan = () => guardar("fp_plan", plan);
+
+async function cargarCatalogo(restr = [], sensible = false) {
+  const q = new URLSearchParams({ restricciones: restr.join(","), sensible: sensible ? "1" : "0" });
+  const j = await api(`/api/alimentos?${q}`);
+  cat = { lang: idioma, ...j };
+  guardar("fp_alimentos", cat);
+  return cat;
+}
+
+// ── Cuentas de la agenda ───────────────────────────────────────────────────
+function casero(n) { const e = Math.trunc(n), m = Math.abs(n - e) >= 0.25; return m ? (e ? `${e} ½` : "½") : String(e); }
+function cantidad(a, n) { return `${casero(n)} ${n <= 1 ? a.unidad[0] : a.unidad[1]}`; }
+const maximo = (a, escala = 1, it) => it?.mx ?? Math.max(a.max, Math.floor(a.max * escala / a.paso) * a.paso);
+const gIt = (it, n = it.p) => n * (A(it.a)?.cho || 0);
+const gPlan = (cm) => cm.items.reduce((s, it) => s + gIt(it), 0);
+const gComido = (cm) => cm.items.reduce((s, it) => s + (it.c != null ? gIt(it, it.c) : 0), 0);
+const gProy = (d) => d.comidas.reduce((s, cm) => s + cm.items.reduce((x, it) => x + gIt(it, it.c ?? it.p), 0), 0);
+const gHecho = (d) => d.comidas.reduce((s, cm) => s + gComido(cm), 0);
+const naHecho = (d) => d.comidas.reduce((s, cm) => s + cm.items.reduce((x, it) => x + (it.c != null ? it.c * (A(it.a)?.sodio || 0) : 0), 0), 0);
+const marcada = (cm) => cm.items.some((it) => it.c != null);
+const completa = (cm) => cm.items.length > 0 && cm.items.every((it) => it.c != null);
+const estadoDe = (g, r) => g < r[0] - 0.5 ? "bajo" : g > r[1] + 0.5 ? "sobre" : "ok";
+const ESTADOS = { bajo: N("Bajo el rango"), ok: N("En el rango"), sobre: N("Sobre el rango") };
+const NOMBRES = { desayuno: N("Desayuno"), colacion: N("Colación"), almuerzo: N("Almuerzo"), once: N("Once"), cena: N("Cena"),
+  noche: N("Antes de dormir"), desayuno_carrera: N("Desayuno"), sodio: N("Sodio extra"), refuerzo: N("Refuerzo") };
+const nombreComida = (cm) => t(NOMBRES[cm.id] || cm.id);
+const redondearPaso = (n, a) => Math.round(n / a.paso) * a.paso;
+function gTexto(it, n) {
+  const a = A(it.a);
+  return a.cho > 0 ? `${fmt(gIt(it, n))} g` : a.sodio > 0 ? `${fmt(n * a.sodio)} mg` : "";
+}
+function payload(d) {
+  return { objetivo_g: d.objetivo_g, rango_g: d.rango_g, escala: d.escala || 1,
+    comidas: d.comidas.map((cm) => ({ id: cm.id, objetivo_g: cm.objetivo_g, tope_g: cm.tope_g, min_g: cm.min_g,
+      items: cm.items.map((it) => ({ a: it.a, p: it.p, c: it.c ?? null, mx: it.mx ?? null })) })) };
+}
+function diaPorDefecto() {
+  const hoy = hoyISO(), i = plan.dias.findIndex((d) => d.fecha === hoy);
+  if (i >= 0) return i;
+  return hoy < plan.dias[0].fecha ? 0 : plan.dias.length - 1;
+}
+function faltan() {
+  const h = (new Date(`${plan.fecha}T${plan.hora}`) - new Date()) / 3600000;
+  return h > 48 ? t("faltan {n} días", { n: Math.ceil(h / 24) }) : h > 0 ? t("faltan {n} h", { n: Math.max(1, Math.floor(h)) })
+    : h > -12 ? t("es hoy") : t("ya pasó");
+}
+const nombreEvento = () => esc(plan.evento || DIST[plan.distancia]?.n || "");
+
+// ── Fin del plan: feedback y planes anteriores ─────────────────────────────
+const termino = () => plan && new Date(`${plan.fecha}T${plan.hora}`).getTime() + plan.tiempo_min * 60000 < Date.now();
+function cumplimiento(p) {
+  const carga = p.dias.filter((d) => d.tipo === "carga"), dc = p.dias[p.dias.length - 1];
+  const obj = carga.reduce((s, d) => s + d.objetivo_g, 0), hecho = carga.reduce((s, d) => s + gHecho(d), 0);
+  const dcObj = dc.comidas.reduce((s, cm) => s + gPlan(cm), 0);
+  return { total: obj ? Math.round(hecho / obj * 100) : null, carrera: dcObj ? Math.round(gHecho(dc) / dcObj * 100) : null,
+    dias: carga.map((d) => ({ fecha: d.fecha, hecho: Math.round(gHecho(d)), objetivo: d.objetivo_g, pct: Math.round(gHecho(d) / d.objetivo_g * 100) })) };
+}
+const FB = {
+  energia: [N("Energía en carrera"), [["bien", N("Con energía hasta el final")], ["bajon", N("Bajón al final")], ["sin", N("Me quedé sin energía")]]],
+  estomago: [N("Estómago"), [["bien", N("Bien")], ["leve", N("Molestias leves")], ["mal", N("Problemas")]]],
+  carga: [N("La carga"), [["bien", N("Cómoda")], ["pesada", N("Me sentí pesado")], ["hambre", N("Me quedé con hambre")]]],
+};
+const etFb = (k, v) => t(FB[k][1].find(([x]) => x === v)?.[1] || "");
+function finHtml() {
+  const c = cumplimiento(plan);
+  return `<div class="fin"><span class="tipo">${nombreEvento()} · ${t("ya pasó")}</span><h3>${t("¿Cómo te fue?")}</h3>
+    <p class="pista" style="margin-bottom:4px">${c.total != null ? t("Cumpliste el {x}% de la carga.", { x: c.total }) + " " : ""}${t("Cuéntanos cómo te sentiste: queda guardado para la próxima.")}</p>
+    ${Object.entries(FB).map(([k, [titulo, ops]]) => `<h4 style="margin:12px 0 2px">${t(titulo)}</h4><div class="chips">${ops.map(([v, et]) =>
+      `<button type="button" class="chip${fb[k] === v ? " on" : ""}" data-acc="fb" data-k="${k}" data-v="${v}">${t(et)}</button>`).join("")}</div>`).join("")}
+    <div class="fila"><label>${t("Tiempo final (opcional)")}<input data-fb="tiempo" value="${esc(fb.tiempo || "")}" placeholder="3:05" inputmode="numeric" autocomplete="off"></label><span></span></div>
+    <label>${t("¿Qué cambiarías la próxima vez?")}<input data-fb="nota" value="${esc(fb.nota || "")}" maxlength="300" autocomplete="off"></label>
+    <div class="botones"><button type="button" data-acc="archivar">${t("Guardar y cerrar el plan")}</button></div></div>`;
+}
+function archivar() {
+  const h = { id: Date.now(), guardado: new Date().toISOString(), evento: plan.evento, distancia: plan.distancia, fecha: plan.fecha,
+    regimen: plan.regimen, peso_kg: plan.peso_kg, tiempo_min: plan.tiempo_min, cumplimiento: cumplimiento(plan),
+    feedback: { ...fb, tiempo: fb.tiempo ? minutos(fb.tiempo) : null }, perfil: structuredClone(perfil), plan };
+  historial = [h, ...historial].slice(0, 20); guardar("fp_historial", historial);
+  for (const d of plan.dias) delete agua[d.fecha];
+  guardar("fp_agua", agua);
+  plan = null; borrarClave("fp_plan"); fb = {}; diaSel = null; abierta = {};
+  if (perfil) { perfil.fecha = ""; guardar("fp_perfil", perfil); }
+  aviso(t("Guardado en tus planes anteriores."));
+  cambiarVista("hoy");
+}
+function pasadoHtml(h) {
+  const c = h.cumplimiento, f = h.feedback || {};
+  const resumen = [f.energia && etFb("energia", f.energia), f.estomago && etFb("estomago", f.estomago)].filter(Boolean).join(" · ");
+  return `<div class="pasado" data-acc="ver-pasado" data-id="${h.id}"><div class="txt"><b>${esc(h.evento || t(DIST[h.distancia]?.n || ""))}</b>
+    <small>${esc(fechaLarga(h.fecha))}${h.regimen ? ` · ${fmt(h.regimen, 1)} g/kg` : ""}</small>${resumen ? `<small>${esc(resumen)}</small>` : ""}</div>
+    ${c.total != null ? `<span class="pct">${c.total}%</span>` : ""}</div>`;
+}
+function historialHtml(max = 99) {
+  if (!historial.length) return "";
+  return `<h4>${t("Planes anteriores")}</h4>${historial.slice(0, max).map(pasadoHtml).join("")}
+    ${historial.length > max ? `<div class="botones"><button type="button" class="sec" data-acc="ir-perfil">${t("Ver todos")}</button></div>` : ""}`;
+}
+function consejos(h) {
+  const c = h.cumplimiento.total, f = h.feedback || {}, out = [];
+  if (c != null && c < 90 && (f.energia === "bajon" || f.energia === "sin"))
+    out.push(t("Llegaste al {x}% de la carga y te faltó energía: la próxima vez apunta a cumplirla completa.", { x: c }));
+  else if (f.energia === "sin" || f.energia === "bajon")
+    out.push(t("Cumpliste la carga y aun así te faltó energía al final: revisa los carbohidratos en carrera y pruébalos en tus fondos."));
+  if (f.estomago === "leve" || f.estomago === "mal")
+    out.push(t("Para el estómago: marca «estómago sensible», baja la fibra y prueba el desayuno y los geles en tus fondos."));
+  if (f.carga === "pesada") out.push(t("Si te sentiste pesado, prueba el régimen conservador o más líquidos con carbohidratos."));
+  if (f.carga === "hambre") out.push(t("Si te quedaste con hambre y lo toleraste bien, puedes probar un régimen más alto."));
+  if (f.energia === "bien" && f.estomago === "bien") out.push(t("Te funcionó: repite este plan en tu próxima carrera."));
+  return out;
+}
+function abrirPasado(id) {
+  const h = historial.find((x) => x.id === id); if (!h) return;
+  const c = h.cumplimiento, f = h.feedback || {};
+  abrirHoja(`<span class="tipo">${t("Plan anterior")}</span><h2 style="font-size:20px">${esc(h.evento || t(DIST[h.distancia]?.n || ""))}</h2>
+    <p class="pista">${esc(fechaLarga(h.fecha))} · ${esc(t(DIST[h.distancia]?.n || ""))}${h.regimen ? ` · ${fmt(h.regimen, 1)} g/kg` : ""} · ${fmt(h.peso_kg, 1)} kg</p>
+    <div class="cambios">
+      ${c.total != null ? `<div class="dato"><span>${t("Carga cumplida")}</span><span>${c.total}%</span></div>` : ""}
+      ${c.dias.map((d) => `<div class="dato"><span>${esc(diaLargo(d.fecha))}</span><span>${fmt(d.hecho)} ${t("de {g} g", { g: fmt(d.objetivo) })}</span></div>`).join("")}
+      ${c.carrera != null ? `<div class="dato"><span>${t("Antes de largar")}</span><span>${c.carrera}%</span></div>` : ""}
+      ${Object.keys(FB).filter((k) => f[k]).map((k) => `<div class="dato"><span>${t(FB[k][0])}</span><span>${etFb(k, f[k])}</span></div>`).join("")}
+      ${f.tiempo ? `<div class="dato"><span>${t("Tiempo final")}</span><span>${hm(f.tiempo)}</span></div>` : ""}
+    </div>
+    ${f.nota ? `<p class="pista">«${esc(f.nota)}»</p>` : ""}
+    ${consejos(h).length ? `<h4>${t("Para la próxima")}</h4><ul class="notas">${consejos(h).map((x) => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
+    <div class="botones fijos"><button type="button" class="sec" data-acc="borrar-pasado" data-id="${h.id}">${t("Borrar")}</button>
+      <button type="button" data-acc="reusar" data-id="${h.id}">${t("Usar como base")}</button></div>`);
 }
 
 // ── Vistas ────────────────────────────────────────────────────────────────
 function sinPauta() {
   return `<span class="tipo">FuelPath</span><h2>${t("Aún no tienes pauta")}</h2>
-    <p class="pista">${t("Arma tu pauta en la pestaña Pauta con tu carrera y tu peso.")}</p>
-    <button type="button" onclick="cambiarVista('pauta')">${t("Armar mi pauta")}</button>`;
+    <p class="pista">${t("Con tu carrera, tu peso y tus horarios armamos la carga de carbohidratos comida a comida.")}</p>
+    <div class="botones"><button type="button" data-acc="ir-pauta">${t("Armar mi pauta")}</button></div>
+    ${historialHtml(3)}`;
+}
+
+function anillo(cm) {
+  if (completa(cm)) return `<svg class="anillo" viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="18" fill="none" stroke="var(--ok)" stroke-width="5"/>
+    <path d="M15 22l5 5 9-10" fill="none" stroke="var(--ok)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  const plan_g = gPlan(cm), f = plan_g ? Math.min(1, gComido(cm) / plan_g) : (marcada(cm) ? 1 : 0), L = 113.1;
+  return `<svg class="anillo" viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="18" fill="none" stroke="var(--linea)" stroke-width="5"/>
+    ${f > 0 ? `<circle cx="22" cy="22" r="18" fill="none" stroke="var(--acento)" stroke-width="5" stroke-dasharray="${(f * L).toFixed(1)} ${L}" transform="rotate(-90 22 22)" stroke-linecap="round"/>` : ""}</svg>`;
+}
+
+function rangoHtml(d, total, hecho, marcas = []) {
+  const r = d.rango_g, E = Math.max(r[1] * 1.13, total * 1.04, 1), p = (x) => Math.max(0, Math.min(100, x / E * 100)).toFixed(1);
+  return `<div class="rango"><div class="banda" style="left:${p(r[0])}%;width:${(p(r[1]) - p(r[0])).toFixed(1)}%"></div>
+    ${total > hecho ? `<div class="proy" style="left:${p(hecho)}%;width:${(p(total) - p(hecho)).toFixed(1)}%"></div>` : ""}
+    <div class="hecho" style="width:${p(Math.min(hecho, total))}%"></div>
+    ${(marcas.length ? marcas : [{ g: d.objetivo_g, c: "" }]).map((m) => `<div class="marca ${m.c}" style="left:${p(m.g)}%"></div>`).join("")}</div>`;
+}
+
+function kpiHtml(di, d) {
+  const hecho = gHecho(d), proy = gProy(d);
+  if (d.tipo === "carrera") {
+    const obj = d.comidas.reduce((s, cm) => s + gPlan(cm), 0);
+    return `<div class="kpi"><span class="tipo" style="color:var(--suave)">${t("Antes de largar")}</span>
+      <div class="grande" style="margin-top:6px">${fmt(hecho)} <small>${t("de {g} g", { g: fmt(obj) })}</small></div>
+      <div class="barra"><i style="width:${obj ? Math.min(100, hecho / obj * 100).toFixed(0) : 0}%"></i></div>
+      <div class="botones"><button type="button" class="sec chico" data-acc="ir-carrera">${t("Plan en carrera")} →</button></div></div>`;
+  }
+  const est = estadoDe(proy, d.rango_g), quedan = d.comidas.some((cm) => !marcada(cm));
+  return `<div class="kpi">
+    <div class="fila-k"><span class="tipo" style="color:var(--suave)">${t("Carga del día")}</span><span class="estado ${est}">${t(ESTADOS[est])}</span></div>
+    <div class="grande" style="margin-top:6px">${fmt(hecho)} <small>${t("hecho")} · ${t("va a quedar en {g} g", { g: fmt(proy) })}</small></div>
+    ${rangoHtml(d, proy, hecho)}
+    <div class="escala"><span>0</span><span>${t("rango {a}–{b} · objetivo {o}", { a: fmt(d.rango_g[0]), b: fmt(d.rango_g[1]), o: fmt(d.objetivo_g) })}</span></div>
+    <div class="ley"><span><i style="background:var(--acento)"></i>${t("Hecho")}</span><span><i style="background:var(--proy1)"></i>${t("Lo que queda")}</span>
+      <span><i style="background:var(--banda)"></i>${t("Rango")}</span><span><i style="background:var(--tinta);width:3px"></i>${t("Objetivo")}</span></div>
+    <div class="mini">
+      <div class="sal"><small>${t("Sodio")}</small><b>${kg(naHecho(d))}</b> <span>${t("de {g} g", { g: kg(d.sodio_mg) })}</span>
+        <div class="barra fina" style="background:var(--sal-barra)"><i style="width:${Math.min(100, naHecho(d) / d.sodio_mg * 100).toFixed(0)}%;background:var(--sal)"></i></div></div>
+      <div><small>${t("Por kilo")}</small><b>${fmt(proy / plan.peso_kg, 1)}</b> <span>${t("g/kg proyectado")}</span></div>
+    </div>
+    ${quedan ? `<div class="botones"><button type="button" class="chico" data-acc="ajustar" data-d="${di}">${t("Ajustar lo que queda")}</button></div>` : ""}</div>`;
+}
+
+const VASO = (lleno) => `<svg viewBox="0 0 26 30" aria-hidden="true"><path d="M4 3h18l-2.5 24h-13z" fill="${lleno ? "var(--azul)" : "none"}" stroke="var(--azul)" stroke-opacity="${lleno ? 1 : .45}" stroke-width="2" stroke-linejoin="round"/></svg>`;
+function aguaHtml(d) {
+  if (!d.agua_ml) return "";
+  const total = Math.round(d.agua_ml / 250), n = agua[d.fecha] || 0;
+  return `<div class="agua"><div class="cab-a"><b>${t("Agua")}</b><span class="pista">${t("aparte de jugos e isotónica")}</span>
+      <span class="der">${kg(n * 250)} ${t("de {g}", { g: kg(d.agua_ml) })} L</span></div>
+    <div class="vasos">${Array.from({ length: Math.max(total, n) }, (_, i) => VASO(i < n)).join("")}</div>
+    <div class="fila-a"><span class="pista">${t("1 vaso = 250 ml. Orina clara: vas bien.")}</span>
+      ${n ? `<button type="button" class="sec chico" data-acc="agua" data-n="-1" aria-label="${t("Quitar un vaso")}">−</button>` : ""}
+      <button type="button" class="chico" data-acc="agua" data-n="1">${t("+ 1 vaso")}</button></div></div>`;
+}
+
+function itemHtml(di, ci, ii, it, d) {
+  const a = A(it.a); if (!a) return "";
+  const marcado = it.c != null, n = it.c ?? it.v ?? it.p, cambiado = (it.c ?? it.v ?? it.p) !== it.p;
+  const ck = !marcado ? "" : it.c === 0 ? "no" : it.c < it.p ? "medio" : "si";
+  const dg = gIt(it, n) - gIt(it);
+  const nota = cambiado && a.cho > 0 ? `<small class="cambio">${t("Plan: {q} · {g} g", { q: cantidad(a, it.p), g: (dg > 0 ? "+" : "−") + fmt(Math.abs(dg)) })}</small>` : "";
+  const editable = !marcado && a.cho > 0;
+  return `<div class="item${cambiado ? " editado" : ""}">
+    <button type="button" class="ck ${ck}" data-acc="marcar" data-d="${di}" data-c="${ci}" data-i="${ii}" aria-label="${t("Marcar")}">${ck === "no" ? "✕" : "✓"}</button>
+    <div class="col"><div class="txt">${editable ? `<b>${esc(a.nombre)}</b>` : `<b>${cantidad(a, n)}</b> · ${esc(a.nombre)}`}${nota}</div>
+      ${editable ? `<div class="paso"><button type="button" data-acc="menos" data-d="${di}" data-c="${ci}" data-i="${ii}" aria-label="${t("Menos")}" ${n <= 0 ? "disabled" : ""}>−</button>
+        <b>${cantidad(a, n)}</b><button type="button" data-acc="mas" data-d="${di}" data-c="${ci}" data-i="${ii}" aria-label="${t("Más")}" ${n + a.paso > maximo(a, d.escala, it) + 1e-6 ? "disabled" : ""}>+</button></div>` : ""}</div>
+    <span class="g">${gTexto(it, n)}</span>
+    ${!marcado && d.tipo !== "carrera" ? `<button type="button" class="mas" data-acc="opciones" data-d="${di}" data-c="${ci}" data-i="${ii}" aria-label="${t("Más opciones")}">⋯</button>` : ""}</div>`;
+}
+
+function comidaHtml(di, ci, cm, d, ahora) {
+  const nombres = cm.items.map((it) => A(it.a)?.nombre.toLowerCase()).filter(Boolean).join(", ");
+  const plan_g = gPlan(cm), na = cm.items.reduce((s, it) => s + it.p * (A(it.a)?.sodio || 0), 0);
+  const der = plan_g > 0 ? (marcada(cm) ? `<b>${fmt(gComido(cm))} g</b>${t("de {g}", { g: fmt(plan_g) })}` : `<b>${fmt(plan_g)} g</b>${t("{n} ítems", { n: cm.items.length })}`)
+    : `<b>${fmt(na)} mg</b>`;
+  const sub = ci === ahora ? `<small class="ahora">${t("AHORA")} · ${cm.hora}</small>` : `<small>${cm.hora} · ${esc(nombres)}</small>`;
+  if (abierta[di] !== ci) return `<div class="comida" data-acc="abrir" data-d="${di}" data-c="${ci}">${anillo(cm)}
+      <div class="txt"><b>${nombreComida(cm)}</b>${sub}</div><div class="der">${der}</div></div>`;
+  const pendientes = cm.items.some((it) => it.c == null);
+  return `<div class="comida abierta"><div class="fila-cab" data-acc="abrir" data-d="${di}" data-c="${ci}">${anillo(cm)}
+      <div class="txt"><b style="font-size:17px">${nombreComida(cm)}</b>${ci === ahora ? sub : `<small>${cm.hora}</small>`}</div><div class="der">${der}</div></div>
+    ${cm.items.map((it, ii) => itemHtml(di, ci, ii, it, d)).join("")}
+    ${pendientes ? `<div class="marcar"><button type="button" class="sec" data-acc="todo" data-d="${di}" data-c="${ci}">${t("✓ Todo")}</button>
+      <button type="button" class="sec" data-acc="medias" data-d="${di}" data-c="${ci}">${t("A medias")}</button>
+      <button type="button" class="sec" data-acc="nada" data-d="${di}" data-c="${ci}">${t("✕ No")}</button></div>` : ""}</div>`;
 }
 
 function pintarHoy() {
-  if (!datos) return $("hoy").innerHTML = sinPauta();
-  const n = diasHasta(carrera.fecha), nombre = esc(carrera.nombre || `${carrera.dist}K`);
-  if (n < 0) return $("hoy").innerHTML = `<h2>${nombre}</h2><p class="pista">${t("La carrera ya pasó.")}</p>`;
-  const dia = datos.dias.find((d) => d.fecha === hoyISO());
-  let h = `<span class="tipo">${n === 0 ? t("Hoy es {c}", { c: nombre }) : t("Faltan {n} días para {c}", { n, c: nombre })}</span>
-    <h2>${esc(fechaLarga(hoyISO()))}</h2>`;
-  if (n === 0) {                     // día de carrera: la comida previa y el plan, a la vista
-    $("hoy").innerHTML = h + `<div class="tarjeta"><h3>${t("Comida previa")}</h3>
-      ${datos.previa.opciones.map((o) => `<p>${t("{h} h antes, a las {t}", { h: o.horas_antes, t: o.hora })} · ${rango(o.carbo_g)}</p>`).join("")}</div>
-      <button type="button" onclick="cambiarVista('carrera')">${t("Durante la carrera")}</button>`;
-    return;
-  }
-  if (dia?.carbo_g) {
-    const g = comido[hoyISO()] || 0, pct = Math.min(100, g / dia.carbo_g[0] * 100);
-    h += `<div class="tarjeta"><h3>${t("Carbohidratos de hoy")}</h3>
-      <div class="grande">${g}<small> / ${rango(dia.carbo_g)}</small></div>
-      <div class="barra"><i style="width:${pct.toFixed(0)}%"></i></div>
-      <div class="botones">${[25, 50, 100].map((x) => `<button class="sec" type="button" onclick="sumar(${x})">+${x} g</button>`).join("")}
-        <button class="sec" type="button" onclick="sumar(-25)">−25 g</button></div>
-      <ul>${dia.notas.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>`;
-  } else {
-    h += `<div class="tarjeta"><h3>${t("Hoy come normal")}</h3><ul>${(dia?.notas || []).map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>`;
-  }
-  $("hoy").innerHTML = h;
+  if (!plan) return $("hoy").innerHTML = sinPauta();
+  if (!cat || cat.lang !== idioma) { cargarCatalogo(perfil?.restricciones || [], perfil?.estomago_sensible).then(pintarHoy).catch(() => {}); if (!cat) return; }
+  if (diaSel == null || !plan.dias[diaSel]) diaSel = diaPorDefecto();
+  const di = diaSel, d = plan.dias[di], esHoy = d.fecha === hoyISO();
+  const ahora = esHoy ? d.comidas.findIndex((cm) => !completa(cm)) : -1;
+  if (!(di in abierta)) abierta[di] = ahora;
+  const titulo = d.tipo === "carrera" ? t("{d}: día de carrera", { d: diaLargo(d.fecha) })
+    : t("{d}: día de carga {n} de {de}", { d: diaLargo(d.fecha), n: d.n, de: d.de });
+  const usa = plan.elegidos.map((id) => A(id)?.nombre).filter(Boolean);
+  $("hoy").innerHTML = `${termino() ? finHtml() : ""}<span class="tipo">${nombreEvento()} · ${faltan()}</span><h2>${titulo}</h2>
+    <div class="dias">${plan.dias.map((x, i) => `<button type="button" class="dia${i === di ? " on" : ""}" data-acc="dia" data-d="${i}">${esc(diaCorto(x.fecha))}
+      <b>${diaNum(x.fecha)}${x.comidas.every(completa) ? ' <span class="ok">✓</span>' : ""}</b></button>`).join("")}</div>
+    <div class="hoy-grid"><div class="lado">${kpiHtml(di, d)}${aguaHtml(d)}
+      <div class="usa"><div><b>${t("Tu pauta usa:")}</b> ${esc(usa.join(", ").toLowerCase())}</div>
+        <button type="button" class="sec chico" data-acc="ir-alimentos">✎ ${t("Cambiar")}</button></div></div>
+    <div class="centro"><h4>${t("Comidas")}</h4><div class="comidas">${d.comidas.map((cm, ci) => comidaHtml(di, ci, cm, d, ahora)).join("")}</div>
+      ${d.notas?.length ? `<ul class="notas">${d.notas.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
+      ${plan.notas.map((x) => `<p class="aviso">${esc(x)}</p>`).join("")}</div></div>`;
 }
-function sumar(g) {
-  const k = hoyISO();
-  comido[k] = Math.max(0, (comido[k] || 0) + g);
-  guardar("fp_comido", comido);
-  pintarHoy();
+
+// ── Marcar, ajustar y recalcular ────────────────────────────────────────────
+function refrescar() { guardarPlan(); pintarHoy(); }
+async function proponer(di, ci, titulo) {
+  const d = plan.dias[di];
+  if (!d.reparto) return;
+  abrirHoja(`<span class="tipo">${nombreComida(d.comidas[ci])}</span><h2 style="font-size:20px">${esc(titulo)}</h2><p class="pista">${t("Calculando…")}</p>`);
+  try {
+    const r = await api("/api/reparto", { dia: payload(d), desde: ci });
+    propuesta = { di, r };
+    pintarPropuesta(di, ci, titulo, r);
+  } catch {
+    cerrarHoja(); aviso(t("Sin conexión: quedó marcado. Puedes ajustar lo que queda más tarde."));
+  }
 }
+function pintarPropuesta(di, ci, titulo, r) {
+  const d = plan.dias[di], hecho = gHecho(d);
+  const est = (g, e) => e === "ok" ? t("En el rango") : e === "bajo" ? t("{g} g bajo el rango", { g: fmt(d.rango_g[0] - g) }) : t("{g} g sobre el rango", { g: fmt(g - d.rango_g[1]) });
+  const cambios = {};
+  for (const c of r.cambios) (cambios[c.comida] ??= []).push(c);
+  const filas = Object.entries(cambios).map(([i, cs]) => {
+    const cm = d.comidas[i], g = cs.reduce((s, c) => s + c.g, 0);
+    const txt = cs.map((c) => `${esc(A(c.a).nombre)} ${c.g > 0 ? "+" : "−"}${cantidad(A(c.a), Math.abs(c.p - c.de))}`).join(" · ");
+    return `<div class="reparto"><div class="txt">${nombreComida(cm)} · ${cm.hora}<small>${txt}</small></div>
+      <span class="mono ${g < 0 ? "menos" : ""}">${g > 0 ? "+" : "−"}${fmt(Math.abs(g))} g</span>${r.en_tope.includes(cm.id) ? `<span class="tope">${t("tope")}</span>` : ""}</div>`;
+  }).join("");
+  $("hoja").innerHTML = `<div class="asa"></div><span class="tipo">${nombreComida(d.comidas[ci])} · ${d.comidas[ci].hora}</span>
+    <h2 style="font-size:20px">${esc(titulo)}</h2>
+    <p class="pista" style="margin:0">${r.cambios.length ? t("¿Lo repartimos en las comidas que vienen? Lo que ya comiste no cambia.") : t("No hay nada que mover: ya no quedan comidas por delante.")}</p>
+    <div class="comparar"><div class="${r.cambios.length ? "" : "on"}"><small>${t("Dejar así")}</small><b>${fmt(r.sin)} g</b><span class="estado ${r.estado_sin}">${est(r.sin, r.estado_sin)}</span></div>
+      ${r.cambios.length ? `<div class="on"><small>${t("Recalcular")}</small><b>${fmt(r.con)} g</b><span class="estado ${r.estado_con}">${est(r.con, r.estado_con)}</span></div>` : ""}</div>
+    ${rangoHtml(d, Math.max(r.sin, r.con), hecho, [{ g: r.sin, c: r.estado_sin === "ok" ? "" : "bajo" }, ...(r.cambios.length ? [{ g: r.con, c: "ok" }] : [])])}
+    <div class="escala"><span>${t("hecho")} ${fmt(hecho)}</span><span>${t("rango {a}–{b} · objetivo {o}", { a: fmt(d.rango_g[0]), b: fmt(d.rango_g[1]), o: fmt(d.objetivo_g) })}</span></div>
+    ${filas ? `<h4>${t("Así quedaría")}</h4><div class="cambios">${filas}</div>` : ""}
+    ${r.avisos.map((x) => `<div class="aviso" style="margin-bottom:0">${esc(x)}</div>`).join("")}
+    <div class="botones fijos">${r.cambios.length ? `<button type="button" class="sec" data-acc="dejar">${t("Dejar así")}</button>
+      <button type="button" class="sec" data-acc="a-mano" data-d="${di}">${t("Ajustar a mano")}</button>
+      <button type="button" data-acc="recalcular">${t("Recalcular")}</button>` : `<button type="button" data-acc="dejar">OK</button>`}</div>`;
+}
+function aplicarCambios(d, cambios) {
+  for (const c of cambios) { const it = d.comidas[c.comida]?.items[c.item]; if (it && it.a === c.a) it.p = c.p; }
+  for (const cm of d.comidas) cm.items = cm.items.filter((it) => it.p > 0 || it.c != null);
+}
+function tituloDif(dg) { return dg < 0 ? t("Comiste {g} g menos de lo planeado", { g: fmt(-dg) }) : t("Comiste {g} g más de lo planeado", { g: fmt(dg) }); }
+function marcarItem(di, ci, ii) {
+  const d = plan.dias[di], it = d.comidas[ci].items[ii];
+  if (it.c != null) { delete it.c; return refrescar(); }
+  it.c = it.v ?? it.p; delete it.v;
+  const dg = gIt(it, it.c) - gIt(it);
+  refrescar();
+  if (Math.abs(dg) >= 5) proponer(di, ci, tituloDif(dg));
+}
+function marcarComida(di, ci, modo) {
+  const d = plan.dias[di]; let dg = 0;
+  for (const it of d.comidas[ci].items) {
+    if (it.c != null) continue;
+    const a = A(it.a), base = it.v ?? it.p;
+    it.c = modo === "todo" ? base : modo === "nada" ? 0 : Math.max(0, redondearPaso(base / 2, a));
+    delete it.v;
+    dg += gIt(it, it.c) - gIt(it);
+  }
+  if (d.comidas[ci].items.every((it) => it.c != null)) abierta[di] = d.comidas.findIndex((cm) => !completa(cm));
+  refrescar();
+  if (Math.abs(dg) >= 5) proponer(di, ci, tituloDif(dg));
+}
+function pasoItem(di, ci, ii, s) {
+  const d = plan.dias[di], it = d.comidas[ci].items[ii], a = A(it.a);
+  const n = Math.max(0, Math.min(maximo(a, d.escala, it), +((it.v ?? it.p) + s * a.paso).toFixed(2)));
+  if (n === it.p) delete it.v; else it.v = n;
+  refrescar();
+}
+
+// Opciones de un alimento: cambiarlo, moverlo o sacarlo.
+function abrirOpciones(di, ci, ii) {
+  const d = plan.dias[di], cm = d.comidas[ci], it = cm.items[ii], a = A(it.a), g = gIt(it);
+  opciones = { di, ci, ii };
+  const permit = new Set(cat.permitidos), enComida = new Set(cm.items.map((x) => x.a));
+  const alts = cat.alimentos.filter((x) => x.rol === a.rol && x.id !== a.id && !x.oculto && permit.has(x.id) && !enComida.has(x.id) && x.cho > 0)
+    .map((x) => { const n = Math.min(maximo(x, d.escala), Math.max(x.paso, redondearPaso(g / x.cho, x))); return { x, n }; }).slice(0, 8);
+  const destinos = d.comidas.map((x, j) => ({ x, j })).filter(({ x, j }) => j > ci && !marcada(x));
+  abrirHoja(`<span class="tipo">${nombreComida(cm)} · ${cm.hora}</span><h2 style="font-size:20px">${cantidad(a, it.p)} · ${esc(a.nombre)}</h2>
+    <p class="pista" style="margin-bottom:6px">${a.cho > 0 ? t("Son {g} g.", { g: fmt(g) }) : ""}</p>
+    ${alts.length ? `<h4 style="margin-top:8px">${t("Cambiar por algo parecido")}</h4><div class="alts">${alts.map(({ x, n }) =>
+      `<button type="button" data-acc="cambiar" data-a="${x.id}" data-n="${n}"><b>${cantidad(x, n)}</b>${esc(x.nombre)}<br><span class="mono">${fmt(n * x.cho)} g</span></button>`).join("")}</div>` : ""}
+    <h4>${t("Mover a otra comida")}</h4><div class="destinos">${destinos.length ? destinos.map(({ x, j }) => {
+      const queda = gPlan(x) + g, cabe = queda <= x.tope_g + 0.5;
+      return `<button type="button" data-acc="mover" data-j="${j}" ${cabe ? "" : "disabled"}><span>${nombreComida(x)} · ${x.hora}</span>
+        <small>${cabe ? `${fmt(gPlan(x))} → ${fmt(queda)} g` : t("No cabe: quedaría en {g} g (tope {t} g)", { g: fmt(queda), t: fmt(x.tope_g) })}</small></button>`; }).join("")
+      : `<p class="pista">${t("No hay comidas más adelante con espacio.")}</p>`}</div>
+    <div class="botones"><button type="button" class="sec" data-acc="sacar" data-repartir="0">${t("Sacar sin repartir")}</button>
+      ${d.reparto ? `<button type="button" data-acc="sacar" data-repartir="1">${t("Sacar y repartir en lo que queda")}</button>` : ""}</div>`);
+}
+
+// Ajustar a mano lo que queda del día («cómo quedaría»).
+function abrirAjuste(di) {
+  sim = { di, d: structuredClone(plan.dias[di]) };
+  for (const cm of sim.d.comidas) for (const it of cm.items) delete it.v;
+  cerrarHoja(); pintarAjuste();
+  $("ajuste").hidden = false; document.body.classList.add("bloq"); $("ajuste").scrollTop = 0;
+}
+function pintarAjuste() {
+  const { di, d } = sim, orig = plan.dias[di];
+  const hecho = gHecho(d), total = gProy(d), est = estadoDe(total, d.rango_g);
+  const bloques = d.comidas.map((cm, ci) => {
+    if (marcada(cm)) return `<div class="sim pasada"><div class="cab-s"><b>${nombreComida(cm)}</b><span class="pista" style="margin:0">${t("ya hecha")}</span>
+      <span class="der">${fmt(gComido(cm))} g</span></div></div>`;
+    const g = gPlan(cm), dif = g - gPlan(orig.comidas[ci]);
+    return `<div class="sim"><div class="cab-s"><b>${nombreComida(cm)}</b><span class="pista" style="margin:0">${cm.hora} · ${t("tope {g} g", { g: fmt(cm.tope_g) })}</span>
+        <span class="der">${fmt(g)} g ${Math.round(dif) ? `<span class="${dif > 0 ? "mas" : "menos"}">${dif > 0 ? "+" : "−"}${fmt(Math.abs(dif))}</span>` : ""}</span></div>
+      ${cm.items.map((it, ii) => { const a = A(it.a); if (!a || a.cho <= 0) return "";
+        const sube = it.p + a.paso <= maximo(a, d.escala, it) + 1e-6 && g + a.paso * a.cho <= cm.tope_g + 0.5;
+        return `<div class="it"><div class="txt">${esc(a.nombre)}</div><div class="paso">
+          <button type="button" data-acc="sim-paso" data-c="${ci}" data-i="${ii}" data-s="-1" aria-label="${t("Menos")}" ${it.p <= 0 ? "disabled" : ""}>−</button><b>${cantidad(a, it.p)}</b>
+          <button type="button" data-acc="sim-paso" data-c="${ci}" data-i="${ii}" data-s="1" aria-label="${t("Más")}" ${sube ? "" : "disabled"}>+</button></div>
+          <span class="g">${fmt(gIt(it))} g</span></div>`; }).join("")}</div>`;
+  }).join("");
+  $("ajuste").innerHTML = `<div class="cuerpo"><span class="tipo">${t("Ajustar lo que queda · {d}", { d: diaLargo(d.fecha) })}</span>
+    <h2>${t("Cómo quedaría tu día")}</h2><p class="pista">${t("Mueve los gramos de las comidas que vienen. Las que ya pasaron no cambian.")}</p>
+    ${bloques}
+    <div class="suma"><div class="linea-s"><b>${fmt(total)}</b> ${t("de {g} g", { g: fmt(d.objetivo_g) })}<span class="estado ${est}">${t(ESTADOS[est])}</span></div>
+      ${rangoHtml(d, total, hecho)}
+      <div class="escala"><span>${t("hecho {a} + por venir {b}", { a: fmt(hecho), b: fmt(total - hecho) })}</span><span>${fmt(d.rango_g[0])}–${fmt(d.rango_g[1])}</span></div>
+      <div class="botones"><button type="button" class="sec" data-acc="sim-cancelar">${t("Cancelar")}</button>
+        <button type="button" class="sec" data-acc="sim-auto">${t("Repartir solo")}</button>
+        <button type="button" data-acc="sim-aplicar">${t("Aplicar")}</button></div></div></div>`;
+}
+function cerrarAjuste() { sim = null; $("ajuste").hidden = true; $("ajuste").innerHTML = ""; document.body.classList.remove("bloq"); }
+
+// ── Hoja, avisos ───────────────────────────────────────────────────────────
+function abrirHoja(html) { $("hoja").innerHTML = `<div class="asa"></div>${html}`; $("capa").hidden = false; document.body.classList.add("bloq"); }
+function cerrarHoja() { $("capa").hidden = true; propuesta = opciones = null; if ($("ajuste").hidden) document.body.classList.remove("bloq"); }
+let _toast;
+function aviso(txt) { $("toast").textContent = txt; $("toast").hidden = false; clearTimeout(_toast); _toast = setTimeout(() => $("toast").hidden = true, 4000); }
+
+// ── Pauta: formulario (paso 1), alimentos (paso 2) y resumen ────────────────
+const DIST = { "10k": { n: "10K", km: 10, dep: "correr" }, "21k": { n: "21K", km: 21.1, dep: "correr" }, "42k": { n: "42K", km: 42.2, dep: "correr" },
+  "703": { n: "70.3", km: 113, dep: "tri" }, "im": { n: "Ironman", km: 226, dep: "tri" }, "fondo": { n: N("Gran fondo (bici)"), km: 120, dep: "bici" },
+  "otra": { n: N("Otra"), km: null, dep: null } };
+const ORDEN_DIST = ["10k", "21k", "42k", "703", "im", "fondo", "otra"];   // «703» es numérica: JS la pondría primero
+const DEPORTES = { correr: N("Correr"), bici: N("Bici"), tri: N("Triatlón") };
+const RESTR = { sin_gluten: N("Sin gluten"), sin_lactosa: N("Sin lactosa"), vegetariano: N("Vegetariano"), vegano: N("Vegano"),
+  mani: N("Maní"), frutos_secos: N("Frutos secos"), huevo: N("Huevo"), soya: N("Soya") };
+const REG = { larga: [[8, N("Conservador")], [10, N("Recomendado")], [12, N("Alto")]], corta: [[7, N("Conservador")], [8, N("Recomendado")], [10, N("Alto")]] };
+const GRUPOS = [[N("Pan y cereales"), ["pan", "snack"]], [N("Arroz, pastas y papas"), ["base", "acomp"]], [N("Para acompañar"), ["proteina"]],
+  [N("Frutas y dulces"), ["fruta", "untable", "dulce", "postre"]], [N("Líquidos"), ["liquido", "lacteo"]], [N("Salados"), ["salado", "caldo"]]];
+const LB = 2.20462;
+function tipoCarga(f) {
+  if (["42k", "703", "im", "fondo"].includes(f.distancia)) return "larga";
+  if (f.distancia === "21k") return "corta";
+  if (f.distancia === "10k") return null;
+  const m = minutos(f.tiempo) || 0;
+  return m > 150 ? "larga" : m > 75 ? "corta" : null;
+}
+function formNuevo() {
+  return perfil ? structuredClone(perfil) : { evento: "", distancia: "42k", km: "", deporte: "correr", tiempo: "", fecha: "", hora: "07:00",
+    peso: "", unidad: "kg", regimen: null, levanta: "07:00", acuesta: "23:00", primera_carga: false, estomago_sensible: false,
+    sudor_salado: false, restricciones: [], otra: "", medica: false, gel_g: 25, intestino: false, elegidos: null, elegidos_restr: null };
+}
+const interruptor = (k, txt, sub) => `<label class="interruptor"><div>${t(txt)}${sub ? `<small>${t(sub)}</small>` : ""}</div>
+  <input type="checkbox" data-f="${k}" ${form[k] ? "checked" : ""}><span class="sw"></span></label>`;
+function pesoKg() { const p = Number(String(form.peso).replace(",", ".")); return form.unidad === "lb" ? p / LB : p; }
 
 function pintarPauta() {
-  if (!datos) return $("pauta").innerHTML = "";
-  $("pauta").innerHTML = datos.dias.map((d) => `<div class="tarjeta"><span class="tipo">${esc(d.etiqueta)}</span>
-      <h3>${esc(fechaLarga(d.fecha))} · ${d.carbo_g ? rango(d.carbo_g) : t("Hoy come normal")}</h3>
-      <ul>${d.notas.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>`).join("")
-    + `<div class="tarjeta"><span class="tipo">${t("Comida previa")}</span>
-      ${datos.previa.opciones.map((o) => `<h3>${t("{h} h antes, a las {t}", { h: o.horas_antes, t: o.hora })} · ${rango(o.carbo_g)}</h3>`).join("")}
-      <ul>${datos.previa.notas.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>
-    <p class="aviso">${esc(datos.aviso)}</p>`;
+  if (plan && !editando) return pintarResumen();
+  form ??= formNuevo();
+  return paso === 2 ? pintarAlimentos() : pintarForm();
+}
+function pintarResumen() {
+  const tipo = plan.tipo_carga, n = plan.dias.length - 1;
+  $("pauta").innerHTML = `<span class="tipo">${t("Tu pauta")}</span><h2>${nombreEvento()}</h2>
+    <div class="tarjeta"><h3>${esc(fechaLarga(plan.fecha))} · ${plan.hora}</h3>
+      <p class="pista" style="margin:0">${esc(t(DIST[plan.distancia].n))}${plan.distancia === "otra" ? ` · ${fmt(plan.km, 1)} km` : ""} · ${hm(plan.tiempo_min)} h · ${fmt(plan.peso_kg, 1)} kg</p>
+      ${tipo ? `<div class="grande" style="margin-top:10px">${fmt(plan.dias[0].objetivo_g)} <small>${t("{g} g/día", { g: "" }).trim()}</small></div>
+        <p class="pista" style="margin-bottom:0">${n > 1 ? t("{n} días de carga a {r} g/kg", { n, r: fmt(plan.regimen, 1) }) : t("1 día de carga a {r} g/kg", { r: fmt(plan.regimen, 1) })} ·
+        ${t("rango {a}–{b} · objetivo {o}", { a: fmt(plan.dias[0].rango_g[0]), b: fmt(plan.dias[0].rango_g[1]), o: fmt(plan.dias[0].objetivo_g) })}</p>
+        <p class="pista" style="margin-bottom:0">${t("La carga parte el {d}.", { d: `${fechaLarga(plan.inicio_carga.slice(0, 10))} · ${plan.inicio_carga.slice(11, 16)}` })}</p>`
+        : `<p class="pista">${t("Sin carga")}</p>`}</div>
+    <div class="botones"><button type="button" data-acc="ir-hoy">${t("Ver mi agenda")}</button></div>
+    <div class="botones"><button type="button" class="sec" data-acc="editar" data-paso="1">✎ ${t("Editar mi carrera")}</button>
+      <button type="button" class="sec" data-acc="editar" data-paso="2">✎ ${t("Alimentos ({n})", { n: plan.elegidos.length })}</button></div>
+    ${plan.notas.map((x) => `<p class="aviso">${esc(x)}</p>`).join("")}
+    <p class="aviso">${esc(plan.aviso)}</p><p class="pista">${esc(plan.fuente)}</p>`;
+}
+function pintarForm(error = "") {
+  const f = form, tipo = tipoCarga(f), regs = tipo ? REG[tipo] : [], kgs = pesoKg();
+  if (tipo && !regs.some(([r]) => r === f.regimen)) f.regimen = tipo === "larga" ? 10 : 8;
+  const ayuda = !tipo ? N("Para esta distancia no necesitas carga: armamos el desayuno del día y el plan en carrera.")
+    : tipo === "larga" ? N("Para esta carrera el consenso es 10–12 g/kg durante 36–48 h. Si es tu primera carga, 10 g/kg es buen punto de partida.")
+    : N("Para un 21K basta con 7–8 g/kg las 24 h previas. 10 g/kg si vas a más de 2 h y ya lo probaste.");
+  $("pauta").innerHTML = `<span class="tipo">${t("Paso 1 de 2 · Tu carrera")}</span><h2>${t("Arma tu pauta")}</h2>
+    <p class="pista">${t("Con esto calculamos la carga de carbohidratos, el desayuno del día y el plan en carrera.")}</p>
+    <form id="form1" class="form" novalidate>
+      <label>${t("Evento")}<input data-f="evento" value="${esc(f.evento)}" placeholder="${t("Maratón de Santiago")}" autocomplete="off" maxlength="80"></label>
+      <div class="fila">
+        <label>${t("Distancia")}<select data-f="distancia">${ORDEN_DIST.map((k) => [k, DIST[k]]).map(([k, v]) => `<option value="${k}" ${k === f.distancia ? "selected" : ""}>${esc(t(v.n))}</option>`).join("")}</select></label>
+        <label>${t("Tiempo esperado")}<input data-f="tiempo" value="${esc(f.tiempo)}" placeholder="3:30" inputmode="numeric" autocomplete="off"></label>
+      </div>
+      ${f.distancia === "otra" ? `<div class="fila"><label>${t("Km")}<input data-f="km" type="number" inputmode="decimal" min="1" max="1000" value="${esc(f.km)}"></label>
+        <label>${t("Deporte")}<select data-f="deporte">${Object.entries(DEPORTES).map(([k, v]) => `<option value="${k}" ${k === f.deporte ? "selected" : ""}>${t(v)}</option>`).join("")}</select></label></div>` : ""}
+      <div class="fila">
+        <label>${t("Fecha")}<input data-f="fecha" type="date" value="${esc(f.fecha)}"></label>
+        <label>${t("Hora de largada")}<input data-f="hora" type="time" value="${esc(f.hora)}"></label>
+      </div>
+      <label>${t("Peso")}<div class="fila" style="grid-template-columns:minmax(0,1.4fr) minmax(0,1fr)">
+        <input data-f="peso" type="number" inputmode="decimal" min="30" max="440" step="0.5" value="${esc(f.peso)}">
+        <div class="seg">${["kg", "lb"].map((u) => `<button type="button" class="${f.unidad === u ? "on" : ""}" data-acc="unidad" data-u="${u}">${u}</button>`).join("")}</div></div></label>
+      <h4>${t("Régimen de carga")}</h4>
+      ${tipo ? `<div class="opciones">${regs.map(([r, et]) => `<button type="button" class="op${f.regimen === r ? " on" : ""}" data-acc="regimen" data-r="${r}">
+          <small class="et">${t(et)}</small><b>${r}</b><small>${t("g por kg")}</small><div class="g">${kgs >= 30 ? t("{g} g/día", { g: fmt(Math.round(r * kgs / 10) * 10) }) : "—"}</div></button>`).join("")}</div>` : ""}
+      <p class="pista" style="margin:2px 0 0">${t(ayuda)}</p>
+      ${tipo ? `<h4>${t("Tus horarios")}</h4><div class="fila">
+        <label>${t("Me levanto")}<input data-f="levanta" type="time" value="${esc(f.levanta)}"></label>
+        <label>${t("Me acuesto")}<input data-f="acuesta" type="time" value="${esc(f.acuesta)}"></label></div>` : ""}
+      <h4>${t("Cómo te cae")}</h4>
+      ${tipo ? interruptor("primera_carga", "Es mi primera carga", "Partimos con más líquidos y porciones repartidas") : ""}
+      ${interruptor("estomago_sensible", "Tengo el estómago sensible", "Menos fibra, más colaciones y más tiempo antes de largar")}
+      ${interruptor("sudor_salado", "Sudo mucho o con sal", "Manchas blancas en la polera o la jockey")}
+      <h4>${t("En carrera (opcional)")}</h4>
+      <div class="fila"><label>${t("Carbohidratos de tu gel (g)")}<input data-f="gel_g" type="number" inputmode="numeric" min="5" max="100" value="${esc(f.gel_g)}"></label><span></span></div>
+      ${interruptor("intestino", "Ya probé más de 60 g por hora en mis fondos")}
+      <h4>${t("Restricciones y alergias")}</h4>
+      <div class="chips">${Object.entries(RESTR).map(([k, v]) => `<button type="button" class="chip${f.restricciones.includes(k) ? " on" : ""}" data-acc="restr" data-r="${k}">${t(v)}</button>`).join("")}</div>
+      <input data-f="otra" value="${esc(f.otra)}" placeholder="${t("Otra restricción o alergia")}" maxlength="120" autocomplete="off">
+      ${interruptor("medica", "Tengo diabetes, un trastorno alimentario o estoy embarazada", "En ese caso no armamos pauta: te recomendamos verlo con un profesional")}
+      ${error ? `<p class="aviso">${esc(error)}</p>` : ""}
+      <div class="botones">${plan ? `<button type="button" class="sec" data-acc="cancelar-edicion">${t("Cancelar")}</button>` : ""}
+        <button type="submit">${t("Siguiente: tus alimentos")}</button></div>
+    </form>`;
+}
+function validarForm() {
+  const f = form, min = minutos(f.tiempo), p = pesoKg();
+  if (!min || min < 10 || min > 1440) return t("Tiempo como 3:30 o 45:00");
+  if (!f.fecha) return t("Falta la fecha de la carrera.");
+  if (f.fecha < hoyISO()) return t("La fecha ya pasó.");
+  if (!(p >= 30 && p <= 200)) return t("Revisa tu peso.");
+  if (f.distancia === "otra" && !(Number(f.km) > 0)) return t("Indica los km de tu carrera.");
+  return "";
+}
+async function pintarAlimentos(error = "") {
+  const f = form, clave = [...f.restricciones].sort().join(",") + (f.estomago_sensible ? "|s" : "");
+  if (!lista || lista.clave !== clave || lista.lang !== idioma) {
+    $("pauta").innerHTML = `<p class="pista">${t("Calculando…")}</p>`;
+    try { lista = { clave, lang: idioma, ...(await cargarCatalogo(f.restricciones, f.estomago_sensible)) }; }
+    catch (e) { paso = 1; return pintarForm(e.message); }
+    if (!f.elegidos || f.elegidos_restr !== clave) { f.elegidos = [...lista.por_defecto]; f.elegidos_restr = clave; }
+  }
+  const permit = new Set(lista.permitidos), sel = new Set(f.elegidos), excl = f.restricciones.length || f.estomago_sensible;
+  const fila = (a) => {
+    const ok = permit.has(a.id), on = ok && sel.has(a.id);
+    const motivo = !ok ? (a.tags.includes("fibra_alta") && f.estomago_sensible ? t("mucha fibra") : t("no va con tus restricciones")) : "";
+    const na = a.sodio >= 150 ? `<span class="etq sal">${fmt(a.sodio * a.ini)} mg Na</span>` : "";
+    return `<div class="alim${ok ? "" : " no"}" ${ok ? `data-acc="elegir" data-a="${a.id}" role="checkbox" aria-checked="${on}" tabindex="0"` : ""}>
+      <div class="tick${on ? " on" : ""}">${on ? "✓" : ""}</div>
+      <div class="txt"><b>${esc(a.nombre)}</b><small>${cantidad(a, a.ini)}${a.peso ? ` · ${fmt(a.peso * a.ini)} ${a.ml ? "ml" : "g"}` : ""} ${motivo ? `<span class="etq gris">${motivo}</span>` : na}</small></div>
+      <span class="g">${a.cho >= 1 ? `${fmt(a.cho * a.ini)} g` : "—"}</span></div>`;
+  };
+  $("pauta").innerHTML = `<span class="tipo">${t("Paso 2 de 2 · Tus alimentos")}</span><h2>${t("Con esto armamos tu carga")}</h2>
+    <p class="pista">${t("Marcamos lo que mejor funciona: alto en carbohidratos, bajo en fibra y grasa. Saca lo que no te guste y suma lo que quieras.")}</p>
+    ${excl ? `<div class="aviso-ok">${t("Según tus restricciones, dejamos fuera lo que no corresponde y marcamos los reemplazos.")}</div>` : ""}
+    ${f.otra.trim() ? `<div class="aviso">${t("Anotaste «{x}»: revisa la lista y desmarca lo que no puedas comer.", { x: esc(f.otra.trim()) })}</div>` : ""}
+    ${GRUPOS.map(([nombre, roles]) => {
+      const as = lista.alimentos.filter((a) => roles.includes(a.rol) && !a.oculto);
+      const etq = roles.includes("liquido") ? `<span class="etq">${t("ayudan a llegar")}</span>` : roles.includes("salado") ? `<span class="etq sal">${t("sodio")}</span>` : "";
+      return `<h4>${t(nombre)} ${etq}</h4><div class="tarjeta" style="padding:2px 14px">${as.map(fila).join("")}</div>`;
+    }).join("")}
+    <p class="pista">${esc(lista.fuente)}</p>
+    ${error ? `<p class="aviso">${esc(error)}</p>` : ""}
+    <div class="botones"><button type="button" class="sec" data-acc="volver">← ${t("Volver")}</button>
+      <button type="button" data-acc="armar">${t("Armar mi agenda")}</button></div>`;
+}
+async function armar() {
+  const f = form, roles = new Set(f.elegidos.map((id) => lista.alimentos.find((a) => a.id === id)?.rol));
+  if (!roles.has("pan") && !roles.has("base") && !roles.has("acomp") && tipoCarga(f)) return pintarAlimentos(t("Elige al menos un pan o una base (arroz, fideos, papas)."));
+  const hayMarcas = plan?.dias.some((d) => d.comidas.some(marcada));
+  if (hayMarcas && !confirm(t("Vas a rehacer tu agenda: se borra lo que marcaste. ¿Seguimos?"))) return;
+  const dep = f.distancia === "otra" ? f.deporte : DIST[f.distancia].dep;
+  const cuerpo = { evento: f.evento.trim(), fecha: f.fecha, hora: f.hora, peso_kg: Math.round(pesoKg() * 10) / 10,
+    distancia: f.distancia, km: f.distancia === "otra" ? Number(f.km) : null, deporte: f.distancia === "otra" ? dep : null,
+    tiempo_min: minutos(f.tiempo), regimen: tipoCarga(f) ? f.regimen : null, levanta: f.levanta || "07:00", acuesta: f.acuesta || "23:00",
+    primera_carga: f.primera_carga, estomago_sensible: f.estomago_sensible, sudor_salado: f.sudor_salado,
+    restricciones: f.restricciones, otra_restriccion: f.otra.trim(), elegidos: f.elegidos,
+    gel_g: Number(f.gel_g) || 25, intestino_entrenado: f.intestino, condicion_medica: f.medica };
+  let r;
+  try { r = await api("/api/carga", cuerpo); } catch (e) { return pintarAlimentos(e.message); }
+  if (r.derivar) { paso = 1; return pintarForm(r.mensaje); }
+  plan = r; perfil = structuredClone(f); guardar("fp_perfil", perfil); guardarPlan();
+  editando = false; paso = 1; diaSel = null; abierta = {};
+  cambiarVista("hoy");
 }
 
+// ── Carrera ───────────────────────────────────────────────────────────────
 function pintarCarrera() {
-  if (!datos) return $("carrera").innerHTML = sinPauta();
-  const r = datos.carrera;
-  $("carrera").innerHTML = `<span class="tipo">${t("Durante la carrera")}</span><h2>${esc(carrera.nombre || `${carrera.dist}K`)}</h2>
-    <div class="tarjeta"><div class="grande">${rango(r.carbo_g_h)}<small> ${t("por hora")}</small></div>
-      <p class="pista">${r.liquido_ml_h ? `${rango(r.liquido_ml_h, "ml")} ${t("líquido")}` : ""}${r.sodio_mg_h ? ` · ${rango(r.sodio_mg_h, "mg")} ${t("sodio")}` : ""}</p></div>
-    <div class="tarjeta"><h3>${t("Geles")}</h3>
-      ${r.geles.length ? r.geles.map((g) => `<div class="gel"><span class="mono">${g.min} ${t("min")}</span><span>km ${Number(g.km).toLocaleString(LOCALE[idioma])}</span></div>`).join("")
-        + `<p class="pista">${t("Total en carrera: {g} g", { g: r.total_carbo_g })}</p>`
-        : `<p class="pista">${t("Sin geles: en esta distancia basta con lo que comiste antes.")}</p>`}
-      <ul>${r.notas.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>`;
+  if (!plan) return $("carrera").innerHTML = sinPauta();
+  if (!cat) return;
+  const d = plan.dias[plan.dias.length - 1], r = plan.carrera;
+  const rg = (x, u) => x ? `<b>${x[0] === x[1] ? fmt(x[0]) : `${fmt(x[0])}–${fmt(x[1])}`}</b> <span>${u}</span>` : "<b>—</b>";
+  const eventos = [...r.geles.map((g, i) => ({ ...g, txt: t("Gel {n}", { n: i + 1 }) + ` · ${fmt(r.gel_g)} g` })),
+    ...r.sal.map((s) => ({ ...s, txt: `${t("Sal")} <span class="etq sal">${fmt(s.mg)} mg</span>` }))].sort((a, b) => a.min - b.min);
+  $("carrera").innerHTML = `<span class="tipo">${esc(fechaLarga(d.fecha))} · ${plan.hora}</span><h2>${t("Día de carrera")}</h2>
+    <div class="tarjeta" style="padding:2px 14px">${d.comidas.map((cm) => `<div class="linea-t"><span class="mono">${cm.hora}</span>
+      <div class="txt"><b>${nombreComida(cm)}</b>${cm.items.map((it) => { const a = A(it.a); return a ? `<small>${cantidad(a, it.p)} · ${esc(a.nombre)} — ${gTexto(it, it.p)}</small>` : ""; }).join("")}</div></div>`).join("")}</div>
+    <ul class="notas">${d.notas.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>
+    <h4>${t("En carrera · {h}", { h: hm(plan.tiempo_min) })}</h4>
+    <div class="trio"><div><small>${t("Carbos")}</small>${rg(r.carbo_g_h, t("g/h"))}</div><div><small>${t("Líquido")}</small>${rg(r.liquido_ml_h, t("ml/h"))}</div>
+      <div class="sal"><small>${t("Sodio")}</small>${rg(r.sodio_mg_h, t("mg/h"))}</div></div>
+    <div class="tarjeta" style="padding:2px 14px">${eventos.length ? eventos.map((e) => `<div class="gel"><span class="mono">${hm(e.min)}</span><span>${e.txt}</span>
+      ${e.km != null ? `<span class="km">${t("km {k}", { k: fmt(e.km, 1) })}</span>` : ""}</div>`).join("")
+      : `<p class="pista">${t("Sin geles: en esta distancia basta con lo que comiste antes.")}</p>`}</div>
+    ${r.geles.length ? `<p class="pista">${t("Total en carrera: {g} g", { g: fmt(r.total_carbo_g) })}</p>` : ""}
+    ${r.notas.map((x) => `<p class="aviso">${esc(x)}</p>`).join("")}
+    <p class="aviso">${esc(plan.aviso)}</p>`;
 }
 
 function cambiarVista(v) {
   vista = v;
   for (const s of document.querySelectorAll("main > section")) s.hidden = s.id !== `v-${v}`;
   for (const a of document.querySelectorAll("nav a")) a.classList.toggle("on", a.dataset.vista === v);
-  ({ hoy: pintarHoy, pauta: pintarPauta, carrera: pintarCarrera })[v]?.();
+  ({ hoy: pintarHoy, pauta: pintarPauta, carrera: pintarCarrera, perfil: pintarPerfil })[v]?.();
   scrollTo(0, 0);
+}
+function pintarPerfil() {
+  $("fuente").textContent = plan?.fuente || cat?.fuente || "";
+  $("historial").innerHTML = historialHtml();
 }
 for (const a of document.querySelectorAll("nav a")) a.onclick = (e) => { e.preventDefault(); cambiarVista(a.dataset.vista); };
 
-// ── Formulario ────────────────────────────────────────────────────────────
-function llenarForm() {
-  if (!carrera) return;
-  $("f-nombre").value = carrera.nombre || ""; $("f-fecha").value = carrera.fecha; $("f-hora").value = carrera.hora;
-  $("f-dist").value = String(carrera.dist); $("f-peso").value = carrera.peso; $("f-gel").value = carrera.gel;
-  $("f-intestino").checked = carrera.intestino;
-  const m = Math.round(carrera.min);
-  $("f-tiempo").value = m >= 60 ? `${Math.floor(m / 60)}:${String(m % 60).padStart(2, "0")}` : `${m}:00`;
-}
-$("form").onsubmit = async (e) => {
-  e.preventDefault();
-  const min = minutos($("f-tiempo").value);
-  if (!min) { $("f-tiempo").setCustomValidity(t("Tiempo como 3:30 o 45:00")); $("f-tiempo").reportValidity(); return; }
-  const c = { nombre: $("f-nombre").value.trim(), fecha: $("f-fecha").value, hora: $("f-hora").value,
-              dist: Number($("f-dist").value), min, peso: Number($("f-peso").value), gel: Number($("f-gel").value) || 25,
-              intestino: $("f-intestino").checked };
-  try {
-    datos = await calcular(c); carrera = c;
-    guardar("fp_carrera", carrera); guardar("fp_pauta", datos);
-    pintarPauta();
-    $("pauta").scrollIntoView({ behavior: "smooth" });
-  } catch (err) { $("pauta").innerHTML = `<p class="aviso">${esc(err.message)}</p>`; }
+// ── Acciones (un solo manejador para todo lo que se toca) ───────────────────
+const ACC = {
+  "ir-pauta": () => cambiarVista("pauta"), "ir-hoy": () => cambiarVista("hoy"), "ir-carrera": () => cambiarVista("carrera"),
+  "ir-alimentos": () => { editando = true; form = formNuevo(); paso = 2; cambiarVista("pauta"); },
+  editar: (b) => { editando = true; form = formNuevo(); paso = Number(b.dataset.paso); cambiarVista("pauta"); },
+  "cancelar-edicion": () => { editando = false; form = null; paso = 1; pintarPauta(); },
+  dia: (b) => { diaSel = Number(b.dataset.d); pintarHoy(); },
+  abrir: (b) => { const di = +b.dataset.d, ci = +b.dataset.c; abierta[di] = abierta[di] === ci ? -1 : ci; pintarHoy(); },
+  marcar: (b) => marcarItem(+b.dataset.d, +b.dataset.c, +b.dataset.i),
+  todo: (b) => marcarComida(+b.dataset.d, +b.dataset.c, "todo"),
+  medias: (b) => marcarComida(+b.dataset.d, +b.dataset.c, "medias"),
+  nada: (b) => marcarComida(+b.dataset.d, +b.dataset.c, "nada"),
+  menos: (b) => pasoItem(+b.dataset.d, +b.dataset.c, +b.dataset.i, -1),
+  mas: (b) => pasoItem(+b.dataset.d, +b.dataset.c, +b.dataset.i, 1),
+  agua: (b) => { const f = plan.dias[diaSel].fecha; agua[f] = Math.max(0, (agua[f] || 0) + Number(b.dataset.n)); guardar("fp_agua", agua); pintarHoy(); },
+  ajustar: (b) => abrirAjuste(+b.dataset.d),
+  cerrar: () => cerrarHoja(),
+  dejar: () => cerrarHoja(),
+  recalcular: () => { const { di, r } = propuesta; aplicarCambios(plan.dias[di], r.cambios); cerrarHoja(); refrescar(); },
+  "a-mano": (b) => abrirAjuste(+b.dataset.d),
+  opciones: (b) => abrirOpciones(+b.dataset.d, +b.dataset.c, +b.dataset.i),
+  cambiar: (b) => { const { di, ci, ii } = opciones; Object.assign(plan.dias[di].comidas[ci].items[ii], { a: b.dataset.a, p: Number(b.dataset.n) });
+    delete plan.dias[di].comidas[ci].items[ii].v; cerrarHoja(); refrescar(); },
+  mover: (b) => { const { di, ci, ii } = opciones, d = plan.dias[di], [it] = d.comidas[ci].items.splice(ii, 1), dest = d.comidas[+b.dataset.j];
+    delete it.v; const igual = dest.items.find((x) => x.a === it.a); if (igual) igual.p += it.p; else dest.items.push(it); cerrarHoja(); refrescar(); },
+  sacar: (b) => { const { di, ci, ii } = opciones, d = plan.dias[di], [it] = d.comidas[ci].items.splice(ii, 1), g = gIt(it);
+    cerrarHoja(); refrescar(); if (b.dataset.repartir === "1" && g >= 5) proponer(di, ci, t("Sacaste {g} g", { g: fmt(g) })); },
+  "sim-paso": (b) => { const cm = sim.d.comidas[+b.dataset.c], it = cm.items[+b.dataset.i], a = A(it.a);
+    it.p = Math.max(0, +(it.p + Number(b.dataset.s) * a.paso).toFixed(2)); pintarAjuste(); },
+  "sim-cancelar": () => cerrarAjuste(),
+  "sim-aplicar": () => { aplicarCambios(sim.d, []); plan.dias[sim.di] = sim.d; cerrarAjuste(); refrescar(); },
+  "sim-auto": async () => {
+    const ult = sim.d.comidas.reduce((u, cm, i) => marcada(cm) ? i : u, -1);
+    try { const r = await api("/api/reparto", { dia: payload(sim.d), desde: ult }); aplicarCambios(sim.d, r.cambios); pintarAjuste(); }
+    catch { aviso(t("Sin conexión: quedó marcado. Puedes ajustar lo que queda más tarde.")); }
+  },
+  // formulario
+  unidad: (b) => { const p = Number(String(form.peso).replace(",", ".")); if (p && b.dataset.u !== form.unidad) form.peso = Math.round((b.dataset.u === "lb" ? p * LB : p / LB) * 2) / 2;
+    form.unidad = b.dataset.u; pintarForm(); },
+  regimen: (b) => { form.regimen = Number(b.dataset.r); pintarForm(); },
+  restr: (b) => { const r = b.dataset.r, s = new Set(form.restricciones); s.has(r) ? s.delete(r) : s.add(r); form.restricciones = [...s]; pintarForm(); },
+  elegir: (b) => { const s = new Set(form.elegidos); s.has(b.dataset.a) ? s.delete(b.dataset.a) : s.add(b.dataset.a); form.elegidos = [...s]; pintarAlimentos(); },
+  volver: () => { paso = 1; pintarForm(); },
+  armar: () => armar(),
+  // cierre e historial
+  fb: (b) => { fb[b.dataset.k] = fb[b.dataset.k] === b.dataset.v ? undefined : b.dataset.v; pintarHoy(); },
+  archivar: () => archivar(),
+  "ir-perfil": () => cambiarVista("perfil"),
+  "ver-pasado": (b) => abrirPasado(Number(b.dataset.id)),
+  "borrar-pasado": (b) => { if (!confirm(t("¿Borrar este plan anterior?"))) return;
+    historial = historial.filter((h) => h.id !== Number(b.dataset.id)); guardar("fp_historial", historial); cerrarHoja(); cambiarVista(vista); },
+  reusar: (b) => { const h = historial.find((x) => x.id === Number(b.dataset.id)); if (!h) return;
+    form = { ...formNuevo(), ...structuredClone(h.perfil || {}), fecha: "" }; editando = !!plan; paso = 1; lista = null;
+    cerrarHoja(); vista = "pauta"; for (const s2 of document.querySelectorAll("main > section")) s2.hidden = s2.id !== "v-pauta";
+    for (const a of document.querySelectorAll("nav a")) a.classList.toggle("on", a.dataset.vista === "pauta"); pintarForm(); scrollTo(0, 0); },
 };
-$("f-tiempo").oninput = () => $("f-tiempo").setCustomValidity("");
+document.addEventListener("click", (e) => {
+  const b = e.target.closest("[data-acc]");
+  if (!b || b.disabled) return;
+  ACC[b.dataset.acc]?.(b, e);
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") { if (!$("capa").hidden) cerrarHoja(); else if (!$("ajuste").hidden) cerrarAjuste(); }
+  if ((e.key === "Enter" || e.key === " ") && e.target.matches?.("[role=checkbox][data-acc]")) { e.preventDefault(); e.target.click(); }
+});
+// Campos del formulario: se guardan en `form` al escribir; los que cambian la pantalla la repintan.
+$("pauta").addEventListener("input", (e) => {
+  const k = e.target.dataset?.f; if (!k) return;
+  form[k] = e.target.type === "checkbox" ? e.target.checked : e.target.value;
+  if (k === "peso" || k === "tiempo") {                    // actualiza los g/día del régimen sin perder el foco
+    const tipo = tipoCarga(form);
+    if (k === "tiempo" && form.distancia === "otra") return;
+    document.querySelectorAll(".op").forEach((op, i) => { const r = REG[tipo]?.[i]?.[0], kgs = pesoKg();
+      const g = op.querySelector(".g"); if (g && r) g.textContent = kgs >= 30 ? t("{g} g/día", { g: fmt(Math.round(r * kgs / 10) * 10) }) : "—"; });
+  }
+});
+$("hoy").addEventListener("input", (e) => { const k = e.target.dataset?.fb; if (k) fb[k] = e.target.value; });
+$("pauta").addEventListener("change", (e) => {
+  const k = e.target.dataset?.f; if (!k) return;
+  if (k === "distancia" || k === "medica" || (k === "tiempo" && form.distancia === "otra")) pintarForm();
+});
+$("pauta").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const err = validarForm();
+  if (err) return pintarForm(err);
+  if (form.medica) return pintarForm(t("En ese caso no armamos pauta: te recomendamos verlo con un profesional"));
+  paso = 2; pintarAlimentos(); scrollTo(0, 0);
+});
 $("borrar").onclick = () => {
-  carrera = datos = null; comido = {};
-  for (const k of ["fp_carrera", "fp_pauta", "fp_comido"]) try { localStorage.removeItem(k); } catch {}
-  $("form").reset(); cambiarVista("hoy");
+  plan = perfil = form = null; agua = {}; diaSel = null; abierta = {}; editando = false; paso = 1;
+  for (const k of ["fp_perfil", "fp_plan", "fp_agua", "fp_carrera", "fp_pauta", "fp_comido"]) borrarClave(k);
+  cambiarVista("hoy");
 };
 
 // ── Idioma y modo noche ───────────────────────────────────────────────────
@@ -346,11 +1317,26 @@ function aplicarIdioma() {
   $("botonIdioma").textContent = sig.toUpperCase();
   $("botonNoche").setAttribute("aria-label", t(noche ? "Modo día" : "Modo noche"));
 }
+async function traducirPlan() {      // los textos del plan vienen del servidor; lo marcado se queda como está
+  if (!plan || !perfil) return;
+  try {
+    const f = perfil, otro = await api("/api/carga", { evento: plan.evento, fecha: plan.fecha, hora: plan.hora, peso_kg: plan.peso_kg,
+      distancia: plan.distancia, km: plan.distancia === "otra" ? plan.km : null, deporte: plan.distancia === "otra" ? plan.deporte : null,
+      tiempo_min: plan.tiempo_min, regimen: plan.regimen, levanta: f.levanta || "07:00", acuesta: f.acuesta || "23:00",
+      primera_carga: f.primera_carga, estomago_sensible: f.estomago_sensible, sudor_salado: f.sudor_salado,
+      restricciones: f.restricciones, elegidos: plan.elegidos, gel_g: Number(f.gel_g) || 25, intestino_entrenado: f.intestino });
+    for (const k of ["notas", "aviso", "fuente"]) plan[k] = otro[k];
+    plan.carrera.notas = otro.carrera.notas;
+    plan.dias.forEach((d, i) => { if (otro.dias[i]) d.notas = otro.dias[i].notas; });
+    guardarPlan();
+  } catch {}
+}
 $("botonIdioma").onclick = async () => {
   idioma = IDIOMAS[(IDIOMAS.indexOf(idioma) + 1) % IDIOMAS.length];
   guardar("fp_idioma", idioma);
-  aplicarIdioma();
-  if (carrera) try { datos = await calcular(carrera); guardar("fp_pauta", datos); } catch {}   // los textos vienen del servidor
+  aplicarIdioma(); lista = null;
+  try { await cargarCatalogo(perfil?.restricciones || [], perfil?.estomago_sensible); } catch {}
+  await traducirPlan();
   cambiarVista(vista);
 };
 function aplicarNoche() {
@@ -360,7 +1346,11 @@ function aplicarNoche() {
 }
 $("botonNoche").onclick = () => { noche = !noche; guardar("fp_noche", noche); aplicarNoche(); aplicarIdioma(); };
 
-aplicarNoche(); aplicarIdioma(); llenarForm(); cambiarVista("hoy");
+// La versión anterior guardaba otra pauta (fp_pauta): ya no sirve.
+if (pref("fp_pauta", null) && !plan) for (const k of ["fp_carrera", "fp_pauta", "fp_comido"]) borrarClave(k);
+if (plan && !Array.isArray(plan.dias?.[0]?.comidas)) { plan = null; borrarClave("fp_plan"); }
+aplicarNoche(); aplicarIdioma(); cambiarVista("hoy");
+fetch("/api/salud").catch(() => {});            // despierta el servidor (Render gratis duerme a los 15 min)
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").catch(() => {});
 </script>
 </body>
