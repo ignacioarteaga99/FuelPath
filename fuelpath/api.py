@@ -266,7 +266,7 @@ def api_alimentos(restricciones: str = "", sensible: bool = False):
     r = tuple(x for x in restricciones.split(",") if x in alimentos.RESTRICCIONES)
     return {"alimentos": alimentos.catalogo(), "por_defecto": alimentos.por_defecto(r, sensible),
             "permitidos": [a["id"] for a in alimentos.ALIMENTOS if alimentos.permitido(a, r, sensible)],
-            "fuente": alimentos.fuente()}
+            "fuente": alimentos.fuente(), "version": alimentos.version()}
 
 
 class PedidoCarga(BaseModel):

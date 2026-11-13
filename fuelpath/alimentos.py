@@ -202,6 +202,24 @@ ALIMENTOS = [
        0, 0, 0, 0.3, 5, "agregado", ml=200, ini=1, mx=3),
     _a("te", ("Té", "Tea", "Chá"), TAZA, 200,
        0, 0, 0, 0, 5, "agregado", ml=200, ini=1, mx=3),
+    _a("tomate", ("Tomate", "Tomato", "Tomate"), UNIDAD, 120,
+       4.5, 1.4, 0.2, 1, 6, "agregado", ini=1, mx=3),
+    _a("aceite", ("Aceite de oliva", "Olive oil", "Azeite de oliva"), CDTA, 5,
+       0, 0, 4.5, 0, 0, "agregado", ini=1, mx=4, tags={"grasa_alta"}),
+    _a("mayonesa", ("Mayonesa", "Mayonnaise", "Maionese"), CDTA, 5,
+       0, 0, 3.7, 0, 30, "agregado", ini=1, mx=4, tags={"grasa_alta", "huevo"}),
+    _a("leche", ("Leche semidescremada", "Semi-skimmed milk", "Leite semidesnatado"), VASO, 200,
+       10, 0, 3, 6.5, 100, "lacteo", ml=200, ini=1, mx=2, tags={"lactosa", "lacteo"}),
+    _a("mote_huesillo", ("Mote con huesillo", "Mote con huesillo (peach and wheat drink)", "Mote com pêssego seco"), VASO, 300,
+       58, 2.5, 0.3, 2.5, 15, "liquido", ml=250, ini=1, mx=1, tags={"gluten"}),
+    _a("queque", ("Queque", "Pound cake", "Bolo simples"), TROZO, 50,
+       28, 0.5, 8, 3, 120, "snack", ini=1, mx=2, tags={"gluten", "huevo", "lactosa", "lacteo"}),
+    _a("alfajor", ("Alfajor", "Alfajor", "Alfajor"), UNIDAD, 50,
+       32, 1, 8, 2.5, 60, "dulce", ini=1, mx=1, tags={"gluten", "lactosa", "lacteo", "grasa_alta"}),
+    _a("chocolate", ("Chocolate de leche", "Milk chocolate", "Chocolate ao leite"), PORCION, 30,
+       17, 1, 9, 2, 25, "dulce", ini=1, mx=1, tags={"lactosa", "lacteo", "grasa_alta"}),
+    _a("sopaipilla", ("Sopaipilla", "Sopaipilla (fried pastry)", "Sopaipilla (massa frita)"), UNIDAD, 50,
+       25, 1, 10, 3, 200, "agregado", ini=1, mx=2, tags={"gluten", "grasa_alta"}),
     # Sólo para el día de carrera
     _a("gel", ("Gel energético", "Energy gel", "Gel de carboidrato"), GEL, 40,
        25, 0, 0, 0, 50, "gel", ini=1, mx=1, base=True, oculto=True),
@@ -279,6 +297,12 @@ def catalogo() -> list[dict]:
              "cho": a["cho"], "fibra": a["fibra"], "grasa": a["grasa"], "prot": a["prot"], "sodio": a["sodio"],
              "ml": a["ml"], "paso": a["paso"], "ini": a["ini"], "max": a["max"], "rol": a["rol"],
              "tags": sorted(a["tags"]), "base": a["base"], "oculto": a["oculto"]} for a in ALIMENTOS]
+
+
+def version() -> str:
+    """Huella de la base: cambia cada vez que se agrega o corrige un alimento (la app la compara)."""
+    import hashlib
+    return hashlib.sha1(repr([(a["id"], a["cho"], a["paso"], a["max"], sorted(a["tags"])) for a in ALIMENTOS]).encode()).hexdigest()[:10]
 
 
 def fuente() -> str:

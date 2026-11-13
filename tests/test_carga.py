@@ -268,3 +268,11 @@ def test_agregados_y_propios_cuentan_pero_no_se_escalan():
     assert cli.post("/api/reparto", json={"dia": dia, "desde": 0}).status_code == 200
     del des["items"][-1]["cho"]
     assert cli.post("/api/reparto", json={"dia": dia, "desde": 0}).status_code == 422
+
+
+def test_base_tiene_lo_comun_y_su_version():
+    cli = TestClient(app)
+    j = cli.get("/api/alimentos").json()
+    ids = {a["id"] for a in j["alimentos"]}
+    assert {"palta", "queso", "mantequilla", "leche", "mote_huesillo", "queque"} <= ids
+    assert len(j["version"]) == 10 and j["version"] == al.version()

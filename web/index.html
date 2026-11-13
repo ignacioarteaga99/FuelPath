@@ -1557,6 +1557,12 @@ $("botonNoche").onclick = () => { noche = !noche; guardar("fp_noche", noche); ap
 // La versión anterior guardaba otra pauta (fp_pauta): ya no sirve.
 if (pref("fp_pauta", null) && !plan) for (const k of ["fp_carrera", "fp_pauta", "fp_comido"]) borrarClave(k);
 if (plan && !Array.isArray(plan.dias?.[0]?.comidas)) { plan = null; borrarClave("fp_plan"); }
+// La base de alimentos guardada puede ser de una versión anterior (sin la palta, por ejemplo):
+// al abrir se pide de nuevo y, si cambió, se repinta lo que esté en pantalla.
+if (perfil || plan) cargarCatalogo(perfil?.restricciones || [], perfil?.estomago_sensible).then((c) => {
+  lista = null;
+  if (vista === "hoy") pintarHoy(); else if (vista === "carrera") pintarCarrera();
+}).catch(() => {});
 aplicarNoche(); aplicarIdioma(); cambiarVista("hoy");
 fetch("/api/cuenta").then((r) => r.json()).then((c) => {
   miCuenta = c.usuario;
