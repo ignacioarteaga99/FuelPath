@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FuelPath mockups</title>
+<style>
+  :root {
+    --acento: #f2541b; --acento-osc: #c9410f; --tinta: #1d1d21; --suave: #6b6b75;
+    --linea: #e6e6ea; --fondo: #ffffff; --gris: #f5f5f7; --ok: #1f9d55; --panel: #ffffff;
+    --acento-claro: #fdeae2; --ok-claro: #e3f4ea; --azul: #2a6fdb; --azul-claro: #e6effc;
+  }
+  @font-face { font-family: "PP Display"; src: url("../../web/vendor/fuentes/InterDisplay-SemiBold.woff2"); font-weight: 600; }
+  @font-face { font-family: "PP Display"; src: url("../../web/vendor/fuentes/InterDisplay-Bold.woff2"); font-weight: 700; }
+  @font-face { font-family: "PP Mono"; src: url("../../web/vendor/fuentes/JetBrainsMono-Bold.woff2"); font-weight: 700; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--fondo); color: var(--tinta);
+    font: 15px/1.4 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif; }
+  .pantalla { display: none; min-height: 844px; position: relative; }
+  .pantalla.on { display: block; }
+  header { position: sticky; top: 0; z-index: 5; background: var(--panel); padding: 54px 16px 10px; border-bottom: 1px solid var(--linea); }
+  .marca { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 19px; letter-spacing: -.3px; }
+  .marca svg { width: 26px; height: 26px; }
+  .marca .der { margin-left: auto; display: flex; gap: 6px; }
+  .marca .der span { padding: 6px 10px; font-size: 13px; font-weight: 700; border-radius: 12px; background: var(--gris); border: 1px solid var(--linea); }
+  main { padding: 14px 16px 110px; }
+  .tipo { color: var(--acento); font-weight: 800; font-size: 12px; letter-spacing: .6px; text-transform: uppercase; }
+  h2 { margin: 2px 0 6px; font-size: 22px; letter-spacing: -.3px; }
+  h4 { margin: 18px 0 8px; font-size: 13px; color: var(--suave); text-transform: uppercase; letter-spacing: .5px; }
+  .pista { color: var(--suave); margin: 4px 0 12px; font-size: 14px; }
+  .aviso { background: #fff6e5; border-radius: 10px; padding: 9px 11px; color: #8a5a00; font-size: 13px; margin: 12px 0; }
+  .aviso-ok { background: var(--ok-claro); border-radius: 10px; padding: 9px 11px; color: #136b3a; font-size: 13px; margin: 12px 0; }
+  .tarjeta { background: var(--gris); border-radius: 16px; padding: 14px; margin: 10px 0; }
+  .grande { font-family: "PP Display", sans-serif; font-weight: 700; font-size: 44px; letter-spacing: -1.5px; line-height: 1; }
+  .grande small { font-size: 18px; letter-spacing: 0; color: var(--suave); font-weight: 600; }
+  .mono { font-family: "PP Mono", ui-monospace, monospace; font-weight: 700; }
+  .barra { height: 10px; border-radius: 5px; background: var(--linea); overflow: hidden; margin: 10px 0 4px; }
+  .barra i { display: block; height: 100%; background: var(--acento); border-radius: 5px; }
+  .barra.fina { height: 6px; margin: 6px 0 2px; }
+  .barra.azul i { background: var(--azul); }
+  .barra.verde i { background: var(--ok); }
+  form { display: grid; gap: 10px; }
+  .fila { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 10px; }
+  label { display: grid; gap: 4px; font-size: 12px; font-weight: 700; color: var(--suave); }
+  .input { font-size: 16px; padding: 11px 12px; border-radius: 12px; border: 1px solid var(--linea); background: var(--gris);
+    color: var(--tinta); font-weight: 400; display: flex; justify-content: space-between; align-items: center; min-height: 46px; }
+  .input .flecha { color: var(--suave); font-size: 12px; }
+  .seg { display: flex; background: var(--gris); border: 1px solid var(--linea); border-radius: 12px; padding: 3px; gap: 3px; }
+  .seg span { flex: 1; text-align: center; padding: 8px 4px; border-radius: 9px; font-size: 15px; font-weight: 600; color: var(--suave); }
+  .seg span.on { background: var(--panel); color: var(--tinta); box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+  .opciones { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; }
+  .op { border: 1.5px solid var(--linea); border-radius: 14px; padding: 10px 8px; text-align: center; background: var(--panel); }
+  .op b { display: block; font-family: "PP Display"; font-size: 24px; letter-spacing: -.5px; color: var(--tinta); }
+  .op small { display: block; font-size: 11px; color: var(--suave); font-weight: 600; }
+  .op .g { font-size: 13px; color: var(--tinta); font-weight: 700; margin-top: 4px; }
+  .op.on { border-color: var(--acento); background: var(--acento-claro); }
+  .op.on small.et { color: var(--acento); }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { padding: 8px 12px; border-radius: 20px; background: var(--gris); border: 1px solid var(--linea); font-size: 14px; font-weight: 600; }
+  .chip.on { background: var(--tinta); color: #fff; border-color: var(--tinta); }
+  .interruptor { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 15px; font-weight: 600;
+    color: var(--tinta); padding: 10px 0; border-bottom: 1px solid var(--linea); }
+  .interruptor small { display: block; font-weight: 400; color: var(--suave); font-size: 13px; }
+  .sw { width: 46px; height: 28px; border-radius: 14px; background: var(--linea); position: relative; flex: none; }
+  .sw::after { content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.2); }
+  .sw.on { background: var(--ok); } .sw.on::after { left: 21px; }
+  .boton { display: block; text-align: center; font-size: 16px; border-radius: 12px; padding: 13px 16px; font-weight: 700; background: var(--acento); color: #fff; }
+  .boton.sec { background: var(--gris); color: var(--tinta); border: 1px solid var(--linea); }
+  .botones { display: flex; gap: 8px; margin-top: 12px; } .botones .boton { flex: 1; }
+  nav { position: absolute; left: 0; right: 0; bottom: 0; background: var(--panel); border-top: 1px solid var(--linea); display: flex; padding: 6px 0 28px; }
+  nav a { flex: 1; text-align: center; color: var(--suave); font-size: 11px; font-weight: 600; }
+  nav a svg { width: 24px; height: 24px; display: block; margin: 0 auto 2px; }
+  nav a.on { color: var(--acento); }
+  .fijo nav { position: fixed; }
+
+  /* Alimentos */
+  .alim { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--linea); }
+  .alim:last-child { border-bottom: 0; }
+  .alim .txt { flex: 1; min-width: 0; }
+  .alim .txt b { display: block; font-size: 15px; }
+  .alim .txt small { color: var(--suave); font-size: 13px; }
+  .alim .g { font-family: "PP Mono"; font-size: 14px; color: var(--tinta); }
+  .tick { width: 26px; height: 26px; border-radius: 8px; border: 2px solid var(--linea); flex: none; display: grid; place-items: center; font-size: 15px; font-weight: 800; color: #fff; background: var(--panel); }
+  .tick.on { background: var(--acento); border-color: var(--acento); }
+  .tick.off { background: var(--gris); }
+  .icn { width: 34px; height: 34px; border-radius: 10px; background: var(--panel); border: 1px solid var(--linea); display: grid; place-items: center; color: var(--suave); font-size: 15px; flex: none; }
+  .etq { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 6px; background: var(--azul-claro); color: var(--azul); margin-left: 4px; vertical-align: 1px; }
+  .etq.gris { background: var(--linea); color: var(--suave); }
+  .etq.sal { background: #f1e9ff; color: #6b3fc4; }
+  .tachado b { text-decoration: line-through; color: var(--suave); }
+
+  /* Agenda A: línea de tiempo */
+  .dias { display: flex; gap: 8px; margin: 10px 0 4px; }
+  .dia { flex: 1; text-align: center; border-radius: 12px; padding: 7px 4px; background: var(--gris); font-size: 12px; font-weight: 700; color: var(--suave); }
+  .dia b { display: block; font-size: 15px; color: var(--tinta); }
+  .dia.on { background: var(--tinta); color: #c9c9d0; } .dia.on b { color: #fff; }
+  .dia.listo b::after { content: " ✓"; color: var(--ok); }
+  .resumen { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; margin-top: 10px; }
+  .resumen div { background: var(--panel); border-radius: 12px; padding: 8px 10px; }
+  .resumen small { display: block; font-size: 11px; font-weight: 700; color: var(--suave); text-transform: uppercase; letter-spacing: .4px; }
+  .resumen b { font-family: "PP Display"; font-size: 18px; letter-spacing: -.3px; }
+  .resumen span { font-size: 12px; color: var(--suave); }
+  .linea { position: relative; padding-left: 58px; }
+  .linea::before { content: ""; position: absolute; left: 22px; top: 8px; bottom: 8px; width: 2px; background: var(--linea); }
+  .hito { position: relative; margin-bottom: 14px; }
+  .hito .hora { position: absolute; left: -58px; top: 0; width: 46px; text-align: center; font-family: "PP Mono"; font-size: 12px; color: var(--suave); background: var(--fondo); padding: 2px 0; }
+  .hito.hecho .hora { color: var(--ok); }
+  .hito.ahora .hora { color: #fff; background: var(--acento); border-radius: 6px; }
+  .hito .cab { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+  .hito .cab b { font-size: 16px; }
+  .hito .cab .meta { margin-left: auto; font-family: "PP Mono"; font-size: 13px; color: var(--suave); }
+  .hito .caja { background: var(--gris); border-radius: 14px; padding: 2px 12px; }
+  .hito.ahora .caja { background: var(--panel); border: 1.5px solid var(--acento); }
+  .hito.hecho .caja { opacity: .65; }
+  .item { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--linea); }
+  .item:last-child { border-bottom: 0; }
+  .ck { width: 24px; height: 24px; border-radius: 50%; border: 2px solid #c8c8d0; flex: none; display: grid; place-items: center; font-size: 13px; font-weight: 800; color: #fff; }
+  .ck.si { background: var(--ok); border-color: var(--ok); }
+  .ck.medio { border-color: var(--ok); background: linear-gradient(90deg, var(--ok) 50%, transparent 50%); }
+  .ck.no { background: var(--linea); border-color: var(--linea); color: var(--suave); }
+  .item .txt { flex: 1; min-width: 0; font-size: 14px; }
+  .item .txt b { font-size: 15px; }
+  .item .txt small { display: block; color: var(--suave); font-size: 12px; }
+  .item .g { font-family: "PP Mono"; font-size: 13px; }
+  .item .mas { color: var(--suave); font-size: 18px; padding-left: 2px; letter-spacing: -1px; }
+
+  /* Agenda B: tarjetas */
+  .comida { background: var(--gris); border-radius: 16px; padding: 12px 14px; margin: 10px 0; display: flex; align-items: center; gap: 12px; }
+  .comida .anillo { width: 44px; height: 44px; flex: none; }
+  .comida .txt { flex: 1; min-width: 0; }
+  .comida .txt b { font-size: 16px; }
+  .comida .txt small { display: block; color: var(--suave); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .comida .der { text-align: right; font-family: "PP Mono"; font-size: 13px; color: var(--suave); }
+  .comida .der b { display: block; color: var(--tinta); font-size: 15px; }
+  .comida.abierta { display: block; background: var(--panel); border: 1.5px solid var(--acento); }
+  .comida.abierta .fila-cab { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+
+  /* Hoja de recálculo */
+  .velo { position: absolute; inset: 0; background: rgba(20,20,24,.45); z-index: 20; }
+  .hoja { position: absolute; left: 0; right: 0; bottom: 0; z-index: 21; background: var(--panel); border-radius: 22px 22px 0 0; padding: 10px 16px 34px; }
+  .asa { width: 40px; height: 5px; border-radius: 3px; background: var(--linea); margin: 0 auto 12px; }
+  .reparto { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--linea); font-size: 14px; }
+  .reparto:last-child { border-bottom: 0; }
+  .reparto .txt { flex: 1; } .reparto .txt small { display: block; color: var(--suave); font-size: 12px; }
+  .reparto .mono { color: var(--ok); }
+  .reparto .tope { font-size: 11px; font-weight: 700; color: var(--suave); background: var(--linea); border-radius: 6px; padding: 2px 6px; }
+  .reemp { display: flex; gap: 8px; overflow: hidden; margin: 6px 0; }
+  .reemp div { flex: none; width: 128px; background: var(--gris); border-radius: 14px; padding: 10px; font-size: 13px; }
+  .reemp div b { display: block; font-size: 14px; }
+  .reemp div .mono { color: var(--acento); font-size: 13px; }
+  .reemp div.on { border: 1.5px solid var(--acento); background: var(--acento-claro); }
+
+  /* Carrera */
+  .gel { display: flex; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--linea); font-size: 14px; }
+  .gel:last-child { border-bottom: 0; }
+  .gel .mono { min-width: 58px; color: var(--acento); }
+  .gel .km { margin-left: auto; font-family: "PP Mono"; color: var(--suave); font-size: 13px; }
+  .trio { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; }
+  .trio > div { background: var(--gris); border-radius: 14px; padding: 10px; }
+  .trio small { display: block; font-size: 11px; font-weight: 700; color: var(--suave); text-transform: uppercase; }
+  .trio b { font-family: "PP Display"; font-size: 22px; letter-spacing: -.5px; }
+  .trio span { font-size: 12px; color: var(--suave); }
+  .trio > div.sal { background: #f4eefe; } .trio > div.sal small { color: #6b3fc4; }
+</style>
+</head>
+<body>
+
+<!-- Reutilizables -->
+<template id="cab">
+  <header><div class="marca">
+    <svg viewBox="0 0 26 26"><rect width="26" height="26" rx="7" fill="#f2541b"/><path d="M13 5.5c3 3.6 5 6.4 5 9a5 5 0 0 1-10 0c0-2.6 2-5.4 5-9z" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/><path d="M11 15.5a2.2 2.2 0 0 0 2 2" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>
+    FuelPath<span class="der"><span>EN</span><span>☾</span></span></div></header>
+</template>
+<template id="nav">
+  <nav>
+    <a data-v="hoy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>Hoy</a>
+    <a data-v="pauta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 9h6M9 13h6M9 17h3"/></svg>Pauta</a>
+    <a data-v="carrera"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg>Carrera</a>
+    <a data-v="perfil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>Perfil</a>
+  </nav>
+</template>
+
+<!-- 1. Formulario -->
+<div class="pantalla" id="p1" data-nav="pauta">
+  <main>
+    <span class="tipo">Paso 1 de 2 · Tu carrera</span>
+    <h2>Arma tu pauta</h2>
+    <p class="pista">Con esto calculamos la carga de carbohidratos de las 36–48 h previas, el desayuno del día y el plan en carrera.</p>
+    <form>
+      <label>Evento<div class="input">Maratón de Santiago</div></label>
+      <label>Deporte<div class="seg"><span class="on">Correr</span><span>Bici</span><span>Triatlón</span></div></label>
+      <div class="fila">
+        <label>Distancia<div class="input">42K <span class="flecha">▼</span></div></label>
+        <label>Tiempo esperado<div class="input"><span class="mono">3:05</span> <span class="flecha">h:mm</span></div></label>
+      </div>
+      <div class="fila">
+        <label>Fecha<div class="input">dom 25 abr</div></label>
+        <label>Hora de largada<div class="input"><span class="mono">07:00</span></div></label>
+      </div>
+      <label>Peso<div class="fila" style="grid-template-columns:minmax(0,1.4fr) minmax(0,1fr)"><div class="input">68</div><div class="seg"><span class="on">kg</span><span>lb</span></div></div></label>
+
+      <h4>Régimen de carga</h4>
+      <div class="opciones">
+        <div class="op"><small class="et">Conservador</small><b>8</b><small>g por kg</small><div class="g">540 g/día</div></div>
+        <div class="op on"><small class="et">Recomendado</small><b>10</b><small>g por kg</small><div class="g">680 g/día</div></div>
+        <div class="op"><small class="et">Alto</small><b>12</b><small>g por kg</small><div class="g">820 g/día</div></div>
+      </div>
+      <p class="pista" style="margin:2px 0 0">Para un 42K el consenso es 10–12 g/kg durante 36–48 h. Si es tu primera carga, 10 g/kg es buen punto de partida.</p>
+
+      <h4>Tus horarios</h4>
+      <div class="fila">
+        <label>Me levanto<div class="input"><span class="mono">07:00</span></div></label>
+        <label>Me acuesto<div class="input"><span class="mono">23:00</span></div></label>
+      </div>
+
+      <h4>Cómo te cae</h4>
+      <div class="interruptor"><div>Es mi primera carga<small>Partimos con más líquidos y porciones repartidas</small></div><div class="sw on"></div></div>
+      <div class="interruptor"><div>Tengo el estómago sensible<small>Menos fibra, menos lácteos, más colaciones</small></div><div class="sw"></div></div>
+      <div class="interruptor"><div>Sudo mucho o con sal<small>Manchas blancas en la polera o la jockey</small></div><div class="sw on"></div></div>
+
+      <h4>Restricciones y alergias</h4>
+      <div class="chips">
+        <span class="chip">Sin gluten</span><span class="chip on">Sin lactosa</span><span class="chip">Vegetariano</span>
+        <span class="chip">Vegano</span><span class="chip">Maní</span><span class="chip">Frutos secos</span>
+        <span class="chip">Huevo</span><span class="chip">Soya</span><span class="chip">+ Otra</span>
+      </div>
+      <div class="interruptor" style="border:0"><div>Tengo diabetes, un trastorno alimentario o estoy embarazada<small>En ese caso no armamos pauta: te recomendamos verlo con un profesional</small></div><div class="sw"></div></div>
+
+      <div class="boton" style="margin-top:6px">Siguiente: tus alimentos</div>
+    </form>
+  </main>
+</div>
+
+<!-- 2. Alimentos de la pauta -->
+<div class="pantalla" id="p2" data-nav="pauta">
+  <main>
+    <span class="tipo">Paso 2 de 2 · Tus alimentos</span>
+    <h2>Con esto armamos tu carga</h2>
+    <p class="pista">Marcamos lo que mejor funciona: alto en carbohidratos, bajo en fibra y grasa. Saca lo que no te guste y cambia lo que quieras.</p>
+    <div class="aviso-ok">Como marcaste <b>sin lactosa</b>, cambiamos la leche chocolatada por la versión sin lactosa y sacamos el yogur.</div>
+
+    <h4>Pan, arroz y pastas</h4>
+    <div class="tarjeta" style="padding:2px 14px">
+      <div class="alim"><div class="tick on">✓</div><div class="txt"><b>Marraqueta</b><small>1 unidad · 100 g</small></div><span class="g">58 g</span><div class="icn">⇄</div></div>
+      <div class="alim"><div class="tick on">✓</div><div class="txt"><b>Fideos cocidos</b><small>1 taza · 140 g</small></div><span class="g">43 g</span><div class="icn">⇄</div></div>
+      <div class="alim"><div class="tick on">✓</div><div class="txt"><b>Arroz blanco cocido</b><small>1 taza · 160 g</small></div><span class="g">45 g</span><div class="icn">⇄</div></div>
+      <div class="alim"><div class="tick on">✓</div><div class="txt"><b>Papa cocida</b><small>1 mediana · 150 g</small></div><span class="g">26 g</span><div class="icn">⇄</div></div>
+      <div class="alim tachado"><div class="tick off"></div><div class="txt"><b>Pan integral</b><small>mucha fibra para estos días <span class="etq gris">fibra</span></small></div><span class="g">—</span><div class="icn">⇄</div></div>
+    </div>
+
+    <h4>Frutas y dulces</h4>
+    <div class="tarjeta" style="padding:2px 14px">
+      <div class="alim"><div class="tick on">✓</div><div class="txt"><b>Plátano</b><small>1 mediano</small></div><span class="g">27 g</span><div class="icn">⇄</div></div>
+      <div class="alim"><div class="tick on">✓</div><div class="txt"><b>Mermelada</b><small>1 cucharada · 20 g</small></div><span class="g">13 g</span><div class="icn">⇄</div></div>
+      <div class="alim"><div class="tick on">✓</div><div class="txt"><b>Miel</b><small>1 cucharada · 21 g</small></div><span class="g">17 g</span><div class="icn">⇄</div></div>
+      <div class="alim"><div class="tick on">✓</div><div class="txt"><b>Gomitas</b><small>1 bolsita · 30 g</small></div><span class="g">24 g</span><div class="icn">⇄</div></div>
+    </div>
+
+    <h4>Líquidos <span class="etq">ayudan a llegar</span></h4>
+    <div class="tarjeta" style="padding:2px 14px">
+      <div class="alim"><div class="tick on">✓</div><div class="txt"><b>Jugo de naranja</b><small>1 vaso · 250 ml</small></div><span class="g">26 g</span><div class="icn">⇄</div></div>
+      <div class="alim"><div class="tick on">✓</div><div class="txt"><b>Bebida isotónica</b><small>1 botella · 500 ml <span class="etq sal">230 mg Na</span></small></div><span class="g">30 g</span><div class="icn">⇄</div></div>
+      <div class="alim"><div class="tick on">✓</div><div class="txt"><b>Leche chocolatada sin lactosa</b><small>1 caja · 200 ml</small></div><span class="g">22 g</span><div class="icn">⇄</div></div>
+    </div>
+
+    <h4>Salados <span class="etq sal">sodio</span></h4>
+    <div class="tarjeta" style="padding:2px 14px">
+      <div class="alim"><div class="tick on">✓</div><div class="txt"><b>Galletas de agua</b><small>6 unidades · 30 g <span class="etq sal">190 mg Na</span></small></div><span class="g">21 g</span><div class="icn">⇄</div></div>
+      <div class="alim"><div class="tick on">✓</div><div class="txt"><b>Caldo o consomé</b><small>1 taza <span class="etq sal">800 mg Na</span></small></div><span class="g">2 g</span><div class="icn">⇄</div></div>
+    </div>
+
+    <div class="botones"><div class="boton sec">+ Alimento propio</div><div class="boton">Ver mi agenda</div></div>
+  </main>
+</div>
+
+<!-- 3. Agenda A: línea de tiempo -->
+<div class="pantalla" id="p3" data-nav="hoy">
+  <main>
+    <span class="tipo">Maratón de Santiago · faltan 17 h</span>
+    <h2>Sábado: día de carga 2 de 2</h2>
+    <div class="dias">
+      <div class="dia listo">Vie<b>23</b></div><div class="dia on">Sáb<b>24</b></div><div class="dia">Dom<b>25</b></div>
+    </div>
+    <div class="tarjeta">
+      <div class="grande">359 <small>de 680 g</small></div>
+      <div class="barra"><i style="width:53%"></i></div>
+      <div class="pista" style="margin:0">Vas al día. Te quedan 4 comidas.</div>
+      <div class="resumen">
+        <div><small>Carbos</small><b>53%</b></div>
+        <div><small>Líquido</small><b>1,4</b> <span>de 3 L</span></div>
+        <div><small>Sodio</small><b>1,6</b> <span>de 3,5 g</span></div>
+      </div>
+    </div>
+
+    <div class="linea" style="margin-top:16px">
+      <div class="hito hecho"><span class="hora">07:30</span>
+        <div class="cab"><b>Desayuno</b><span class="meta">137/140 g</span></div>
+        <div class="caja">
+          <div class="item"><span class="ck si">✓</span><div class="txt"><b>1 marraqueta</b> con 2 cdas de mermelada</div><span class="g">84 g</span></div>
+          <div class="item"><span class="ck si">✓</span><div class="txt"><b>1 plátano</b> · <b>1 vaso</b> de jugo</div><span class="g">53 g</span></div>
+        </div></div>
+      <div class="hito hecho"><span class="hora">10:30</span>
+        <div class="cab"><b>Colación</b><span class="meta">68/70 g</span></div>
+        <div class="caja">
+          <div class="item"><span class="ck si">✓</span><div class="txt"><b>1 isotónica</b> 500 ml · <b>6 galletas</b> de agua</div><span class="g">51 g</span></div>
+          <div class="item"><span class="ck si">✓</span><div class="txt"><b>1 barra</b> de cereal</div><span class="g">17 g</span></div>
+        </div></div>
+      <div class="hito ahora"><span class="hora">13:30</span>
+        <div class="cab"><b>Almuerzo</b><span class="meta">154/172 g</span></div>
+        <div class="caja">
+          <div class="item"><span class="ck si">✓</span><div class="txt"><b>3 tazas de fideos</b> con salsa de tomate<small>Un plato hondo bien servido · sal normal</small></div><span class="g">128 g</span></div>
+          <div class="item"><span class="ck si">✓</span><div class="txt"><b>1 vaso</b> de jugo</div><span class="g">26 g</span></div>
+          <div class="item"><span class="ck"></span><div class="txt"><b>1 jalea</b> de postre</div><span class="g">18 g</span><span class="mas">⋯</span></div>
+        </div></div>
+      <div class="hito"><span class="hora">17:00</span>
+        <div class="cab"><b>Once</b><span class="meta">115 g</span></div>
+        <div class="caja">
+          <div class="item"><span class="ck"></span><div class="txt"><b>2 rebanadas</b> de pan de molde con miel</div><span class="g">42 g</span><span class="mas">⋯</span></div>
+          <div class="item"><span class="ck"></span><div class="txt"><b>1 leche chocolatada</b> · <b>1 plátano</b></div><span class="g">49 g</span><span class="mas">⋯</span></div>
+          <div class="item"><span class="ck"></span><div class="txt"><b>1 bolsita</b> de gomitas</div><span class="g">24 g</span><span class="mas">⋯</span></div>
+        </div></div>
+      <div class="hito"><span class="hora">19:30</span>
+        <div class="cab"><b>Cena</b><span class="meta">134 g</span></div>
+        <div class="caja">
+          <div class="item"><span class="ck"></span><div class="txt"><b>2 tazas de arroz</b> con pollo<small>Temprano y algo que ya conozcas</small></div><span class="g">90 g</span><span class="mas">⋯</span></div>
+          <div class="item"><span class="ck"></span><div class="txt"><b>1 papa</b> cocida · <b>1 jalea</b></div><span class="g">44 g</span><span class="mas">⋯</span></div>
+        </div></div>
+    </div>
+  </main>
+</div>
+
+<!-- 4. Agenda B: tarjetas por comida -->
+<div class="pantalla" id="p4" data-nav="hoy">
+  <main>
+    <span class="tipo">Maratón de Santiago · faltan 17 h</span>
+    <h2>Sábado: día de carga 2 de 2</h2>
+    <div class="dias">
+      <div class="dia listo">Vie<b>23</b></div><div class="dia on">Sáb<b>24</b></div><div class="dia">Dom<b>25</b></div>
+    </div>
+    <div class="trio" style="margin-top:12px">
+      <div><small>Carbos</small><b>359</b> <span>de 680 g</span><div class="barra fina"><i style="width:53%"></i></div></div>
+      <div><small>Líquido</small><b>1,4</b> <span>de 3 L</span><div class="barra fina azul"><i style="width:47%"></i></div></div>
+      <div class="sal"><small>Sodio</small><b>1,6</b> <span>de 3,5 g</span><div class="barra fina" style="background:#e3d7fb"><i style="width:46%;background:#6b3fc4"></i></div></div>
+    </div>
+
+    <div class="comida"><svg class="anillo" viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" fill="none" stroke="#1f9d55" stroke-width="5"/><path d="M15 22l5 5 9-10" fill="none" stroke="#1f9d55" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div class="txt"><b>Desayuno</b><small>07:30 · marraqueta, plátano, jugo</small></div><div class="der"><b>137 g</b>de 140</div></div>
+    <div class="comida"><svg class="anillo" viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" fill="none" stroke="#1f9d55" stroke-width="5"/><path d="M15 22l5 5 9-10" fill="none" stroke="#1f9d55" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div class="txt"><b>Colación</b><small>10:30 · isotónica, galletas, barra</small></div><div class="der"><b>68 g</b>de 70</div></div>
+
+    <div class="comida abierta">
+      <div class="fila-cab"><svg class="anillo" viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" fill="none" stroke="#e6e6ea" stroke-width="5"/><circle cx="22" cy="22" r="18" fill="none" stroke="#f2541b" stroke-width="5" stroke-dasharray="101 113" transform="rotate(-90 22 22)" stroke-linecap="round"/></svg>
+        <div class="txt" style="flex:1"><b style="font-size:17px">Almuerzo</b><small style="color:var(--acento);font-weight:700">AHORA · 13:30</small></div><div class="der"><b>154 g</b>de 172</div></div>
+      <div class="item"><span class="ck si">✓</span><div class="txt"><b>3 tazas de fideos</b> con salsa de tomate<small>Un plato hondo bien servido · sal normal</small></div><span class="g">128 g</span></div>
+      <div class="item"><span class="ck si">✓</span><div class="txt"><b>1 vaso</b> de jugo de naranja</div><span class="g">26 g</span></div>
+      <div class="item"><span class="ck"></span><div class="txt"><b>1 jalea</b> de postre</div><span class="g">18 g</span><span class="mas">⋯</span></div>
+      <div class="botones" style="margin-top:8px"><div class="boton sec" style="padding:10px">✓ Todo</div><div class="boton sec" style="padding:10px">A medias</div><div class="boton sec" style="padding:10px">✕ No</div></div>
+    </div>
+
+    <div class="comida"><svg class="anillo" viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" fill="none" stroke="#e6e6ea" stroke-width="5"/></svg>
+      <div class="txt"><b>Once</b><small>17:00 · pan con miel, leche chocolatada…</small></div><div class="der"><b>115 g</b>4 ítems</div></div>
+    <div class="comida"><svg class="anillo" viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" fill="none" stroke="#e6e6ea" stroke-width="5"/></svg>
+      <div class="txt"><b>Cena</b><small>19:30 · arroz con pollo, papa, jalea</small></div><div class="der"><b>134 g</b>3 ítems</div></div>
+    <div class="comida"><svg class="anillo" viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" fill="none" stroke="#e6e6ea" stroke-width="5"/></svg>
+      <div class="txt"><b>Antes de dormir</b><small>21:30 · galletas de agua, jugo</small></div><div class="der"><b>47 g</b>2 ítems</div></div>
+    <div class="aviso">Es normal subir 1–2 kg con la carga: el glucógeno se guarda con agua. No es grasa.</div>
+  </main>
+</div>
+
+<!-- 5. Eliminar y recalcular -->
+<div class="pantalla" id="p5" data-nav="hoy">
+  <main>
+    <span class="tipo">Maratón de Santiago · faltan 17 h</span>
+    <h2>Sábado: día de carga 2 de 2</h2>
+    <div class="tarjeta"><div class="grande">359 <small>de 680 g</small></div><div class="barra"><i style="width:53%"></i></div></div>
+    <div class="tarjeta" style="height:400px"></div>
+  </main>
+  <div class="velo"></div>
+  <div class="hoja">
+    <div class="asa"></div>
+    <span class="tipo">Once · 17:00</span>
+    <h2 style="font-size:20px">Sacar «2 rebanadas de pan con miel»</h2>
+    <p class="pista" style="margin-bottom:6px">Son 42 g. Lo mejor es cambiarlo por algo parecido:</p>
+    <div class="reemp">
+      <div class="on"><b>1 marraqueta</b>con mermelada<br><span class="mono">45 g</span></div>
+      <div><b>2 plátanos</b>chicos<br><span class="mono">40 g</span></div>
+      <div><b>1 ½ isotónica</b>750 ml<br><span class="mono">45 g</span></div>
+    </div>
+    <h4 style="margin-top:14px">O repartirlo en lo que queda del día</h4>
+    <div class="reparto"><div class="txt">Cena · 19:30<small>+1 taza de arroz</small></div><span class="mono">+25 g</span><span class="tope">tope</span></div>
+    <div class="reparto"><div class="txt">Antes de dormir · 21:30<small>+1 vaso de jugo, en vez de ½</small></div><span class="mono">+13 g</span></div>
+    <div class="reparto"><div class="txt" style="color:var(--suave)">Sin cubrir</div><span class="mono" style="color:var(--suave)">4 g</span></div>
+    <div class="aviso" style="margin-bottom:0">No cargamos más la cena para que duermas bien. Si te faltan unos gramos, está bien: no lo fuerces.</div>
+    <div class="botones"><div class="boton sec">Repartir</div><div class="boton">Cambiar</div></div>
+  </div>
+</div>
+
+<!-- 6. Día de carrera -->
+<div class="pantalla" id="p6" data-nav="carrera">
+  <main>
+    <span class="tipo">Domingo 25 · largada 07:00</span>
+    <h2>Día de carrera</h2>
+
+    <div class="linea" style="margin-top:12px">
+      <div class="hito ahora"><span class="hora">04:00</span>
+        <div class="cab"><b>Desayuno</b><span class="meta">3 h antes · 175 g</span></div>
+        <div class="caja">
+          <div class="item"><span class="ck"></span><div class="txt"><b>1 marraqueta</b> con 2 cdas de miel</div><span class="g">92 g</span></div>
+          <div class="item"><span class="ck"></span><div class="txt"><b>1 plátano</b> · <b>1 vaso</b> de jugo</div><span class="g">53 g</span></div>
+          <div class="item"><span class="ck"></span><div class="txt"><b>1 isotónica</b> 500 ml, a sorbos hasta las 06:00<small>Líquido y sodio para partir hidratado</small></div><span class="g">30 g</span></div>
+        </div></div>
+      <div class="hito"><span class="hora">06:15</span>
+        <div class="cab"><b>Sodio extra</b><span class="meta">sudas con sal</span></div>
+        <div class="caja">
+          <div class="item"><span class="ck"></span><div class="txt"><b>1 cápsula de sal</b> o 1 sobre de sales con 300 ml de agua</div><span class="g">500 mg</span></div>
+        </div></div>
+      <div class="hito"><span class="hora">06:40</span>
+        <div class="cab"><b>Refuerzo</b><span class="meta">20 min antes</span></div>
+        <div class="caja">
+          <div class="item"><span class="ck"></span><div class="txt"><b>1 gel</b> con unos sorbos de agua</div><span class="g">25 g</span></div>
+        </div></div>
+    </div>
+
+    <span class="tipo" style="display:block;margin-top:18px">En carrera · 3:05 h</span>
+    <div class="trio" style="margin-top:8px">
+      <div><small>Carbos</small><b>60–70</b> <span>g/h</span></div>
+      <div><small>Líquido</small><b>500–750</b> <span>ml/h</span></div>
+      <div class="sal"><small>Sodio</small><b>500–800</b> <span>mg/h</span></div>
+    </div>
+    <div class="tarjeta" style="padding:2px 14px">
+      <div class="gel"><span class="mono">0:30</span>Gel 1 + agua<span class="km">km 6,9</span></div>
+      <div class="gel"><span class="mono">0:55</span>Gel 2 + isotónica<span class="km">km 12,6</span></div>
+      <div class="gel"><span class="mono">1:00</span><span>Cápsula de sal <span class="etq sal">250 mg</span></span><span class="km">km 13,7</span></div>
+      <div class="gel"><span class="mono">1:20</span>Gel 3 + agua<span class="km">km 18,3</span></div>
+      <div class="gel"><span class="mono">1:45</span>Gel 4 + isotónica<span class="km">km 24,0</span></div>
+      <div class="gel"><span class="mono">2:00</span><span>Cápsula de sal <span class="etq sal">250 mg</span></span><span class="km">km 27,4</span></div>
+      <div class="gel"><span class="mono">2:10</span>Gel 5 + agua<span class="km">km 29,7</span></div>
+      <div class="gel"><span class="mono">2:35</span>Gel 6 + isotónica<span class="km">km 35,4</span></div>
+    </div>
+    <div class="aviso">El sodio depende de cuánto y cómo sudas. Haz el test de sudor en un entrenamiento de 1 h para afinarlo. Prueba este plan en tus fondos antes de la carrera.</div>
+  </main>
+</div>
+
+<script>
+  const p = new URLSearchParams(location.search).get("p") || "p1";
+  const el = document.getElementById(p);
+  el.classList.add("on");
+  el.prepend(document.getElementById("cab").content.cloneNode(true));
+  const nav = document.getElementById("nav").content.cloneNode(true);
+  nav.querySelector(`[data-v="${el.dataset.nav}"]`).classList.add("on");
+  if (p !== "p5") el.append(nav);
+  if (new URLSearchParams(location.search).get("fijo")) document.body.classList.add("fijo");
+</script>
+</body>
+</html>
