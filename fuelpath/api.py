@@ -211,6 +211,16 @@ async def _dominio_propio(request: Request, call_next):
 
 
 @app.middleware("http")
+async def _sin_barra_final(request: Request, call_next):
+    """«/admin/» → «/admin» (y así con todas las páginas): con la barra final no se reconocían."""
+    ruta = request.url.path
+    if len(ruta) > 1 and ruta.endswith("/") and request.method in ("GET", "HEAD") and not ruta.startswith("/api/"):
+        q = f"?{request.url.query}" if request.url.query else ""
+        return RedirectResponse(ruta.rstrip("/") + q, status_code=308)
+    return await call_next(request)
+
+
+@app.middleware("http")
 async def _head(request: Request, call_next):
     """HEAD responde como GET, sin cuerpo: los filtros de correo revisan los
     enlaces con HEAD y un 405 les parece sospechoso. No se registra."""

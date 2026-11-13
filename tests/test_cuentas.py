@@ -308,3 +308,11 @@ def test_dominio_propio_y_head(base, monkeypatch):
     assert r.status_code == 301 and r.headers["location"] == "https://fuelpath.example/privacidad?lang=en"
     assert c.get("/api/salud").status_code == 200                              # la API no se mueve
     assert TestClient(app).head("/privacidad").status_code == 200
+
+
+def test_paginas_con_barra_final(base):
+    cli = TestClient(app)
+    r = cli.get("/admin/", follow_redirects=False)
+    assert r.status_code == 308 and r.headers["location"] == "/admin"
+    assert "Panel de FuelPath" in cli.get("/admin/").text
+    assert cli.get("/privacidad/?lang=en", follow_redirects=False).headers["location"] == "/privacidad?lang=en"
