@@ -335,10 +335,12 @@ def api_carga(p: PedidoCarga):
 
 
 class ItemDia(BaseModel):
-    a: str
+    a: str = Field(max_length=40)
     p: float = Field(ge=0, le=50)
     c: float | None = Field(default=None, ge=0, le=50)
     mx: float | None = Field(default=None, ge=0, le=50)
+    cho: float | None = Field(default=None, ge=0, le=500)       # sólo alimentos propios (p_…)
+    sodio: float | None = Field(default=None, ge=0, le=10000)
 
 
 class ComidaDia(BaseModel):
@@ -364,7 +366,8 @@ class PedidoReparto(BaseModel):
 @app.post("/api/reparto")
 def api_reparto(p: PedidoReparto):
     dia = p.dia.model_dump()
-    if any(it["a"] not in alimentos.POR_ID for cm in dia["comidas"] for it in cm["items"]):
+    if any(it["a"] not in alimentos.POR_ID and not (it["a"].startswith(alimentos.PROPIO) and it["cho"] is not None)
+           for cm in dia["comidas"] for it in cm["items"]):
         raise HTTPException(422, idioma.tr("Hay un alimento que no conozco.", "There's a food I don't know.",
                                            "Há um alimento que não conheço."))
     return reparto.proponer(dia, p.desde)

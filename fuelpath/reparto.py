@@ -15,7 +15,7 @@ planeadas, "c": porciones comidas o None si aún no se marca}], y sus
 """
 from __future__ import annotations
 
-from .alimentos import FIJOS, POR_ID, ROLES
+from .alimentos import FIJOS, ROLES, de_item
 from .idioma import tr
 
 _EPS = 1e-6
@@ -23,11 +23,11 @@ _EPS = 1e-6
 
 def g_item(it: dict, comido: bool = False) -> float:
     n = it.get("c") if comido and it.get("c") is not None else it["p"]
-    return n * POR_ID[it["a"]]["cho"]
+    return n * de_item(it)["cho"]
 
 
 def gramos(items: list[dict]) -> float:
-    return sum(it["p"] * POR_ID[it["a"]]["cho"] for it in items)
+    return sum(it["p"] * de_item(it)["cho"] for it in items)
 
 
 def _minimo(a: dict, p_inicial: float) -> float:
@@ -60,7 +60,7 @@ def ajustar(items: list[dict], objetivo: float, techo: float | None = None, piso
         err = (techo - s) if forzar else objetivo - s
         mejor = None
         for i, it in enumerate(items):
-            a = POR_ID[it["a"]]
+            a = de_item(it)
             if a["rol"] in FIJOS or a["cho"] <= 0:
                 continue
             prio, paso, inc, mx = ROLES.get(a["rol"], 9), a["paso"], a["paso"] * a["cho"], maximo(a, escala, it)
@@ -134,7 +134,7 @@ def proponer(dia: dict, desde: int) -> dict:
                 en_tope.append(cm["id"])          # ya no le cabe ni un paso más
             for j, (antes, despues) in enumerate(zip(cm["items"], nuevos)):
                 if abs(antes["p"] - despues["p"]) > _EPS:
-                    dg = (despues["p"] - antes["p"]) * POR_ID[antes["a"]]["cho"]
+                    dg = (despues["p"] - antes["p"]) * de_item(antes)["cho"]
                     cambios.append({"comida": i, "item": j, "a": antes["a"], "de": antes["p"], "p": despues["p"],
                                     "g": round(dg)})
                     movido += dg
@@ -147,7 +147,7 @@ def proponer(dia: dict, desde: int) -> dict:
 
 
 def _paso_minimo(cm: dict) -> float:
-    pasos = [POR_ID[it["a"]]["paso"] * POR_ID[it["a"]]["cho"] for it in cm["items"] if POR_ID[it["a"]]["cho"] > 0]
+    pasos = [de_item(it)["paso"] * de_item(it)["cho"] for it in cm["items"] if de_item(it)["cho"] > 0]
     return min(pasos) if pasos else 0.0
 
 

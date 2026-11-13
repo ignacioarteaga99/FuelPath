@@ -31,7 +31,7 @@ def test_alimentos_bien_formados():
         assert a["cho"] >= 0 and a["paso"] > 0 and a["ini"] > 0 and a["max"] >= a["ini"]
         assert a["rol"] in al.ROLES or a["rol"] in al.FIJOS
         assert a["tags"] <= {"gluten", "lactosa", "lacteo", "carne", "pescado", "gelatina", "huevo", "miel",
-                             "mani", "frutos_secos", "soya", "fibra_alta"}
+                             "mani", "frutos_secos", "soya", "fibra_alta", "grasa_alta"}
     for normal, otro in al.REEMPLAZOS.items():
         assert normal in al.POR_ID and otro in al.POR_ID
 
@@ -249,3 +249,22 @@ def test_api_reparto():
     assert r.status_code == 200 and r.json()["cambios"]
     dia["comidas"][0]["items"][0]["a"] = "veneno"
     assert cli.post("/api/reparto", json={"dia": dia, "desde": 2}).status_code == 422
+
+
+def test_agregados_y_propios_cuentan_pero_no_se_escalan():
+    dia = copy.deepcopy(_plan()["dias"][1])
+    _comer(dia, 0)
+    des = dia["comidas"][0]
+    des["items"].append({"a": "palta", "p": 3, "c": 3})                      # palta en el pan
+    des["items"].append({"a": "p_kuchen", "p": 1, "c": 1, "cho": 40})        # alimento propio
+    antes = reparto.proyectado(copy.deepcopy(_plan()["dias"][1]))
+    assert abs(reparto.proyectado(dia) - antes - (3 * 1.3 + 40)) < 0.5
+    r = reparto.proponer(dia, 0)
+    assert r["dif_g"] < 0 and all(c["comida"] > 0 for c in r["cambios"])   # baja lo que viene
+    assert not any(c["a"] in ("palta", "p_kuchen") for c in r["cambios"])
+    assert "palta" not in al.por_defecto() and "palta" in {a["id"] for a in al.catalogo()}
+    # La API acepta el propio con su cho y rechaza uno inventado sin él.
+    cli = TestClient(app)
+    assert cli.post("/api/reparto", json={"dia": dia, "desde": 0}).status_code == 200
+    del des["items"][-1]["cho"]
+    assert cli.post("/api/reparto", json={"dia": dia, "desde": 0}).status_code == 422

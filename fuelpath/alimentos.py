@@ -34,7 +34,9 @@ from .idioma import actual, tr
 # no se escalan: acompañan.
 ROLES = {"base": 0, "pan": 0, "acomp": 1, "liquido": 2, "lacteo": 2, "fruta": 3, "untable": 4,
          "snack": 5, "salado": 5, "dulce": 5, "postre": 6}
-FIJOS = {"proteina", "caldo", "gel", "sales"}
+FIJOS = {"proteina", "caldo", "gel", "sales", "agregado"}
+# «agregado»: lo que el corredor suma por su cuenta (palta en el pan, queso…). La
+# pauta no lo propone ni lo escala; cuenta en los totales del día.
 
 # Qué etiquetas saca cada restricción.
 RESTRICCIONES = {
@@ -58,6 +60,8 @@ UNIDAD = _u("unidad", "unidades", "piece", "pieces", "unidade", "unidades")
 TAZA = _u("taza", "tazas", "cup", "cups", "xícara", "xícaras")
 VASO = _u("vaso", "vasos", "glass", "glasses", "copo", "copos")
 CDA = _u("cucharada", "cucharadas", "tbsp", "tbsp", "colher de sopa", "colheres de sopa")
+CDTA = _u("cucharadita", "cucharaditas", "tsp", "tsp", "colher de chá", "colheres de chá")
+LAMINA = _u("lámina", "láminas", "slice", "slices", "fatia", "fatias")
 POTE = _u("pote", "potes", "pot", "pots", "pote", "potes")
 BOLSITA = _u("bolsita", "bolsitas", "small bag", "small bags", "saquinho", "saquinhos")
 BOTELLA = _u("botella de 500 ml", "botellas de 500 ml", "500 ml bottle", "500 ml bottles",
@@ -179,6 +183,25 @@ ALIMENTOS = [
        CAJA, 200, 22, 1, 3, 6, 120, "lacteo", ml=200, ini=1, mx=2, tags={"lacteo"}),
     _a("gaseosa", ("Bebida gaseosa", "Soft drink", "Refrigerante"), VASO, 250,
        26, 0, 0, 0, 10, "liquido", ml=250, paso=0.5, ini=1, mx=2),
+    # Agregados: lo que el corredor suma por su cuenta (no los propone la pauta)
+    _a("palta", ("Palta", "Avocado", "Abacate"), CDA, 15,
+       1.3, 1, 2.2, 0.3, 1, "agregado", ini=2, mx=8, tags={"grasa_alta"}),
+    _a("mantequilla", ("Mantequilla", "Butter", "Manteiga"), CDTA, 5,
+       0, 0, 4, 0, 30, "agregado", ini=1, mx=6, tags={"grasa_alta", "lacteo"}),
+    _a("queso", ("Queso", "Cheese", "Queijo"), LAMINA, 20,
+       0.3, 0, 5, 5, 150, "agregado", ini=1, mx=4, tags={"grasa_alta", "lactosa", "lacteo"}),
+    _a("quesillo", ("Quesillo", "Fresh cheese", "Queijo fresco"), LAMINA, 30,
+       1, 0, 3, 4, 120, "agregado", ini=1, mx=4, tags={"lactosa", "lacteo"}),
+    _a("jamon", ("Jamón de pavo", "Turkey ham", "Peito de peru"), LAMINA, 15,
+       0.3, 0, 0.5, 3, 180, "agregado", ini=2, mx=6, tags={"carne"}),
+    _a("mani_crema", ("Mantequilla de maní", "Peanut butter", "Pasta de amendoim"), CDA, 16,
+       3, 1, 8, 4, 70, "agregado", ini=1, mx=3, tags={"grasa_alta", "mani"}),
+    _a("azucar", ("Azúcar", "Sugar", "Açúcar"), CDTA, 5,
+       5, 0, 0, 0, 0, "agregado", ini=1, mx=6),
+    _a("cafe", ("Café", "Coffee", "Café"), TAZA, 200,
+       0, 0, 0, 0.3, 5, "agregado", ml=200, ini=1, mx=3),
+    _a("te", ("Té", "Tea", "Chá"), TAZA, 200,
+       0, 0, 0, 0, 5, "agregado", ml=200, ini=1, mx=3),
     # Sólo para el día de carrera
     _a("gel", ("Gel energético", "Energy gel", "Gel de carboidrato"), GEL, 40,
        25, 0, 0, 0, 50, "gel", ini=1, mx=1, base=True, oculto=True),
@@ -186,6 +209,16 @@ ALIMENTOS = [
        SOBRE, 5, 0, 0, 0, 0, 500, "sales", ini=1, mx=1, base=True, oculto=True),
 ]
 POR_ID = {a["id"]: a for a in ALIMENTOS}
+PROPIO = "p_"            # prefijo de los alimentos que el corredor inventa (con sus g de carbohidratos)
+
+
+def de_item(it: dict) -> dict:
+    """El alimento de un ítem de la agenda: de la base, o uno propio (trae su `cho` y su `sodio`)."""
+    a = POR_ID.get(it["a"])
+    if a is not None:
+        return a
+    return {"id": it["a"], "cho": float(it.get("cho") or 0), "sodio": float(it.get("sodio") or 0), "paso": 1.0,
+            "ini": 1.0, "max": 99.0, "rol": "agregado", "tags": frozenset(), "ml": 0}
 _IDX = {"es": 0, "en": 1, "pt": 2}
 
 # Si la restricción saca el normal, se ofrece el reemplazo (y queda marcado).

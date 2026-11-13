@@ -228,6 +228,13 @@
   .reparto .txt { flex: 1; min-width: 0; } .reparto .txt small { display: block; color: var(--suave); font-size: 12px; }
   .reparto .mono { color: var(--ok); white-space: nowrap; } .reparto .mono.menos { color: var(--ambar); }
   .tope { font-size: 11px; font-weight: 700; color: var(--suave); background: var(--linea); border-radius: 6px; padding: 2px 6px; }
+  .agregar { display: block; width: 100%; margin-top: 8px; background: transparent; color: var(--acento); border: 1.5px dashed var(--linea); font-size: 15px; }
+  .agr-lista button { display: flex; width: 100%; align-items: center; gap: 10px; text-align: left; background: transparent; color: var(--tinta);
+    border-radius: 0; border-bottom: 1px solid var(--linea); padding: 12px 2px; font-weight: 600; white-space: normal; }
+  .agr-lista button small { margin-left: auto; color: var(--suave); font-weight: 400; font-size: 13px; white-space: nowrap; }
+  .agr-lista button.otro { color: var(--acento); border-bottom: 0; }
+  .agr-sel { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 12px 0; }
+  .agr-sel .grande { font-size: 32px; }
   .alts { display: flex; gap: 8px; overflow-x: auto; margin: 6px -16px; padding: 0 16px 4px; scrollbar-width: none; }
   .alts button { flex: none; width: 140px; text-align: left; white-space: normal; background: var(--gris); color: var(--tinta); border: 1px solid var(--linea);
     border-radius: 14px; padding: 10px; font-size: 13px; font-weight: 400; }
@@ -493,6 +500,24 @@ const EN = {
   "¿Borrar tu cuenta y todos tus datos? No se puede deshacer.": "Delete your account and all your data? This can't be undone.",
   "Privacidad": "Privacy",
   "Términos": "Terms",
+  // Agregar
+  "Agregar": "Add",
+  "Agregar a {c}": "Add to {c}",
+  "Lo más común": "Most common",
+  "Otro alimento": "Another food",
+  "Sin resultados: agrégalo como otro alimento.": "No results: add it as another food.",
+  "Ya lo comí": "I've already eaten it",
+  "Nombre": "Name",
+  "Porción": "Serving",
+  "unidad": "piece",
+  "porción": "serving",
+  "porciones": "servings",
+  "Carbohidratos por porción (g)": "Carbs per serving (g)",
+  "Mira la etiqueta: carbohidratos por porción.": "Check the label: carbs per serving.",
+  "Aporta grasa: en la carga, mejor poco y no cerca de dormir.": "It adds fat: while loading, keep it small and not close to bedtime.",
+  "Buscar alimento…": "Search food…",
+  "Escribe el nombre y los gramos de carbohidratos.": "Enter the name and the grams of carbs.",
+  "Agregaste {g} g": "You added {g} g",
 };
 const PT = {
   "Hoy": "Hoje", "Pauta": "Plano", "Carrera": "Prova", "Perfil": "Perfil", "Tus datos": "Seus dados",
@@ -628,6 +653,24 @@ const PT = {
   "¿Borrar tu cuenta y todos tus datos? No se puede deshacer.": "Apagar sua conta e todos os seus dados? Não dá para desfazer.",
   "Privacidad": "Privacidade",
   "Términos": "Termos",
+  // Agregar
+  "Agregar": "Adicionar",
+  "Agregar a {c}": "Adicionar ao {c}",
+  "Lo más común": "Mais comuns",
+  "Otro alimento": "Outro alimento",
+  "Sin resultados: agrégalo como otro alimento.": "Sem resultados: adicione como outro alimento.",
+  "Ya lo comí": "Já comi",
+  "Nombre": "Nome",
+  "Porción": "Porção",
+  "unidad": "unidade",
+  "porción": "porção",
+  "porciones": "porções",
+  "Carbohidratos por porción (g)": "Carboidratos por porção (g)",
+  "Mira la etiqueta: carbohidratos por porción.": "Veja o rótulo: carboidratos por porção.",
+  "Aporta grasa: en la carga, mejor poco y no cerca de dormir.": "Tem gordura: na carga, melhor pouco e longe da hora de dormir.",
+  "Buscar alimento…": "Buscar alimento…",
+  "Escribe el nombre y los gramos de carbohidratos.": "Escreva o nome e os gramas de carboidratos.",
+  "Agregaste {g} g": "Você adicionou {g} g",
 };
 function t(es, vars) {
   let s = idioma === "en" ? (EN[es] ?? es) : idioma === "pt" ? (PT[es] ?? EN[es] ?? es) : es;
@@ -670,7 +713,8 @@ let propuesta = null, opciones = null, sim = null;
 // fp_historial: planes terminados con lo cumplido y el feedback del corredor (los 20 últimos)
 let historial = pref("fp_historial", []), fb = {};
 const porId = () => cat?._porId || (cat && (cat._porId = Object.fromEntries(cat.alimentos.map((a) => [a.id, a]))));
-const A = (id) => porId()?.[id];
+// Un alimento: de la base o uno propio que el corredor agregó (plan.propios, con sus g de carbohidratos).
+const A = (id) => porId()?.[id] || plan?.propios?.[id];
 const guardarPlan = () => guardar("fp_plan", plan);
 
 async function cargarCatalogo(restr = [], sensible = false) {
@@ -706,7 +750,8 @@ function gTexto(it, n) {
 function payload(d) {
   return { objetivo_g: d.objetivo_g, rango_g: d.rango_g, escala: d.escala || 1,
     comidas: d.comidas.map((cm) => ({ id: cm.id, objetivo_g: cm.objetivo_g, tope_g: cm.tope_g, min_g: cm.min_g,
-      items: cm.items.map((it) => ({ a: it.a, p: it.p, c: it.c ?? null, mx: it.mx ?? null })) })) };
+      items: cm.items.map((it) => ({ a: it.a, p: it.p, c: it.c ?? null, mx: it.mx ?? null,
+        ...(it.a.startsWith("p_") ? { cho: A(it.a)?.cho ?? 0, sodio: A(it.a)?.sodio ?? 0 } : {}) })) })) };
 }
 function diaPorDefecto() {
   const hoy = hoyISO(), i = plan.dias.findIndex((d) => d.fecha === hoy);
@@ -889,6 +934,7 @@ function comidaHtml(di, ci, cm, d, ahora) {
   return `<div class="comida abierta"><div class="fila-cab" data-acc="abrir" data-d="${di}" data-c="${ci}">${anillo(cm)}
       <div class="txt"><b style="font-size:17px">${nombreComida(cm)}</b>${ci === ahora ? sub : `<small>${cm.hora}</small>`}</div><div class="der">${der}</div></div>
     ${cm.items.map((it, ii) => itemHtml(di, ci, ii, it, d)).join("")}
+    <button type="button" class="agregar" data-acc="agregar" data-d="${di}" data-c="${ci}">+ ${t("Agregar")}</button>
     ${pendientes ? `<div class="marcar"><button type="button" class="sec" data-acc="todo" data-d="${di}" data-c="${ci}">${t("✓ Todo")}</button>
       <button type="button" class="sec" data-acc="medias" data-d="${di}" data-c="${ci}">${t("A medias")}</button>
       <button type="button" class="sec" data-acc="nada" data-d="${di}" data-c="${ci}">${t("✕ No")}</button></div>` : ""}</div>`;
@@ -1007,6 +1053,69 @@ function abrirOpciones(di, ci, ii) {
       ${d.reparto ? `<button type="button" data-acc="sacar" data-repartir="1">${t("Sacar y repartir en lo que queda")}</button>` : ""}</div>`);
 }
 
+// Agregar algo que no venía en la pauta (palta en el pan) o un alimento propio con sus gramos.
+let agr = null;
+const sinTildes = (x) => String(x || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+function abrirAgregar(di, ci) {
+  agr = { di, ci, q: "", sel: null, n: 1, comido: plan.dias[di].comidas[ci].items.some((it) => it.c != null) || plan.dias[di].fecha <= hoyISO(),
+    otro: false, nombre: "", porcion: "", cho: "" };
+  abrirHoja(""); pintarAgregar();
+}
+function listaAgregar() {
+  const permit = new Set(cat.permitidos), q = sinTildes(agr.q.trim());
+  const base = cat.alimentos.filter((a) => !a.oculto && permit.has(a.id));
+  const propios = Object.values(plan.propios || {});
+  const lista = q ? [...propios, ...base].filter((a) => sinTildes(a.nombre).includes(q)).slice(0, 30)
+    : [...propios, ...base.filter((a) => a.rol === "agregado")];
+  return `${q ? "" : `<h4 style="margin-top:6px">${t("Lo más común")}</h4>`}
+    ${lista.map((a) => `<button type="button" data-acc="agr-elegir" data-a="${a.id}">${esc(a.nombre)}<small>${cantidad(a, a.ini || 1)} · ${fmt((a.ini || 1) * a.cho)} g</small></button>`).join("")
+      || `<p class="pista">${t("Sin resultados: agrégalo como otro alimento.")}</p>`}
+    <button type="button" class="otro" data-acc="agr-otro">+ ${t("Otro alimento")}</button>`;
+}
+function pintarAgregar() {
+  const d = plan.dias[agr.di], cm = d.comidas[agr.ci];
+  const cab = `<span class="tipo">${nombreComida(cm)} · ${cm.hora}</span><h2 style="font-size:20px">${t("Agregar a {c}", { c: nombreComida(cm).toLowerCase() })}</h2>`;
+  const comido = `<label class="interruptor"><div>${t("Ya lo comí")}</div><input type="checkbox" data-agr="comido" ${agr.comido ? "checked" : ""}><span class="sw"></span></label>`;
+  if (agr.sel || agr.otro) {
+    const a = agr.sel ? A(agr.sel) : { nombre: agr.nombre, cho: Number(String(agr.cho).replace(",", ".")) || 0, paso: 1,
+      unidad: [agr.porcion || t("porción"), agr.porcion || t("porciones")], tags: [] };
+    $("hoja").innerHTML = `<div class="asa"></div>${cab}
+      ${agr.otro ? `<div class="form">
+        <label>${t("Nombre")}<input data-agr="nombre" value="${esc(agr.nombre)}" maxlength="40" autocomplete="off"></label>
+        <div class="fila"><label>${t("Porción")}<input data-agr="porcion" value="${esc(agr.porcion)}" placeholder="${t("unidad")}" maxlength="20" autocomplete="off"></label>
+          <label>${t("Carbohidratos por porción (g)")}<input data-agr="cho" type="number" inputmode="decimal" min="0" max="300" value="${esc(agr.cho)}"></label></div>
+        <p class="pista" style="margin:0">${t("Mira la etiqueta: carbohidratos por porción.")}</p></div>`
+        : `<h3 style="margin:10px 0 0">${esc(a.nombre)}</h3>`}
+      <div class="agr-sel"><div class="paso"><button type="button" data-acc="agr-paso" data-s="-1" aria-label="${t("Menos")}" ${agr.n <= a.paso ? "disabled" : ""}>−</button>
+        <b>${cantidad(a, agr.n)}</b><button type="button" data-acc="agr-paso" data-s="1" aria-label="${t("Más")}">+</button></div>
+        <div class="grande" id="agr-g">${fmt(agr.n * a.cho)} <small>g</small></div></div>
+      ${a.tags?.includes("grasa_alta") ? `<p class="aviso" style="margin-top:0">${t("Aporta grasa: en la carga, mejor poco y no cerca de dormir.")}</p>` : ""}
+      ${comido}
+      <div class="botones fijos"><button type="button" class="sec" data-acc="agr-volver">← ${t("Volver")}</button>
+        <button type="button" data-acc="agr-ok">${t("Agregar")}</button></div>`;
+    return;
+  }
+  $("hoja").innerHTML = `<div class="asa"></div>${cab}
+    <input data-agr="q" value="${esc(agr.q)}" placeholder="${t("Buscar alimento…")}" autocomplete="off" style="margin-top:6px">
+    <div class="agr-lista" id="agr-lista">${listaAgregar()}</div>`;
+}
+function agregarOk() {
+  const d = plan.dias[agr.di], cm = d.comidas[agr.ci];
+  let id = agr.sel;
+  if (agr.otro) {
+    const cho = Number(String(agr.cho).replace(",", "."));
+    if (!agr.nombre.trim() || !(cho >= 0)) return aviso(t("Escribe el nombre y los gramos de carbohidratos."));
+    id = "p_" + Date.now().toString(36);
+    const porcion = agr.porcion.trim();
+    plan.propios = { ...(plan.propios || {}), [id]: { id, nombre: agr.nombre.trim(), cho: Math.min(300, cho), sodio: 0, paso: 1, ini: 1, max: 99,
+      rol: "agregado", tags: [], ml: 0, peso: 0, unidad: [porcion || t("porción"), porcion || t("porciones")] } };
+  }
+  const n = agr.n, g = n * (A(id)?.cho || 0), di = agr.di, ci = agr.ci;
+  cm.items.push(agr.comido ? { a: id, p: n, c: n } : { a: id, p: n });
+  agr = null; cerrarHoja(); refrescar();
+  if (g >= 5) proponer(di, ci, t("Agregaste {g} g", { g: fmt(g) }));
+}
+
 // Ajustar a mano lo que queda del día («cómo quedaría»).
 function abrirAjuste(di) {
   sim = { di, d: structuredClone(plan.dias[di]) };
@@ -1044,7 +1153,7 @@ function cerrarAjuste() { sim = null; $("ajuste").hidden = true; $("ajuste").inn
 
 // ── Hoja, avisos ───────────────────────────────────────────────────────────
 function abrirHoja(html) { $("hoja").innerHTML = `<div class="asa"></div>${html}`; $("capa").hidden = false; document.body.classList.add("bloq"); }
-function cerrarHoja() { $("capa").hidden = true; propuesta = opciones = null; if ($("ajuste").hidden) document.body.classList.remove("bloq"); }
+function cerrarHoja() { $("capa").hidden = true; propuesta = opciones = agr = null; if ($("ajuste").hidden) document.body.classList.remove("bloq"); }
 let _toast;
 function aviso(txt) { $("toast").textContent = txt; $("toast").hidden = false; clearTimeout(_toast); _toast = setTimeout(() => $("toast").hidden = true, 4000); }
 
@@ -1333,6 +1442,13 @@ const ACC = {
   elegir: (b) => { const s = new Set(form.elegidos); s.has(b.dataset.a) ? s.delete(b.dataset.a) : s.add(b.dataset.a); form.elegidos = [...s]; pintarAlimentos(); },
   volver: () => { paso = 1; pintarForm(); },
   armar: () => armar(),
+  agregar: (b) => abrirAgregar(+b.dataset.d, +b.dataset.c),
+  "agr-elegir": (b) => { agr.sel = b.dataset.a; agr.n = A(agr.sel).ini || 1; pintarAgregar(); },
+  "agr-otro": () => { agr.otro = true; agr.nombre = agr.q.trim(); agr.n = 1; pintarAgregar(); },
+  "agr-volver": () => { agr.sel = null; agr.otro = false; pintarAgregar(); },
+  "agr-paso": (b) => { const a = agr.sel ? A(agr.sel) : { paso: 1, max: 99 };
+    agr.n = Math.max(a.paso, Math.min(a.max * 2, +(agr.n + Number(b.dataset.s) * a.paso).toFixed(2))); pintarAgregar(); },
+  "agr-ok": () => agregarOk(),
   entrar: () => { location.href = "/entrar"; },
   salir: async () => { await subirCuenta(); await fetch("/api/auth/salir", { method: "POST" }).catch(() => {}); location.replace("/"); },
   exportar: () => { location.href = "/api/cuenta/exportar"; },
@@ -1365,6 +1481,13 @@ document.addEventListener("keydown", (e) => {
   if ((e.key === "Enter" || e.key === " ") && e.target.matches?.("[role=checkbox][data-acc]")) { e.preventDefault(); e.target.click(); }
 });
 // Campos del formulario: se guardan en `form` al escribir; los que cambian la pantalla la repintan.
+// Campos de «Agregar»: la búsqueda repinta sólo la lista (para no perder el foco).
+$("hoja").addEventListener("input", (e) => {
+  const k = e.target.dataset?.agr; if (!k || !agr) return;
+  agr[k] = e.target.type === "checkbox" ? e.target.checked : e.target.value;
+  if (k === "q") $("agr-lista").innerHTML = listaAgregar();
+  if (k === "cho" && $("agr-g")) $("agr-g").innerHTML = `${fmt(agr.n * (Number(String(agr.cho).replace(",", ".")) || 0))} <small>g</small>`;
+});
 $("pauta").addEventListener("input", (e) => {
   const k = e.target.dataset?.f; if (!k) return;
   form[k] = e.target.type === "checkbox" ? e.target.checked : e.target.value;
