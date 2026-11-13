@@ -2,8 +2,9 @@
 
 App para corredores: **seguimiento de la pauta nutricional previa a una
 carrera**. Cubre la carga de carbohidratos de los días antes, la comida previa
-y el plan de geles, líquido y sodio en carrera. Ver `README.md`, `PLAN.md` y
-`docs/ARQUITECTURA.md`.
+y el plan de geles, líquido y sodio en carrera. Ver `README.md`, `PLAN.md`,
+`docs/ARQUITECTURA.md` y **`docs/MEMORIA.md`** (cómo trabajar con el usuario y
+lo decidido; leerlo al empezar).
 
 ## De dónde viene
 - Es la app hermana de **PacePath** (`ignacioarteaga99/PacePath`, en
